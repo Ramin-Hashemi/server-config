@@ -22,7 +22,7 @@
 # Python package called fabric is a function that creates a connection to the server:
 
 
-#  Finally, run these four simple commands:
+# Finally, run these four simple commands:
 # The first one took a few minutes (remember that it compiles and install Python),
 # and when everything is done, the web app is running in the server!!
 
@@ -98,6 +98,7 @@ def _install_packages(conn):
     conn.sudo('pip install -y fastapi')
     conn.sudo('pip install -y unicorn')
     conn.sudo('pip install -y gunicorn')
+    conn.sudo('pip install -y python-dotenv')
     conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
     conn.sudo('pip install -y ollama')
     conn.sudo('npm i -y ollama')

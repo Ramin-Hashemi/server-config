@@ -13,10 +13,10 @@ environ['REMOTE_HOST'] = '89.32.250.198'
 environ['REMOTE_USER'] = 'root'
 environ['REMOTE_PASSWORD'] = 'ENqfwV24JVP@M3W'
 #
-## Python venv
+# Python venv
 # environ['VENV_NAME'] = 'prod-api'
 #
 ### Git
-environ['GIT_DIR'] = '~/ime-ai'
+environ['GIT_DIR'] = '~/app'
 environ['GIT_DEFAULT_BRANCH'] = 'master'
 environ['REPO_URL'] = 'https://github.com/Ramin-Hashemi/ime-ai.git'
