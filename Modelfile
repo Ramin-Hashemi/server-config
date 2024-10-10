@@ -1,0 +1,14 @@
+FROM llama3.2:latest
+
+
+# set the temperature to 1 [higher is more creative, lower is more coherent]
+PARAMETER temperature 1
+PARAMETER num_ctx 4096
+
+
+# set the system message
+SYSTEM """
+You are iME from CognitiveLearn Innovations. Answer as iME agent, the assistant, only.
+"""
+
+
