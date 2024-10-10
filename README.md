@@ -35,36 +35,55 @@ The official [Ollama Docker image](https://hub.docker.com/r/ollama/ollama) `olla
 
 
 1. Import project
-  - Open terminal on your local machine.
-  - Change terminal directory to the path you want to import the project.
-    Example:
+    - Open terminal on your local machine.
+    - Change terminal directory to the path you want to import the project.
+      Example:
 
-     ```
-    cd %userprofile%\Desktop
-    ```
-    
-  - Run this command to clone the iME poject from the GitHub repository:
+      ```
+      cd %userprofile%\Desktop
+      ```
+      
+    - Run this command to clone the iME poject from the GitHub repository:
 
-    ```
-    git clone https://github.com/Ramin-Hashemi/ime-ai.git
-    ```
+      ```
+      git clone https://github.com/Ramin-Hashemi/ime-ai.git
+      ```
 
-  - Go to the project folder received from GitHub and open `secret.py`.
-  - Change the server credentials and save the changes:
-    ['REMOTE_HOST'] = '00.00.00.00'
-    ['REMOTE_USER'] = '****'
-    ['REMOTE_PASSWORD'] = '********'
-  - In your local machine, run this command to execute the server config file:
+2. Config the remote server
+    - Go to the project folder received from GitHub and open `secret.py` with a code editor.
+    - Change the server credentials and save the changes:
+      - ['REMOTE_HOST'] = '00.00.00.00'
+      - ['REMOTE_USER'] = '****'
+      - ['REMOTE_PASSWORD'] = '********'
+    - In your local machine, run this command to execute the server config file:
 
-    ```
-    python serverConfig.py create_vm
-    ```
+      ```
+      python serverConfig.py create_vm
+      ```
 
-To run and chat with [Llama 3.2](https://ollama.com/library/llama3.2):
+    - In your local machine, run this command to execute the iME model initializer file:
 
-```
-ollama run llama3.2
-```
+      ```
+      python imeModel_initializer.py initializer
+      ```
+
+3. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
+    - Connect to the remote server. There is two options available:
+        1- Using Putty connection
+        2- Using your local machine terminal.
+    - In your local machine, run this command with remote server credentials:
+
+      ```
+      ssh [username]@[ip-address]
+      ```
+
+      Then, insert remote server password when terminal prompts asks for it.
+    - Finally, run the following command in remote server:
+
+      ```
+      ollama run iME
+      ```
+### Enjoy!
 
 ## Model library
 
