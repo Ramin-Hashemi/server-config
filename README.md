@@ -4,8 +4,6 @@
 
 # iME
 
-[![Linkedin](https://dcbadge.vercel.app/api/server/ollama?style=flat&compact=true)](https://discord.gg/ollama)
-
 Get up and running with iME large language model.
 
 ## Quickstart
