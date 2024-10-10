@@ -1,5 +1,5 @@
 <div align="center">
- <img alt="iME" height="200px" src="assets/logo-readme.png">
+ <img alt="iME" height="300px" src="assets/logo-readme.png">
 </div>
 
 # iME

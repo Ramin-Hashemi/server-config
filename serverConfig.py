@@ -61,13 +61,14 @@ def _create_vm(conn):
     _install_packages(conn)
     _install_python(conn)
     # _install_venv(conn)
+    _pull_repo(conn)
 
 
 def _install_packages(conn):
     conn.sudo('apt-get -y update')
     conn.sudo('apt-get -y upgrade')
     conn.sudo('apt-get install -y build-essential')
-    # conn.sudo('apt-get install -y checkinstall')
+    conn.sudo('apt-get install -y checkinstall')
     conn.sudo('apt-get install -y libreadline-gplv2-dev')
     conn.sudo('apt-get install -y libncurses-dev')
     conn.sudo('apt-get install -y libncursesw5-dev')
@@ -86,8 +87,14 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y uuid-dev')
     conn.sudo('apt-get install -y lzma-dev')
     conn.sudo('apt-get install -y wget')
+    conn.sudo('apt-get install -y curl')
+    conn.sudo('apt-get install -y python3-pip')
     conn.sudo('apt-get install -y git')
     conn.sudo('apt-get install -y postgresql')
+    conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
+    conn.sudo('pip install -y ollama')
+    conn.sudo('npm i -y ollama')
+    conn.sudo('pip install -y ollama-haystack')
 
 
 def _install_python(conn):
@@ -225,9 +232,9 @@ def create_vm(**kwargs):
     _create_vm(create_conn())
 
 
-def pull_repo(**kwargs):
-    conn = create_conn()
-    _pull_repo(conn, **kwargs)
+# def pull_repo(**kwargs):
+#     conn = create_conn()
+#     _pull_repo(conn, **kwargs)
 
 
 # def install_project(**kwargs):

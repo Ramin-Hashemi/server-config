@@ -14,6 +14,6 @@ environ['REMOTE_PASSWORD'] = 'a6l14GyRdm4'
 # environ['VENV_NAME'] = 'prod-api'
 #
 ### Git
-environ['GIT_DIR'] = '~/iME_AI'
+environ['GIT_DIR'] = '~/ime-ai'
 environ['GIT_DEFAULT_BRANCH'] = 'master'
-environ['REPO_URL'] = 'https://github.com/Ramin-Hashemi/iME_AI.git'
+environ['REPO_URL'] = 'https://github.com/Ramin-Hashemi/ime-ai.git'
