@@ -39,7 +39,7 @@ Get up and running with iME large language model.
     - In your local machine, run this command to execute the iME model initializer file:
 
       ```
-      python imeModel_initializer.py initializer
+      python imeModel_initialize.py initializer
       ```
 
 3. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):

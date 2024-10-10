@@ -1,6 +1,6 @@
-#############################
-# File imeModel_initializer #
-#############################
+############################
+# File imeModel_initialize #
+############################
 
 
 from serverConfig import create_conn
@@ -18,6 +18,7 @@ from serverConfig import create_conn
 def _initializer(conn):
     conn.sudo('ollama run llama3.2')
     conn.sudo('ollama create iME -f ./Modelfile')
+    conn.sudo('fastapi dev main.py')
 
 
 def initializer(**kwargs):
