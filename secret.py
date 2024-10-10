@@ -1,4 +1,7 @@
-# File secret.py
+##################
+# File secret.py #
+##################
+
 
 # In the main file, I simply do import secret and all environment variables are loaded.
 # The two files main.py and secret.py must be in the same directory.

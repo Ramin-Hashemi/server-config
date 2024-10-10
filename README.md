@@ -33,6 +33,33 @@ The official [Ollama Docker image](https://hub.docker.com/r/ollama/ollama) `olla
 
 ## Quickstart
 
+
+1. Import project
+  - Open terminal on your local machine.
+  - Change terminal directory to the path you want to import the project.
+    Example:
+
+     ```
+    cd %userprofile%\Desktop
+    ```
+    
+  - Run this command to clone the iME poject from the GitHub repository:
+
+    ```
+    git clone https://github.com/Ramin-Hashemi/ime-ai.git
+    ```
+
+  - Go to the project folder received from GitHub and open `secret.py`.
+  - Change the server credentials and save the changes:
+    ['REMOTE_HOST'] = '00.00.00.00'
+    ['REMOTE_USER'] = '****'
+    ['REMOTE_PASSWORD'] = '********'
+  - In your local machine, run this command to execute the server config file:
+
+    ```
+    python serverConfig.py create_vm
+    ```
+
 To run and chat with [Llama 3.2](https://ollama.com/library/llama3.2):
 
 ```
