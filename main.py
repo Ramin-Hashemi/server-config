@@ -12,10 +12,9 @@ def read_root():
     return {"message": "Hello, LLM World!"}
 
 
+# def feedMessage(conn):
+#     conn.sudo('uvicorn main:app --host 0.0.0.0 --port 8000')
 
-def _feedMessage(conn):
-    conn.sudo('uvicorn main:app --host 89.32.250.198 --port 9000')
 
-
-def feedMessage(**kwargs):
-    _feedMessage(create_conn())
+# def feedMessage(**kwargs):
+#     _feedMessage(create_conn())

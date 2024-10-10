@@ -97,6 +97,7 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
     conn.sudo('pip install -y fastapi')
     conn.sudo('pip install -y unicorn')
+    conn.sudo('pip install -y gunicorn')
     conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
     conn.sudo('pip install -y ollama')
     conn.sudo('npm i -y ollama')
