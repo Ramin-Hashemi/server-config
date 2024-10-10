@@ -1,5 +1,5 @@
 <div align="center">
- <img alt="iME" height="200px" src="https://github.com/Ramin-Hashemi/ime-ai/assets/logo-readme.png">
+ <img alt="iME" height="200px" src="https://github.com/Ramin-Hashemi/ime-ai/assets/logo-readme">
 </div>
 
 # iME
