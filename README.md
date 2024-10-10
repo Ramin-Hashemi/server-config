@@ -4,32 +4,9 @@
 
 # iME
 
-[![Discord](https://dcbadge.vercel.app/api/server/ollama?style=flat&compact=true)](https://discord.gg/ollama)
+[![Linkedin](https://dcbadge.vercel.app/api/server/ollama?style=flat&compact=true)](https://discord.gg/ollama)
 
-Get up and running with large language models.
-
-
-### Linux
-
-```
-curl -fsSL https://ollama.com/install.sh | sh
-```
-
-[Manual install instructions](https://github.com/ollama/ollama/blob/main/docs/linux.md)
-
-### Docker
-
-The official [Ollama Docker image](https://hub.docker.com/r/ollama/ollama) `ollama/ollama` is available on Docker Hub.
-
-### Libraries
-
-- [ollama-python](https://github.com/ollama/ollama-python)
-- [ollama-js](https://github.com/ollama/ollama-js)
-
-
-### haystack-core-integrations/
-- [ollama-haystack](https://github.com/deepset-ai/haystack-core-integrations/tree/9438634f2082bc8c7ebd518f319512ed4fbe9882/integrations/ollama)
-
+Get up and running with iME large language model.
 
 ## Quickstart
 
@@ -69,16 +46,16 @@ The official [Ollama Docker image](https://hub.docker.com/r/ollama/ollama) `olla
 
 3. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
     - Connect to the remote server. There is two options available:
-        1- Using Putty connection
-        2- Using your local machine terminal.
+        1. Using Putty connection
+        2. Using your local machine terminal.
     - In your local machine, run this command with remote server credentials:
 
       ```
       ssh [username]@[ip-address]
       ```
 
-      Then, insert remote server password when terminal prompts asks for it.
-    - Finally, run the following command in remote server:
+      Then, insert remote server password when terminal prompt asks for it.
+    - Finally, run the following command in the remote server:
 
       ```
       ollama run iME
