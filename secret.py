@@ -14,6 +14,6 @@ environ['REMOTE_PASSWORD'] = 'a6l14GyRdm4'
 # environ['VENV_NAME'] = 'prod-api'
 #
 ### Git
-environ['GIT_DIR'] = '~/app'
-environ['GIT_DEFAULT_BRANCH'] = 'main'
-environ['REPO_URL'] = 'https://github.com/digitalocean/sample-flask.git'
+environ['GIT_DIR'] = '~/iME_AI'
+environ['GIT_DEFAULT_BRANCH'] = 'master'
+environ['REPO_URL'] = 'https://github.com/Ramin-Hashemi/iME_AI.git'
