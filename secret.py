@@ -11,7 +11,7 @@ from os import environ, path
 ### Connection
 environ['REMOTE_HOST'] = '89.32.250.198'
 environ['REMOTE_USER'] = 'root'
-environ['REMOTE_PASSWORD'] = 'a6l14GyRdm4'
+environ['REMOTE_PASSWORD'] = 'ENqfwV24JVP@M3W'
 #
 ## Python venv
 # environ['VENV_NAME'] = 'prod-api'

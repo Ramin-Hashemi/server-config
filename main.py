@@ -2,7 +2,7 @@
 # File main.py #
 ################
 
-from serverConfig import create_conn
+# from serverConfig import create_conn
 from fastapi import FastAPI
 
 app = FastAPI()
