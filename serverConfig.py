@@ -68,7 +68,9 @@ def _create_vm(conn):
 
 
 def _install_packages(conn):
-    conn.sudo('apt-get -y update')
+    conn.sudo('apt-get update -y')
+    # if prompt/error happened; run 'dpkg' command manually:
+    conn.sudo('dpkg --configure -a')
     conn.sudo('apt-get -y upgrade')
     conn.sudo('apt-get install -y build-essential')
     conn.sudo('apt-get install -y checkinstall')
@@ -91,10 +93,12 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y lzma-dev')
     conn.sudo('apt-get install -y wget')
     conn.sudo('apt-get install -y curl')
+    conn.sudo('apt-get install -y ca-certificates')
+    conn.sudo('apt-get install -y lsb-release')
+    conn.sudo('apt-get install -y gnupg')
     conn.sudo('apt-get install -y python3-pip')
     conn.sudo('apt-get install -y git')
     conn.sudo('apt-get install -y postgresql')
-    conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
     conn.sudo('pip install -y fastapi')
     conn.sudo('pip install -y unicorn')
     conn.sudo('pip install -y gunicorn')
@@ -103,6 +107,12 @@ def _install_packages(conn):
     conn.sudo('pip install -y ollama')
     conn.sudo('npm i -y ollama')
     conn.sudo('pip install -y ollama-haystack')
+    # Install Docker:
+    # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
+    # conn.sudo('echo \
+    # "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    # $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
+    # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
 
 
 def _install_python(conn):
@@ -253,39 +263,39 @@ def create_vm(**kwargs):
     # _restart_web(create_conn())
 
 
-# def main(tasks):
-#     if len(tasks) <= 1:
-#         print('No task name found')
-#         return
-#     i = 1
-#     while i < len(tasks):
-#         try:
-#             fn = getattr(sys.modules[__name__], tasks[i])
-#         except AttributeError:
-#             print(f'Cannot find task {tasks[i]}. Quit.')
-#             return
-#         params = {}
-#         j = i + 1
-#         while j < len(tasks) and '=' in tasks[j]:
-#             k, v = tasks[j].split('=')
-#             params[k] = v
-#             j += 1
-#         i = j
-#         print(f'Function is {fn}')
-#         print(f'args are {params}')
-#         fn(**params)
+def main(tasks):
+    if len(tasks) <= 1:
+        print('No task name found')
+        return
+    i = 1
+    while i < len(tasks):
+        try:
+            fn = getattr(sys.modules[__name__], tasks[i])
+        except AttributeError:
+            print(f'Cannot find task {tasks[i]}. Quit.')
+            return
+        params = {}
+        j = i + 1
+        while j < len(tasks) and '=' in tasks[j]:
+            k, v = tasks[j].split('=')
+            params[k] = v
+            j += 1
+        i = j
+        print(f'Function is {fn}')
+        print(f'args are {params}')
+        fn(**params)
 
 
-# if __name__ == '__main__':
-#     '''
-#     Run it with
-#     $ python main <task1> <key1-task1>=<value1-task1> <key2-task1>=<value2-task2> <task2> <key1-task2>=<value1-task2>
-#     E.g.
-#     $ python main create_vm
+if __name__ == '__main__':
+    '''
+    Run it with
+    $ python main <task1> <key1-task1>=<value1-task1> <key2-task1>=<value2-task2> <task2> <key1-task2>=<value1-task2>
+    E.g.
+    $ python main create_vm
     
-#     Or
-#     $ python main pull_repo branch=develop
-#     '''
-#     import sys
-#     tasks = sys.argv
-#     main(tasks)
+    Or
+    $ python main pull_repo branch=develop
+    '''
+    import sys
+    tasks = sys.argv
+    main(tasks)
