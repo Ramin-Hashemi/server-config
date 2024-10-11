@@ -69,7 +69,7 @@ def _create_vm(conn):
 
 def _install_packages(conn):
     conn.sudo('apt-get update -y')
-    # if prompt/error happened; run 'dpkg' command manually:
+    # if prompt/error happened; run 'dpkg' command manually in remote server:
     conn.sudo('dpkg --configure -a')
     conn.sudo('apt-get -y upgrade')
     conn.sudo('apt-get install -y build-essential')
@@ -99,14 +99,15 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y python3-pip')
     conn.sudo('apt-get install -y git')
     conn.sudo('apt-get install -y postgresql')
-    conn.sudo('pip install -y fastapi')
-    conn.sudo('pip install -y unicorn')
-    conn.sudo('pip install -y gunicorn')
-    conn.sudo('pip install -y python-dotenv')
+    conn.sudo('pip install fastapi')
+    conn.sudo('pip install unicorn')
+    conn.sudo('pip install gunicorn')
+    conn.sudo('pip install python-dotenv')
     conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
-    conn.sudo('pip install -y ollama')
-    conn.sudo('npm i -y ollama')
-    conn.sudo('pip install -y ollama-haystack')
+    conn.sudo('pip install ollama')
+    conn.sudo('pip install ollama-haystack')
+    # conn.sudo('apt-get install -y npm')
+    # conn.sudo('npm i ollama')
     # Install Docker:
     # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
     # conn.sudo('echo \
@@ -116,31 +117,31 @@ def _install_packages(conn):
 
 
 def _install_python(conn):
-    """Install python 3.7 in the remote machine."""
+    """Install python 3.12 in the remote machine."""
 
     res = conn.run('python3 --version')
-    if '3.7' in res.stdout.strip():
-        # Python >= 3.7 already exists
+    if '3.12' in res.stdout.strip():
+        # Python >= 3.12 already exists
         return
 
-    conn.run('rm -rf /tmp/Python3.7 && mkdir /tmp/Python3.7')
+    conn.run('rm -rf /tmp/Python3.12 && mkdir /tmp/Python3.12')
 
-    with conn.cd('/tmp/Python3.7'):
-        conn.run('wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz')
-        conn.run('tar xvf Python-3.7.0.tar.xz')
+    with conn.cd('/tmp/Python3.12'):
+        conn.run('wget https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz')
+        conn.run('tar xvf Python-3.12.0.tar.xz')
 
-    with conn.cd ('/tmp/Python3.7/Python-3.7.0'):
+    with conn.cd ('/tmp/Python3.12/Python-3.12.0'):
         conn.run('./configure --enable-optimizations')
         conn.run('make')
 
     # see https://github.com/pyinvoke/invoke/issues/459
-    conn.sudo('bash -c "cd /tmp/Python3.7/Python-3.7.0 && make altinstall"')
+    conn.sudo('bash -c "cd /tmp/Python3.12/Python-3.12.0 && make altinstall"')
 
 
 def _install_venv(conn):
     """Install virtualenv, virtualenvwrapper."""
 
-    res = conn.run('which python3.7')
+    res = conn.run('which python3.12')
     res = res.stdout.strip()
     py_path = res
 
@@ -250,9 +251,9 @@ def create_vm(**kwargs):
     _create_vm(create_conn())
 
 
-# def pull_repo(**kwargs):
-#     conn = create_conn()
-#     _pull_repo(conn, **kwargs)
+def pull_repo(**kwargs):
+    conn = create_conn()
+    _pull_repo(conn, **kwargs)
 
 
 # def install_project(**kwargs):
