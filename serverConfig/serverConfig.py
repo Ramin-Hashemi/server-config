@@ -34,7 +34,7 @@
 
 from fabric import Connection
 from os import environ
-import serverConfig.secret as secret
+import secret
 
 def create_conn():
     # Switch the two lines if you connect via PEM Key instead of password.
@@ -62,6 +62,7 @@ def create_conn():
 
 def _create_vm(conn):
     _install_packages(conn)
+    _new_user(conn)    
     # _install_python(conn)
     # _install_venv(conn)
     # _pull_repo(conn)
@@ -69,13 +70,9 @@ def _create_vm(conn):
 
 def _install_packages(conn):
     conn.sudo('apt-get update -y')
-    # if prompt/error happened; run 'dpkg' command manually in remote server:
     conn.sudo('dpkg --configure -a')
     conn.sudo('apt-get upgrade -y')
-    conn.sudo('apt-get -y unattended-upgrades')
-    conn.sudo('APT::Periodic::Update-Package-Lists "1";')
-    conn.sudo('APT::Periodic::Unattended-Upgrade "1";')
-    conn.sudo('APT::Periodic::AutocleanInterval "7";')
+    conn.sudo('apt-get install -y unattended-upgrades')
     conn.sudo('apt-get install -y build-essential')
     conn.sudo('apt-get install -y checkinstall')
     conn.sudo('apt-get install -y libreadline-gplv2-dev')
@@ -109,7 +106,17 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y postgresql')
     conn.sudo('pip install python-dotenv')
     
-    
+
+# The code below implements these sub-steps in server:
+# 1- Create a user name project-user,
+# 2- Add it to the sudo group (which contains all users with root privileges),
+
+def _new_user(conn):
+    conn.sudo('adduser project-user')
+    conn.sudo('gpasswd -a project-user sudo')
+    conn.sudo('mkdir /home/project-user/.ssh/')
+    conn.sudo('chmod 700 -R /home/project-user/.ssh/')
+
 
 def _install_python(conn):
     """Install python 3.12 in the remote machine."""
@@ -244,6 +251,10 @@ def _restart_web(conn):
 
 def create_vm(**kwargs):
     _create_vm(create_conn())
+
+
+def new_user(**kwargs):
+    _new_user(create_conn())
 
 
 # def pull_repo(**kwargs):

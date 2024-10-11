@@ -4,16 +4,16 @@
 
 
 # Instructions & Help:
-# Server deployment with Python: From A to Z.
+# How to Securely Deploy a FastAPI app with NGINX and Gunicorn.
 # https://dylancastillo.co/posts/fastapi-nginx-gunicorn.html
 
 
 from fabric import Connection
 from os import environ, path
-import serverConfig.secret as secret
+import secret
 
 
-def create_conn2():
+def create_conn():
     # Switch the two lines if you connect via PEM Key instead of password.
     params = {
         # 'key_filename': environ['SSH_KEY_PATH']
@@ -31,28 +31,37 @@ def create_conn2():
 # Internal Functions #
 ######################
 
-# The code below implements these sub-steps in server:
-# 1- Create a user name fastapi-user,
-# 2- Add it to the sudo group (which contains all users with root privileges),
-# 3- And then log in as that user.
-# 4- Create a .ssh directory
-# 5- Set the necessary permissions (the owner of .ssh/ has full read, write, and execute permissions, but other users and groups shouldn’t).
-# 6- Opens 'authorized_keys' with an editor,
-#    Paste your public SSH key into authorized_keys,
-#    Save the changes and close the editor.
+# The code below disable the root login and use password authentication for SSH connections in server:
+
+# 1- Log in as that user.
+# 2- Create a .ssh directory
+# 3- Set the necessary permissions (the owner of .ssh/ has full read, write, and execute permissions, but other users and groups shouldn’t).
 
 
-def _configUser(conn):
-    _projectAdmin_config(conn)    
+def _config_user_ssh(conn):
+    _user_ssh(conn)    
 
 
-def _projectAdmin_config(conn):
-    conn.sudo('adduser projectAdmin-user')
-    conn.sudo('gpasswd -a projectAdmin-user sudo')
-    conn.sudo('su - projectAdmin-user')
-    conn.sudo('mkdir ~/.ssh/')
-    conn.sudo('chmod 700 -R ~/.ssh/')
-    conn.sudo('vim ~/.ssh/authorized_keys')
+def _user_ssh(conn):
+    conn.sudo('add-apt-repository ppa:deadsnakes/ppa')
+    # conn.sudo('apt-get update')
+    # conn.sudo('apt-get install python3.12 python3.12-venv -y')
+    # conn.sudo('apt-get install supervisor nginx -y')
+    # conn.sudo('systemctl enable supervisor')
+    # conn.sudo('systemctl start supervisor')
+    # conn.sudo('snap install ollama')
+    # conn.sudo('pip install ollama-haystack')
+    # conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
+    # conn.sudo('pip install ollama')
+    
+    # conn.sudo('apt-get install -y npm')
+    # conn.sudo('npm i ollama')
+    # Install Docker:
+    # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
+    # conn.sudo('echo \
+    # "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    # $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
+    # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
 
 
 #####################################
@@ -65,12 +74,12 @@ def _projectAdmin_config(conn):
 # This means that I want to have a __main__ entrypoint that only runs a function that I want to run in that specific moment,
 # and it also passes to it any argument that is coming from command line.
 
-def configUser(**kwargs):
-    _configUser(create_conn2())
+def config_user_ssh(**kwargs):
+    _config_user_ssh(create_conn())
 
 
-def projectAdmin_config(**kwargs):
-    _projectAdmin_config(create_conn2())
+def user_ssh(**kwargs):
+    _user_ssh(create_conn())
     
 
 def main(tasks):

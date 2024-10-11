@@ -1,0 +1,50 @@
+su - project-user
+
+
+*****
+sudo nano /etc/apt/apt.conf.d/20auto-upgrades
+
+Edit /etc/apt/apt.conf.d/20auto-upgrades to include the following lines:
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";
+
+
+******
+sudo nano /etc/apt/apt.conf.d/50unattended-upgrades
+
+Edit /etc/apt/apt.conf.d/50unattended-upgrades to include the following line:
+Unattended-Upgrade::Automatic-Reboot "true";
+
+
+*****
+sudo nano ~/.ssh/authorized_keys
+
+Edit ~/.ssh/authorized_keys to include the following Public SSH key:
+SHA256:NwY7+gysPDye3205STS/bo5WmjT5Rez5AbjXRmjOjHo ramin.hashemi.myself@gmail.com
+
+* If you don’t already have an SSH key, open a new terminal on your local machine and run the following command:
+ssh-keygen -t ed25519 -C "username@email.com"
+
+
+******
+sudo nano /etc/ssh/sshd_config
+
+Edit /etc/ssh/sshd_config to include the following lines:
+PermitRootLogin no
+...
+PasswordAuthentication no
+
+
+*****
+You can also configure your system to send emails when there are issues with the upgrades. If you want to do that, take a look at this article.
+https://www.cyberciti.biz/faq/ubuntu-enable-setup-automatic-unattended-security-updates/
+
+
+*****
+Other Security Measures
+Most cloud providers offer firewall services, but if yours doesn’t, you should configure one and only allow incoming traffic to the necessary ports: 80, 443, and 22.
+Also, you can install fail2ban to prevent brute-force authentication attacks.
+https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04
+To learn more about the best practices to secure a Linux server, check out this guide from Linode.
+https://www.linode.com/docs/guides/set-up-and-secure/
