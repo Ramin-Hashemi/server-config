@@ -34,12 +34,12 @@
 
 from fabric import Connection
 from os import environ
-import secret
+import serverConfig.secret as secret
 
 def create_conn():
     # Switch the two lines if you connect via PEM Key instead of password.
     params = {
-        #'key_filename': environ['SSH_KEY_PATH']}
+        #'key_filename': environ['SSH_KEY_PATH']
         'password': environ['REMOTE_PASSWORD']
     }
     conn = Connection(
@@ -62,16 +62,20 @@ def create_conn():
 
 def _create_vm(conn):
     _install_packages(conn)
-    _install_python(conn)
+    # _install_python(conn)
     # _install_venv(conn)
-    _pull_repo(conn)
+    # _pull_repo(conn)
 
 
 def _install_packages(conn):
     conn.sudo('apt-get update -y')
     # if prompt/error happened; run 'dpkg' command manually in remote server:
     conn.sudo('dpkg --configure -a')
-    conn.sudo('apt-get -y upgrade')
+    conn.sudo('apt-get upgrade -y')
+    conn.sudo('apt-get -y unattended-upgrades')
+    conn.sudo('APT::Periodic::Update-Package-Lists "1";')
+    conn.sudo('APT::Periodic::Unattended-Upgrade "1";')
+    conn.sudo('APT::Periodic::AutocleanInterval "7";')
     conn.sudo('apt-get install -y build-essential')
     conn.sudo('apt-get install -y checkinstall')
     conn.sudo('apt-get install -y libreadline-gplv2-dev')
@@ -96,29 +100,16 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y wget')
     conn.sudo('apt-get install -y tree')
     conn.sudo('apt-get install -y curl')
+    conn.sudo('apt-get install -y vim')
     conn.sudo('apt-get install -y ca-certificates')
     conn.sudo('apt-get install -y lsb-release')
     conn.sudo('apt-get install -y gnupg')
     conn.sudo('apt-get install -y python3-pip')
     conn.sudo('apt-get install -y git')
     conn.sudo('apt-get install -y postgresql')
-    conn.sudo('pip install fastapi')
-    conn.sudo('pip install unicorn')
-    conn.sudo('pip install gunicorn')
     conn.sudo('pip install python-dotenv')
-    conn.sudo('snap install ollama')
-    # conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
-    # conn.sudo('pip install ollama')
-    conn.sudo('pip install ollama-haystack')
-    # conn.sudo('apt-get install -y npm')
-    # conn.sudo('npm i ollama')
-    # Install Docker:
-    # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
-    # conn.sudo('echo \
-    # "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    # $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
-    # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
-
+    
+    
 
 def _install_python(conn):
     """Install python 3.12 in the remote machine."""
@@ -255,9 +246,9 @@ def create_vm(**kwargs):
     _create_vm(create_conn())
 
 
-def pull_repo(**kwargs):
-    conn = create_conn()
-    _pull_repo(conn, **kwargs)
+# def pull_repo(**kwargs):
+#     conn = create_conn()
+#     _pull_repo(conn, **kwargs)
 
 
 # def install_project(**kwargs):
