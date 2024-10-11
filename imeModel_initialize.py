@@ -18,6 +18,7 @@ import ollama
 
 def _initializer(conn):
     conn.sudo('ollama pull llama3.2')
+    conn.sudo('cd /ime-ai')
     conn.sudo('ollama create iME -f ./Modelfile')
     conn.sudo('fastapi dev main.py')
 

@@ -94,6 +94,7 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y uuid-dev')
     conn.sudo('apt-get install -y lzma-dev')
     conn.sudo('apt-get install -y wget')
+    conn.sudo('apt-get install -y tree')
     conn.sudo('apt-get install -y curl')
     conn.sudo('apt-get install -y ca-certificates')
     conn.sudo('apt-get install -y lsb-release')
