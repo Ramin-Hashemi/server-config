@@ -5,7 +5,7 @@
 
 from fabric import Connection
 from os import environ
-from server import secret
+import secret
 import ollama
 
 

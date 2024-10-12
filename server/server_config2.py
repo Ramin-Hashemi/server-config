@@ -44,13 +44,12 @@ def _config_user_ssh(conn):
 
 def _user_ssh(conn):
     conn.sudo('add-apt-repository ppa:deadsnakes/ppa')
-    conn.sudo('apt-get update')
     conn.sudo('apt-get install python3.12 python3.12-venv -y')
     conn.sudo('apt-get install supervisor nginx -y')
     conn.sudo('systemctl enable supervisor')
     conn.sudo('systemctl start supervisor')
-    conn.sudo('snap install ollama')
-    conn.sudo('pip install ollama-haystack')
+    # conn.sudo('snap install ollama')
+    # conn.sudo('pip install ollama-haystack')
     # conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
     # conn.sudo('pip install ollama')
     
