@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=iME-app
+NAME=fastapi-app
 DIR=/home/project-user/ime-ai
 USER=project-user
 GROUP=project-user

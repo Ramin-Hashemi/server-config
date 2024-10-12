@@ -31,29 +31,26 @@ def create_conn():
 # Internal Functions #
 ######################
 
-# The code below disable the root login and use password authentication for SSH connections in server:
 
-# 1- Log in as that user.
-# 2- Create a .ssh directory
-# 3- Set the necessary permissions (the owner of .ssh/ has full read, write, and execute permissions, but other users and groups shouldn’t).
+def _create_app(conn):
+    _install_software_tools(conn)
+    _clone_repo(conn)
+    _create_vitual_env(conn)
+    _configure_gunicorn(conn)
+    _configure_supervisor(conn)
+    _configure_nginx(conn)
+    _ssl_certificate_cerbot(conn)
 
 
-def _config_user_ssh(conn):
-    _user_ssh(conn)    
-
-
-def _user_ssh(conn):
+def _install_software_tools(conn):
     conn.sudo('add-apt-repository ppa:deadsnakes/ppa')
+    conn.sudo('apt-get update')
     conn.sudo('apt-get install python3.12 python3.12-venv -y')
     conn.sudo('apt-get install supervisor nginx -y')
     conn.sudo('systemctl enable supervisor')
     conn.sudo('systemctl start supervisor')
-    # conn.sudo('snap install ollama')
-    # conn.sudo('pip install ollama-haystack')
-    # conn.sudo('curl -fsSL https://ollama.com/install.sh | sh')
-    # conn.sudo('pip install ollama')
-    
-    # conn.sudo('apt-get install -y npm')
+
+  # conn.sudo('apt-get install -y npm')
     # conn.sudo('npm i ollama')
     # Install Docker:
     # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
@@ -63,23 +60,78 @@ def _user_ssh(conn):
     # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
 
 
+def _clone_repo(conn):
+    conn.sudo('git clone https://github.com/Ramin-Hashemi/ime-ai.git')
+
+
+def _create_vitual_env(conn):
+    conn.su('- project-user/ime-ai')
+    conn.sudo('python3.12 -m venv .venv')
+    conn.sudo('source .venv/bin/activate')
+    conn.sudo('pip install -r requirements.txt')
+
+
+def _configure_gunicorn(conn):
+    conn.sudo('chmod u+x gunicorn_start')
+    conn.sudo('vim /etc/supervisor/conf.d/fastapi-app.conf')
+
+
+def _configure_supervisor(conn):
+    conn.sudo('supervisorctl reread')
+    conn.sudo('supervisorctl update')
+    conn.sudo('supervisorctl status fastapi-app')
+    conn.sudo('supervisorctl restart fastapi-app')
+
+def _configure_nginx(conn):
+    conn.sudo('vim /etc/nginx/sites-available/fastapi-app')
+    conn.sudo('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
+    conn.sudo('usermod -aG project-user www-data')
+    conn.sudo('nginx -t')
+    conn.sudo('systemctl restart nginx')
+
+
+def _ssl_certificate_cerbot(conn):
+    conn.sudo('snap install --classic certbot')
+    conn.sudo('ln -s /snap/bin/certbot /usr/bin/certbot')
+    conn.sudo('certbot --nginx')
+
+
 #####################################
 # Functions used from the __main__ ##
 #####################################
 
-# The motivation is that sometimes I will want to run one of the functions we saw, and just one.
-# And some times they may need arguments in input (this is the case for _pull_repo).
 
-# This means that I want to have a __main__ entrypoint that only runs a function that I want to run in that specific moment,
-# and it also passes to it any argument that is coming from command line.
-
-def config_user_ssh(**kwargs):
-    _config_user_ssh(create_conn())
+def create_app(**kwargs):
+    _create_app(create_conn())
 
 
-def user_ssh(**kwargs):
-    _user_ssh(create_conn())
-    
+def install_software_tools(**kwargs):
+    _install_software_tools(create_conn())
+
+
+def clone_repo(**kwargs):
+    _clone_repo(create_conn())
+
+
+def create_vitual_env(**kwargs):
+    _create_vitual_env(create_conn())
+
+
+def configure_gunicorn(**kwargs):
+    _configure_gunicorn(create_conn())
+
+
+def configure_supervisor(**kwargs):
+    _configure_supervisor(create_conn())
+
+
+def configure_nginx(**kwargs):
+    _configure_nginx(conn)
+
+
+def ssl_certificate_cerbot(**kwargs):
+    _ssl_certificate_cerbot(create_conn())
+
 
 def main(tasks):
     if len(tasks) <= 1:

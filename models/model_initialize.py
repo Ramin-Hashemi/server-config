@@ -6,7 +6,6 @@
 from fabric import Connection
 from os import environ
 import secret
-import ollama
 
 
 def create_conn():
@@ -27,18 +26,16 @@ def create_conn():
 # Internal Functions #
 ######################
 
-def _initializer(conn):
-    conn.sudo('git clone https://github.com/Ramin-Hashemi/ime-ai.git')
-    conn.sudo('python3.12 -m venv .venv')
-    conn.sudo('source .venv/bin/activate')
-    conn.sudo('pip install -r requirements.txt')
-    conn.sudo('uvicorn main:app')
-    # conn.sudo('ollama pull llama3.2')
-    # conn.sudo('ollama create iME -f ~/ime-ai/Modelfile')
+def _base_model(conn):
+    conn.sudo('snap install ollama')
+    # conn.sudo('pip install ollama')
+    conn.sudo('pip install ollama-haystack')
+    conn.sudo('ollama pull llama3.2')
+    conn.sudo('ollama create iME -f ~/ime-ai/Modelfile')
 
 
-def initializer(**kwargs):
-    _initializer(create_conn())
+def base_model(**kwargs):
+    _base_model(create_conn())
 
 
 def main(tasks):

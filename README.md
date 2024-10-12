@@ -1,5 +1,5 @@
 <div align="center">
- <img alt="iME" height="300px" src="assets/logo-readme.png">
+ <img alt="iME" height="300px" src="assets/ime_logo.png">
 </div>
 
 # iME
@@ -30,10 +30,11 @@ Get up and running with iME large language model.
       - ['REMOTE_HOST'] = '00.00.00.00'
       - ['REMOTE_USER'] = '****'
       - ['REMOTE_PASSWORD'] = '********'
-    - In your local machine, run this command to execute the server config file:
+    - In your local machine, run this command to execute the required server config files:
 
       ```
-      python serverConfig.py create_vm
+      python server_config.py create_vm
+       python server_config2.py create_vm
       ```
 
     - In your local machine, run this command to execute the iME model initializer file:

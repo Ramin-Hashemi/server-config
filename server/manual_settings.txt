@@ -36,6 +36,53 @@ PermitRootLogin no
 PasswordAuthentication no
 
 
+******
+sudo nano /etc/supervisor/conf.d/fastapi-app.conf
+
+Edit /etc/supervisor/conf.d/fastapi-app.conf to include the following lines:
+[program:fastapi-app]
+command=/home/project-user/ime-ai/gunicorn_start
+user=project-user
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/home/project-user/ime-ai/logs/gunicorn-error.log
+
+
+******
+sudo nano /etc/nginx/sites-available/fastapi-app
+
+Edit /etc/nginx/sites-available/fastapi-app to include the following lines:
+upstream app_server {
+    server unix:/home/project-user/ime-ai/run/gunicorn.sock fail_timeout=0;
+}
+
+server {
+    listen 80;
+
+    # add here the ip address of your server
+    # or a domain pointing to that ip (like example.com or www.example.com)
+    server_name XXXX;
+
+    keepalive_timeout 5;
+    client_max_body_size 4G;
+
+    access_log /home/project-user/ime-ai/logs/nginx-access.log;
+    error_log /home/project-user/ime-ai/logs/nginx-error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        if (!-f $request_filename) {
+            proxy_pass http://app_server;
+            break;
+        }
+    }
+}
+
+
 *****
 You can also configure your system to send emails when there are issues with the upgrades. If you want to do that, take a look at this article.
 https://www.cyberciti.biz/faq/ubuntu-enable-setup-automatic-unattended-security-updates/
