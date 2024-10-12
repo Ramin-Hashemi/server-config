@@ -69,7 +69,7 @@ def _create_vm(conn):
 
 
 def _install_packages(conn):
-    conn.sudo('apt-get update -y')
+    # conn.sudo('apt-get update -y')
     conn.sudo('dpkg --configure -a')
     conn.sudo('apt-get upgrade -y')
     conn.sudo('apt-get install -y unattended-upgrades')
