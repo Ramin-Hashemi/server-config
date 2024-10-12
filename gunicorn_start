@@ -1,9 +1,9 @@
 #!/bin/bash
 
 NAME=fastapi-app
-DIR=/home/project-user/ime-ai
-USER=project-user
-GROUP=project-user
+DIR=/home/senior-user/ime-ai
+USER=senior-user
+GROUP=senior-user
 WORKERS=3
 WORKER_CLASS=uvicorn.workers.UvicornWorker
 VENV=$DIR/.venv/bin/activate

@@ -43,7 +43,6 @@ def create_conn():
 def _create_vm(conn):
     _install_packages(conn)
     _create_new_user(conn)
-    _secure_server(conn) 
 
 
 def _install_packages(conn):
@@ -87,11 +86,11 @@ def _install_packages(conn):
     
 
 def _create_new_user(conn):
-    conn.sudo('adduser project-user')
-    conn.sudo('gpasswd -a project-user sudo')
-    # conn.su('- project-user')
-    conn.sudo('mkdir /home/project-user/.ssh/')
-    conn.sudo('chmod 700 -R /home/project-user/.ssh/')
+    conn.sudo('adduser senior-user')
+    conn.sudo('gpasswd -a senior-user sudo')
+    # conn.su('- senior-user')
+    conn.sudo('mkdir /home/senior-user/.ssh/')
+    conn.sudo('chmod 700 -R /home/senior-user/.ssh/')
 
 
 #####################################

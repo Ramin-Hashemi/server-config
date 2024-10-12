@@ -65,7 +65,7 @@ def _clone_repo(conn):
 
 
 def _create_vitual_env(conn):
-    conn.su('- project-user/ime-ai')
+    conn.su('- senior-user/ime-ai')
     conn.sudo('python3.12 -m venv .venv')
     conn.sudo('source .venv/bin/activate')
     conn.sudo('pip install -r requirements.txt')
@@ -85,7 +85,7 @@ def _configure_supervisor(conn):
 def _configure_nginx(conn):
     conn.sudo('vim /etc/nginx/sites-available/fastapi-app')
     conn.sudo('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
-    conn.sudo('usermod -aG project-user www-data')
+    conn.sudo('usermod -aG senior-user www-data')
     conn.sudo('nginx -t')
     conn.sudo('systemctl restart nginx')
 
@@ -126,7 +126,7 @@ def configure_supervisor(**kwargs):
 
 
 def configure_nginx(**kwargs):
-    _configure_nginx(conn)
+    _configure_nginx(create_conn())
 
 
 def ssl_certificate_cerbot(**kwargs):
