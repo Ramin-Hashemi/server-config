@@ -20,7 +20,7 @@
 
 from fabric import Connection
 from os import environ
-import secret
+import secret_server
 
 def create_conn():
     # Switch the two lines if you connect via PEM Key instead of password.
@@ -43,6 +43,7 @@ def create_conn():
 def _create_vm(conn):
     _install_packages(conn)
     _create_new_user(conn)
+    _update_user(conn)
 
 
 def _install_packages(conn):
@@ -86,11 +87,14 @@ def _install_packages(conn):
     
 
 def _create_new_user(conn):
-    conn.sudo('adduser senior-user')
-    conn.sudo('gpasswd -a senior-user sudo')
-    # conn.su('- senior-user')
-    conn.sudo('mkdir /home/senior-user/.ssh/')
-    conn.sudo('chmod 700 -R /home/senior-user/.ssh/')
+    conn.sudo('adduser main-user')
+    # conn.sudo('gpasswd -a main-user sudo')
+
+
+def _update_user(conn):
+    # conn.sudo('-S su - main-user')
+    conn.sudo('mkdir /home/main-user/.ssh/')
+    conn.sudo('chmod 700 -R /home/main-user/.ssh/')
 
 
 #####################################
@@ -104,6 +108,10 @@ def create_vm(**kwargs):
 
 def create_new_user(**kwargs):
     _create_new_user(create_conn())
+
+
+def update_user(**kwargs):
+    _update_user(create_conn())
 
 
 def main(tasks):

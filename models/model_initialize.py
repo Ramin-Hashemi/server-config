@@ -5,7 +5,7 @@
 
 from fabric import Connection
 from os import environ
-import secret
+import secret_user
 
 
 def create_conn():

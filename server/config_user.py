@@ -10,7 +10,7 @@
 
 from fabric import Connection
 from os import environ, path
-import secret
+import secret_user
 
 
 def create_conn():
@@ -65,7 +65,7 @@ def _clone_repo(conn):
 
 
 def _create_vitual_env(conn):
-    conn.su('- senior-user/ime-ai')
+    conn.su('- main-user/ime-ai')
     conn.sudo('python3.12 -m venv .venv')
     conn.sudo('source .venv/bin/activate')
     conn.sudo('pip install -r requirements.txt')
@@ -85,7 +85,7 @@ def _configure_supervisor(conn):
 def _configure_nginx(conn):
     conn.sudo('vim /etc/nginx/sites-available/fastapi-app')
     conn.sudo('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
-    conn.sudo('usermod -aG senior-user www-data')
+    conn.sudo('usermod -aG main-user www-data')
     conn.sudo('nginx -t')
     conn.sudo('systemctl restart nginx')
 
