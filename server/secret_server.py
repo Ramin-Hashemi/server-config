@@ -9,15 +9,14 @@
 
 from os import environ, path
 
+
 ### Connection
 environ['REMOTE_HOST'] = '89.32.250.198'
 environ['REMOTE_USER'] = 'root'
 environ['REMOTE_PASSWORD'] = 'ENqfwV24'
 environ['SSH_KEY_PATH'] = '~/.ssh/'
-#
-# # Python venv
-# environ['VENV_NAME'] = 'prod-api'
-#
+
+
 ### Git
 environ['GIT_DIR'] = '~/ime-ai'
 environ['GIT_DEFAULT_BRANCH'] = 'master'

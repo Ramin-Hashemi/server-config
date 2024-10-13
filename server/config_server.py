@@ -19,8 +19,11 @@
 
 
 from fabric import Connection
+import os
+from datetime import datetime
 from os import environ
 import secret_server
+
 
 def create_conn():
     # Switch the two lines if you connect via PEM Key instead of password.
@@ -43,14 +46,17 @@ def create_conn():
 def _create_vm(conn):
     _install_packages(conn)
     _create_new_user(conn)
-    _update_user(conn)
+    # _delete_users(conn)
+    # _create_resetter_user(conn)
 
 
 def _install_packages(conn):
-    conn.sudo('apt update && apt upgrade -y')
-    conn.sudo('apt install unattended-upgrades')
+    conn.sudo('apt-get update -y')
+    conn.sudo('apt-get upgrade -y')
+    conn.sudo('apt-get install -y unattended-upgrades')
     conn.sudo('apt-get install -y build-essential')
     conn.sudo('apt-get install -y checkinstall')
+    conn.sudo('apt-get install -y coreutils')
     conn.sudo('apt-get install -y libreadline-gplv2-dev')
     conn.sudo('apt-get install -y libncurses-dev')
     conn.sudo('apt-get install -y libncursesw5-dev')
@@ -87,14 +93,46 @@ def _install_packages(conn):
     
 
 def _create_new_user(conn):
-    conn.sudo('adduser main-user')
-    # conn.sudo('gpasswd -a main-user sudo')
+    conn.sudo('adduser --disabled-password one-user')
+    conn.sudo('gpasswd -a one-user sudo')
 
 
-def _update_user(conn):
-    # conn.sudo('-S su - main-user')
-    conn.sudo('mkdir /home/main-user/.ssh/')
-    conn.sudo('chmod 700 -R /home/main-user/.ssh/')
+def _delete_users(conn):
+    from_date = '2024-10-10 00:00:00'
+    
+    # Get the list of users
+    result = conn.sudo('cut -d: -f1 /etc/passwd', hide=True)
+    users = result.stdout.splitlines()
+
+    # Convert from_date to a timestamp
+    from_timestamp = datetime.strptime(from_date, '%Y-%m-%d %H:%M:%S').timestamp()
+
+    # Define the users to exclude
+    exclude_users = ['root', 'one-user']
+
+    # Filter users based on creation date
+    filtered_users = []
+    for user in users:
+        try:
+            user_info = pwd.getpwnam(user)
+            home_dir = user_info.pw_dir
+            if os.path.exists(home_dir):
+                creation_time = os.path.getctime(home_dir)
+                if creation_time >= from_timestamp:
+                    filtered_users.append(user)
+        except KeyError:
+            # User might not have a home directory or other issues
+            continue
+
+    # Loop through the users and delete them if they are not in the exclude list
+    for user in filtered_users:
+        if user not in exclude_users:
+            conn.sudo(f'userdel -r {user}')
+
+
+def _create_resetter_user(conn):
+    conn.sudo('adduser resetter')
+    conn.sudo('gpasswd -a resetter sudo')
 
 
 #####################################
@@ -110,8 +148,11 @@ def create_new_user(**kwargs):
     _create_new_user(create_conn())
 
 
-def update_user(**kwargs):
-    _update_user(create_conn())
+def delete_users(**kwargs):
+    _delete_users(create_conn())
+
+def create_resetter_user(**kwargs):
+    _create_resetter_user(create_conn())
 
 
 def main(tasks):

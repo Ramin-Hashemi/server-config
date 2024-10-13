@@ -33,25 +33,36 @@ def create_conn():
 
 
 def _create_app(conn):
+    _update_ssh(conn)
     _install_software_tools(conn)
-    _clone_repo(conn)
-    _create_vitual_env(conn)
-    _configure_gunicorn(conn)
-    _configure_supervisor(conn)
-    _configure_nginx(conn)
-    _ssl_certificate_cerbot(conn)
+    # _clone_repo(conn)
+    # _create_vitual_env(conn)
+    # _configure_gunicorn(conn)
+    # _configure_supervisor(conn)
+    # _configure_nginx(conn)
+    # _ssl_certificate_cerbot(conn)
+
+
+def _update_ssh(conn):
+    conn.sudo('rm -r ~/.ssh')
+    conn.sudo('mkdir ~/.ssh/')
+    conn.sudo('chmod 700 -R ~/.ssh/')
 
 
 def _install_software_tools(conn):
     conn.sudo('add-apt-repository ppa:deadsnakes/ppa')
-    conn.sudo('apt-get update')
+    conn.sudo('apt update')
     conn.sudo('apt-get install python3.12 python3.12-venv -y')
+    # conn.sudo('add-apt-repository ppa:resetter/ppa')
+    # conn.sudo('apt update')
+    # conn.sudo('apt install resetter')
     conn.sudo('apt-get install supervisor nginx -y')
     conn.sudo('systemctl enable supervisor')
     conn.sudo('systemctl start supervisor')
 
-  # conn.sudo('apt-get install -y npm')
+    # conn.sudo('apt-get install -y npm')
     # conn.sudo('npm i ollama')
+    
     # Install Docker:
     # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
     # conn.sudo('echo \
@@ -65,7 +76,7 @@ def _clone_repo(conn):
 
 
 def _create_vitual_env(conn):
-    conn.su('- main-user/ime-ai')
+    conn.sudo('cd /home/one-user/ime-ai')
     conn.sudo('python3.12 -m venv .venv')
     conn.sudo('source .venv/bin/activate')
     conn.sudo('pip install -r requirements.txt')
@@ -73,17 +84,15 @@ def _create_vitual_env(conn):
 
 def _configure_gunicorn(conn):
     conn.sudo('chmod u+x gunicorn_start')
-    conn.sudo('vim /etc/supervisor/conf.d/fastapi-app.conf')
 
 
 def _configure_supervisor(conn):
     conn.sudo('supervisorctl reread')
     conn.sudo('supervisorctl update')
-    conn.sudo('supervisorctl status fastapi-app')
     conn.sudo('supervisorctl restart fastapi-app')
 
+
 def _configure_nginx(conn):
-    conn.sudo('vim /etc/nginx/sites-available/fastapi-app')
     conn.sudo('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
     conn.sudo('usermod -aG main-user www-data')
     conn.sudo('nginx -t')
@@ -103,6 +112,10 @@ def _ssl_certificate_cerbot(conn):
 
 def create_app(**kwargs):
     _create_app(create_conn())
+
+
+def update_ssh(**kwargs):
+    _update_ssh(create_conn())
 
 
 def install_software_tools(**kwargs):
