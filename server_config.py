@@ -143,6 +143,35 @@ def create_virtual_env():
 
 def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
+    # Create a file to define the parameters you’ll use when running Gunicorn.
+    config_content = """
+#!/bin/bash
+
+NAME=fastapi-app
+DIR=/home/fastapi-user/fastapi-nginx-gunicorn
+USER=fastapi-user
+GROUP=fastapi-user
+WORKERS=3
+WORKER_CLASS=uvicorn.workers.UvicornWorker
+VENV=$DIR/.venv/bin/activate
+BIND=unix:$DIR/run/gunicorn.sock
+LOG_LEVEL=error
+
+cd $DIR
+source $VENV
+
+exec gunicorn main:app \
+  --name $NAME \
+  --workers $WORKERS \
+  --worker-class $WORKER_CLASS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOG_LEVEL \
+  --log-file=-
+"""
+    with open("/home/one-user/ime-ai/gunicorn_start", "w") as config_file:
+        config_file.write(config_content)
     
     # Make the gunicorn_start script executable
     subprocess.run(["chmod", "u+x", "gunicorn_start"], check=True)
