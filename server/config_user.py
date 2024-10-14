@@ -35,11 +35,11 @@ def create_conn():
 def _create_app(conn):
     _secure_server(conn)
     _install_software_tools(conn)
-    # _clone_repo(conn)
-    # _create_vitual_env(conn)
-    # _configure_gunicorn(conn)
-    # _configure_supervisor(conn)
-    # _configure_nginx(conn)
+    _clone_repo(conn)
+    _create_vitual_env(conn)
+    _configure_gunicorn(conn)
+    _configure_supervisor(conn)
+    _configure_nginx(conn)
     # _ssl_certificate_cerbot(conn)
 
 
@@ -101,14 +101,17 @@ def _create_vitual_env(conn):
 
 def _configure_gunicorn(conn):
     with conn.cd('/home/one-user/ime-ai'):
+        # Make it executable.
         conn.run('chmod u+x gunicorn_start')
+        # make a run folder in your project directory for the Unix socket file you defined in the BIND parameter:
         conn.run('mkdir run')
 
 
 def _configure_supervisor(conn):
     with conn.cd('/home/one-user/ime-ai'):
         conn.run('mkdir logs')
-        conn.run('sudo touch /etc/supervisor/conf.d/fastapi-app.conf')
+        # create a Supervisor’s configuration file.
+        conn.run('sudo sh -c "echo > /etc/supervisor/conf.d/fastapi-app.conf')
         conn.run('sudo echo "[program:fastapi-app]" >> /etc/supervisor/conf.d/fastapi-app.conf')
         conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
         conn.run('sudo echo "command=/home/one-user/ime-ai/gunicorn_start" >> /etc/supervisor/conf.d/fastapi-app.conf')
@@ -122,6 +125,7 @@ def _configure_supervisor(conn):
         conn.run('sudo echo "redirect_stderr=true" >> /etc/supervisor/conf.d/fastapi-app.conf')
         conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
         conn.run('sudo echo "stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        # Reread Supervisor’s configuration file and restart the service.
         conn.run('supervisorctl reread')
         conn.run('supervisorctl update')
         conn.run('supervisorctl restart fastapi-app')
@@ -129,8 +133,41 @@ def _configure_supervisor(conn):
 
 def _configure_nginx(conn):
     with conn.cd('/home/one-user/ime-ai'):
+        # Create a new NGINX configuration file.
+        conn.run('sudo sh -c "echo > /etc/nginx/sites-available/fastapi-app"')
+        conn.run('sudo echo "upstream app_server {" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    server unix:/home/fastapi-user/fastapi-nginx-gunicorn/run/gunicorn.sock fail_timeout=0;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "}" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "server {" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    listen 80;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    # add here the ip address of your server" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    # or a domain pointing to that ip (like example.com or www.example.com)" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    server_name XXXX;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    keepalive_timeout 5;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    client_max_body_size 4G;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    access_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-access.log;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    error_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-error.log;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    location / {" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "        proxy_set_header Host $http_host;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "        proxy_redirect off;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "        if (!-f $request_filename) {" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "            proxy_pass http://app_server;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "            break;" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "        }" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "    }" >> /etc/nginx/sites-available/fastapi-app')
+        conn.run('sudo echo "}" >> /etc/nginx/sites-available/fastapi-app')
+        # Enable the configuration of your site by creating a symbolic link from the file in sites-available into sites-enabled.
         conn.run('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
+        # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user.
         conn.run('usermod -aG main-user www-data')
+        # Test that the configuration file is OK and restart NGINX.
         conn.run('nginx -t')
         conn.run('systemctl restart nginx')
 
@@ -139,6 +176,9 @@ def _ssl_certificate_cerbot(conn):
     with conn.cd('/home/one-user/ime-ai'):
         conn.run('snap install --classic certbot')
         conn.run('ln -s /snap/bin/certbot /usr/bin/certbot')
+        # generate a certificate for your domain.
+        conn.run('certbot --nginx')
+        # Certbot will automatically handle the renewal of your certificate. To test that it works run the following:
         conn.run('certbot --nginx')
 
 

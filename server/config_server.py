@@ -92,13 +92,11 @@ def _install_packages(conn):
     
 
 def _unattended_upgrades(conn):
-    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
+    # Configure unattended-upgrades so that it runs automatically.
     conn.run('echo "APT::Periodic::Update-Package-Lists "1";" >> /etc/apt/apt.conf.d/20auto-upgrades')
-    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
     conn.run('echo "APT::Periodic::Unattended-Upgrade "1";" >> /etc/apt/apt.conf.d/20auto-upgrades')
-    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
     conn.run('echo "APT::Periodic::AutocleanInterval "7";" >> /etc/apt/apt.conf.d/20auto-upgrades')
-    
+    # System automatically reboots when kernel updates require it
     conn.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades')
 
 
