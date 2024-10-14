@@ -173,7 +173,7 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
     # Reread Supervisor’s configuration file and restart the service
     subprocess.run(["sudo", "supervisorctl", "reread"], check=True)
     subprocess.run(["sudo", "supervisorctl", "update"], check=True)
-    subprocess.run(["sudo", "supervisorctl", "restart", "fastapi-app"], check=True)
+    subprocess.run(["sudo", "supervisorctl", "restart", "fastapi-app"])
 
 
 def configure_nginx():
@@ -221,7 +221,7 @@ server {
     
     # Test that the configuration file is OK and restart NGINX
     subprocess.run(["sudo", "nginx", "-t"], check=True)
-    subprocess.run(["sudo", "systemctl", "restart", "nginx"], check=True)
+    subprocess.run(["sudo", "systemctl", "restart", "nginx"])
 
 
 def ssl_certificate_certbot():
