@@ -5,6 +5,7 @@
 
 import subprocess
 import secret
+import sys
 import os
 
 
@@ -242,3 +243,14 @@ def ssl_certificate_certbot():
     
     # Certbot will automatically handle the renewal of your certificate. To test that it works, run the following:
     subprocess.run(["sudo", "certbot", "renew", "--dry-run"], check=True)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        func_name = sys.argv[1]
+        if func_name == "make_server_ready":
+            make_server_ready()
+        else:
+            print(f"No function named {func_name} found.")
+    else:
+        print("Please provide a function name to run.")
