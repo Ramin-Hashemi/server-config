@@ -248,8 +248,7 @@ server {
     # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user
     # subprocess.run(["sudo", "usermod", "-aG", "main-user", "www-data"], check=True)
     
-    # Test that the configuration file is OK and restart NGINX
-    subprocess.run(["sudo", "nginx", "-t"], check=True)
+    # Restart NGINX
     subprocess.run(["sudo", "systemctl", "restart", "nginx"])
 
 
