@@ -94,7 +94,7 @@ def secure_server():
 
 
 def install_software_tools():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Install Python
     subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"], check=True)
@@ -128,12 +128,12 @@ def install_docker():
 
 
 def clone_repo():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-ai.git"], check=True)
 
 
 def create_virtual_env():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Create the virtual environment
     subprocess.run(["python3.12", "-m", "venv", ".venv"], check=True)
@@ -143,7 +143,7 @@ def create_virtual_env():
 
 
 def configure_gunicorn():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Make the gunicorn_start script executable
     subprocess.run(["chmod", "u+x", "gunicorn_start"], check=True)
@@ -153,7 +153,7 @@ def configure_gunicorn():
 
 
 def configure_supervisor():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Create logs directory
     subprocess.run(["mkdir", "-p", "logs"], check=True)
@@ -161,12 +161,12 @@ def configure_supervisor():
     # Create a Supervisor configuration file
     config_content = """
 [program:fastapi-app]
-command=/home/one-user/ime-ai/gunicorn_start
+command=/home/one-user/server-config/gunicorn_start
 user=one-user
 autostart=true
 autorestart=true
 redirect_stderr=true
-stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
+stdout_logfile=/home/one-user/server-config/logs/gunicorn-error.log
 """
     with open("/etc/supervisor/conf.d/fastapi-app.conf", "w") as config_file:
         config_file.write(config_content)
@@ -178,7 +178,7 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 
 
 def configure_nginx():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Create a new NGINX configuration file
     config_content = """
@@ -226,7 +226,7 @@ server {
 
 
 def ssl_certificate_certbot():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/one-user/server-config')
     
     # Install Certbot
     subprocess.run(["sudo", "snap", "install", "--classic", "certbot"], check=True)
