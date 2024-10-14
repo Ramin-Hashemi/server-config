@@ -182,21 +182,21 @@ def configure_nginx():
     # Create a new NGINX configuration file
     config_content = """
 upstream app_server {
-    server unix:/home/fastapi-user/fastapi-nginx-gunicorn/run/gunicorn.sock fail_timeout=0;
+    server unix:/home/one-user/ime-ai/run/gunicorn.sock fail_timeout=0;
 }
 
 server {
     listen 80;
 
-    # add here the IP address of your server
-    # or a domain pointing to that IP (like example.com or www.example.com)
+    # add here the ip address of your server
+    # or a domain pointing to that ip (like example.com or www.example.com)
     server_name XXXX;
 
     keepalive_timeout 5;
     client_max_body_size 4G;
 
-    access_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-access.log;
-    error_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-error.log;
+    access_log /home/one-user/ime-ai/logs/nginx-access.log;
+    error_log /home/one-user/ime-ai/logs/nginx-error.log;
 
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
