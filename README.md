@@ -9,51 +9,28 @@ Get up and running with iME large language model.
 ## Quickstart
 
 
-1. Import project
-    - Open terminal on your local machine.
-    - Change terminal directory to the path you want to import the project.
-      Example:
+1. Import 'server_config' project
+    - Open terminal on remote server.
+    - Run this command to clone the 'server_config' poject from the GitHub repository:
 
       ```
-      cd %userprofile%\Desktop
-      ```
-      
-    - Run this command to clone the iME poject from the GitHub repository:
-
-      ```
-      git clone https://github.com/Ramin-Hashemi/ime-ai.git
+      git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
 
 2. Config the remote server
-    - Go to the project folder received from GitHub and open `secret.py` with a code editor.
-    - Change the server credentials and save the changes:
-      - ['REMOTE_HOST'] = '00.00.00.00'
-      - ['REMOTE_USER'] = '****'
-      - ['REMOTE_PASSWORD'] = '********'
-    - In your local machine, run this command to execute the required server config files:
+    - Run this command to execute the required server config files:
 
       ```
-      python server_config.py create_vm
-       python server_config2.py create_vm
+      python server_config.py make_server_ready
       ```
 
-    - In your local machine, run this command to execute the iME model initializer file:
+    - Run this command to execute the iME 'model_initialize' file:
 
       ```
-      python imeModel_initialize.py initializer
+      python model_initialize.py initializer
       ```
 
 3. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
-    - Connect to the remote server. There is two options available:
-        1. Using Putty connection
-        2. Using your local machine terminal.
-    - In your local machine, run this command with remote server credentials:
-
-      ```
-      ssh [username]@[ip-address]
-      ```
-
-      Then, insert remote server password when terminal prompt asks for it.
     - Finally, run the following command in the remote server:
 
       ```
