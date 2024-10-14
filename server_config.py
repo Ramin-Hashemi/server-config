@@ -219,7 +219,7 @@ server {
 
     # add here the ip address of your server
     # or a domain pointing to that ip (like example.com or www.example.com)
-    server_name XXXX;
+    server_name 89.32.250.198;
 
     keepalive_timeout 5;
     client_max_body_size 4G;
