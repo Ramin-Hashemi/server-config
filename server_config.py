@@ -44,6 +44,7 @@ def install_packages():
     subprocess.run(["sudo", "apt-get", "install", "-y", "openssl"], check=True)
     subprocess.run(["sudo", "apt-get", "install", "-y", "libffi-dev"], check=True)
     subprocess.run(["sudo", "apt-get", "install", "-y", "snapd"], check=True)
+    subprocess.run(["sudo", "apt-get", "install", "-y", "software-properties-common"], check=True)
     subprocess.run(["sudo", "snap", "install", "core"], check=True)
     subprocess.run(["sudo", "snap", "refresh", "core"], check=True)
     subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"], check=True)
@@ -100,9 +101,9 @@ def install_software_tools():
     subprocess.run(["sudo", "apt-get", "install", "python3.12", "python3.12-venv", "-y"], check=True)
         
     # Install Resetter
-    subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"], check=True)
-    subprocess.run(["sudo", "apt", "update"], check=True)
-    subprocess.run(["sudo", "apt", "install", "resetter", "-y"], check=True)
+    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"], check=True)
+    # subprocess.run(["sudo", "apt", "update"], check=True)
+    # subprocess.run(["sudo", "apt", "install", "resetter", "-y"], check=True)
 
     # Install Supervisor and NGINX
     subprocess.run(["sudo", "apt-get", "install", "supervisor", "nginx", "-y"], check=True)
