@@ -94,8 +94,6 @@ def secure_server():
 
 
 def install_software_tools():
-    os.chdir('/home/one-user/server-config')
-    
     # Install Python
     subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"], check=True)
     subprocess.run(["sudo", "apt", "update"], check=True)
@@ -128,7 +126,7 @@ def install_docker():
 
 
 def clone_repo():
-    os.chdir('/home/one-user/server-config')
+    os.chdir('/home/one-user')
     subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-ai.git"], check=True)
 
 
