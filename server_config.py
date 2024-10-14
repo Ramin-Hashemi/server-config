@@ -12,7 +12,7 @@ import os
 def make_server_ready():
     install_packages()
     unattended_upgrades()
-    create_new_user()
+    # create_new_user()
     secure_server()
     install_software_tools()
     clone_repo()
@@ -78,6 +78,7 @@ def unattended_upgrades():
 def create_new_user():
     subprocess.run(["sudo", "adduser", "one-user"], check=True)
     subprocess.run(["sudo", "gpasswd", "-a", "one-user", "sudo"], check=True)
+    # subprocess.run(["sudo", "-i", "-u", "one-user"], check=True) # Log in as one-user
 
 
 def secure_server():
