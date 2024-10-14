@@ -20,7 +20,7 @@ def make_server_ready():
     configure_gunicorn()
     configure_supervisor()
     configure_nginx()
-    ssl_certificate_certbot()
+    # ssl_certificate_certbot()
 
 
 def install_packages():
