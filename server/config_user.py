@@ -33,7 +33,7 @@ def create_conn():
 
 
 def _create_app(conn):
-    _update_ssh(conn)
+    _secure_server(conn)
     _install_software_tools(conn)
     # _clone_repo(conn)
     # _create_vitual_env(conn)
@@ -43,66 +43,103 @@ def _create_app(conn):
     # _ssl_certificate_cerbot(conn)
 
 
-def _update_ssh(conn):
-    conn.sudo('rm -r ~/.ssh')
-    conn.sudo('mkdir ~/.ssh/')
-    conn.sudo('chmod 700 -R ~/.ssh/')
+def _secure_server(conn):
+    # Set up your server so that you connect to it using an SSH key instead of a password.
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('sudo rm -r ~/.ssh')
+        conn.run('sudo mkdir ~/.ssh/')
+        conn.run('sudo chmod 700 -R ~/.ssh/')
+        conn.run('sudo echo >> ~/.ssh/authorized_keys')  # new line
+        conn.run(f'sudo echo {secret_user.Public_SSH_key} >> ~/.ssh/authorized_keys')
+        
+        # Disable the root login and password authentication rather than an SSH key for SSH connections.
+        conn.run('sudo sed -i \'s|#PermitRootLogin yes|PermitRootLogin no|\' /etc/ssh/sshd_config')
+        conn.run('sudo sed -i \'s|#PasswordAuthentication yes|PasswordAuthentication no|\' /etc/ssh/sshd_config')
 
 
 def _install_software_tools(conn):
-    conn.sudo('add-apt-repository ppa:deadsnakes/ppa')
-    conn.sudo('apt update')
-    conn.sudo('apt-get install python3.12 python3.12-venv -y')
-    # conn.sudo('add-apt-repository ppa:resetter/ppa')
-    # conn.sudo('apt update')
-    # conn.sudo('apt install resetter')
-    conn.sudo('apt-get install supervisor nginx -y')
-    conn.sudo('systemctl enable supervisor')
-    conn.sudo('systemctl start supervisor')
+    with conn.cd('/home/one-user/ime-ai'):
+        
+        # Install Python
+        conn.run('add-apt-repository ppa:deadsnakes/ppa')
+        conn.run('apt update')
+        conn.run('apt-get install python3.12 python3.12-venv -y')
+        
+        # Install Resetter
+        # conn.run('add-apt-repository ppa:resetter/ppa')
+        # conn.run('apt update')
+        # conn.run('apt install resetter')
 
-    # conn.sudo('apt-get install -y npm')
-    # conn.sudo('npm i ollama')
+        # Install Supervisor and NGINX
+        conn.run('apt-get install supervisor nginx -y')
+        conn.run('systemctl enable supervisor')
+        conn.run('systemctl start supervisor')
+        
+        # Install JS
+        # conn.sudo('apt-get install -y npm')
+        # conn.sudo('npm i ollama')
     
-    # Install Docker:
-    # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
-    # conn.sudo('echo \
-    # "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    # $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
-    # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
+        # Install Docker:
+        # conn.sudo('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg')
+        # conn.sudo('echo \
+        # "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+        # $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
+        # conn.sudo('apt-get install -y docker-ce docker-ce-cli containerd.io')
 
 
 def _clone_repo(conn):
-    conn.sudo('git clone https://github.com/Ramin-Hashemi/ime-ai.git')
+    with conn.cd('/home/one-user'):
+        conn.run('git clone https://github.com/Ramin-Hashemi/ime-ai.git')
 
 
 def _create_vitual_env(conn):
-    conn.sudo('cd /home/one-user/ime-ai')
-    conn.sudo('python3.12 -m venv .venv')
-    conn.sudo('source .venv/bin/activate')
-    conn.sudo('pip install -r requirements.txt')
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('python3.12 -m venv .venv')
+        conn.run('source .venv/bin/activate')
+        conn.run('pip install -r requirements.txt')
 
 
 def _configure_gunicorn(conn):
-    conn.sudo('chmod u+x gunicorn_start')
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('chmod u+x gunicorn_start')
+        conn.run('mkdir run')
 
 
 def _configure_supervisor(conn):
-    conn.sudo('supervisorctl reread')
-    conn.sudo('supervisorctl update')
-    conn.sudo('supervisorctl restart fastapi-app')
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('mkdir logs')
+        conn.run('sudo touch /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "[program:fastapi-app]" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "command=/home/one-user/ime-ai/gunicorn_start" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "user=one-user" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "autostart=true" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "autorestart=true" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "redirect_stderr=true" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('sudo echo "stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log" >> /etc/supervisor/conf.d/fastapi-app.conf')
+        conn.run('supervisorctl reread')
+        conn.run('supervisorctl update')
+        conn.run('supervisorctl restart fastapi-app')
 
 
 def _configure_nginx(conn):
-    conn.sudo('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
-    conn.sudo('usermod -aG main-user www-data')
-    conn.sudo('nginx -t')
-    conn.sudo('systemctl restart nginx')
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/')
+        conn.run('usermod -aG main-user www-data')
+        conn.run('nginx -t')
+        conn.run('systemctl restart nginx')
 
 
 def _ssl_certificate_cerbot(conn):
-    conn.sudo('snap install --classic certbot')
-    conn.sudo('ln -s /snap/bin/certbot /usr/bin/certbot')
-    conn.sudo('certbot --nginx')
+    with conn.cd('/home/one-user/ime-ai'):
+        conn.run('snap install --classic certbot')
+        conn.run('ln -s /snap/bin/certbot /usr/bin/certbot')
+        conn.run('certbot --nginx')
 
 
 #####################################
@@ -114,8 +151,8 @@ def create_app(**kwargs):
     _create_app(create_conn())
 
 
-def update_ssh(**kwargs):
-    _update_ssh(create_conn())
+def secure_server(**kwargs):
+    _secure_server(create_conn())
 
 
 def install_software_tools(**kwargs):

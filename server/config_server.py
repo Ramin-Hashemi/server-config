@@ -13,8 +13,6 @@
 
 # This script needs:
 # $ pip install fabric
-
-
 # Python package called fabric is a function that creates a connection to the server:
 
 
@@ -45,6 +43,7 @@ def create_conn():
 
 def _create_vm(conn):
     _install_packages(conn)
+    _unattended_upgrades(conn)
     _create_new_user(conn)
     # _delete_users(conn)
     # _create_resetter_user(conn)
@@ -92,16 +91,28 @@ def _install_packages(conn):
     conn.sudo('apt-get install -y postgresql')
     
 
+def _unattended_upgrades(conn):
+    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
+    conn.run('echo "APT::Periodic::Update-Package-Lists "1";" >> /etc/apt/apt.conf.d/20auto-upgrades')
+    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
+    conn.run('echo "APT::Periodic::Unattended-Upgrade "1";" >> /etc/apt/apt.conf.d/20auto-upgrades')
+    conn.run('echo >> /etc/apt/apt.conf.d/20auto-upgrades')  # new line
+    conn.run('echo "APT::Periodic::AutocleanInterval "7";" >> /etc/apt/apt.conf.d/20auto-upgrades')
+    
+    conn.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades')
+
+
 def _create_new_user(conn):
-    conn.sudo('adduser --disabled-password one-user')
-    conn.sudo('gpasswd -a one-user sudo')
+    conn.run('adduser --disabled-password one-user')
+    conn.run('gpasswd -a one-user sudo')
+    # conn.su('- one-user')
 
 
 def _delete_users(conn):
     from_date = '2024-10-10 00:00:00'
     
     # Get the list of users
-    result = conn.sudo('cut -d: -f1 /etc/passwd', hide=True)
+    result = conn.run('cut -d: -f1 /etc/passwd', hide=True)
     users = result.stdout.splitlines()
 
     # Convert from_date to a timestamp
@@ -127,12 +138,12 @@ def _delete_users(conn):
     # Loop through the users and delete them if they are not in the exclude list
     for user in filtered_users:
         if user not in exclude_users:
-            conn.sudo(f'userdel -r {user}')
+            conn.run(f'userdel -r {user}')
 
 
 def _create_resetter_user(conn):
-    conn.sudo('adduser resetter')
-    conn.sudo('gpasswd -a resetter sudo')
+    conn.run('adduser resetter')
+    conn.run('gpasswd -a resetter sudo')
 
 
 #####################################
@@ -142,6 +153,10 @@ def _create_resetter_user(conn):
 
 def create_vm(**kwargs):
     _create_vm(create_conn())
+
+
+def unattended_upgrades(**kwargs):
+    _unattended_upgrades(create_conn())
 
 
 def create_new_user(**kwargs):

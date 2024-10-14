@@ -1,7 +1,8 @@
-su - main-user
+su - one-user
 
 
 *****
+Automatic Security Updates
 sudo nano /etc/apt/apt.conf.d/20auto-upgrades
 
 Edit /etc/apt/apt.conf.d/20auto-upgrades to include the following lines:
@@ -11,6 +12,7 @@ APT::Periodic::AutocleanInterval "7";
 
 
 ******
+System Automatically Reboots
 sudo nano /etc/apt/apt.conf.d/50unattended-upgrades
 
 Edit /etc/apt/apt.conf.d/50unattended-upgrades to include the following line:
@@ -37,24 +39,26 @@ PasswordAuthentication no
 
 
 ******
+Configure Supervisor
 sudo nano /etc/supervisor/conf.d/fastapi-app.conf
 
 Edit /etc/supervisor/conf.d/fastapi-app.conf to include the following lines:
 [program:fastapi-app]
-command=/home/main-user/ime-ai/gunicorn_start
-user=main-user
+command=/home/one-user/ime-ai/gunicorn_start
+user=one-user
 autostart=true
 autorestart=true
 redirect_stderr=true
-stdout_logfile=/home/main-user/ime-ai/logs/gunicorn-error.log
+stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 
 
 ******
+Configure NGINX
 sudo nano /etc/nginx/sites-available/fastapi-app
 
 Edit /etc/nginx/sites-available/fastapi-app to include the following lines:
 upstream app_server {
-    server unix:/home/main-user/ime-ai/run/gunicorn.sock fail_timeout=0;
+    server unix:/home/one-user/ime-ai/run/gunicorn.sock fail_timeout=0;
 }
 
 server {
@@ -67,8 +71,8 @@ server {
     keepalive_timeout 5;
     client_max_body_size 4G;
 
-    access_log /home/main-user/ime-ai/logs/nginx-access.log;
-    error_log /home/main-user/ime-ai/logs/nginx-error.log;
+    access_log /home/one-user/ime-ai/logs/nginx-access.log;
+    error_log /home/one-user/ime-ai/logs/nginx-error.log;
 
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
