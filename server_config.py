@@ -155,31 +155,31 @@ def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
     # Create a file to define the parameters you’ll use when running Gunicorn.
     config_content = """
-    #!/bin/bash
+#!/bin/bash
 
-    NAME=fastapi-app
-    DIR=/home/one-user/ime-ai
-    USER=one-user
-    GROUP=one-user
-    WORKERS=3
-    WORKER_CLASS=uvicorn.workers.UvicornWorker
-    VENV=$DIR/.venv/bin/activate
-    BIND=unix:$DIR/run/gunicorn.sock
-    LOG_LEVEL=error
+NAME=fastapi-app
+DIR=/home/one-user/ime-ai
+USER=one-user
+GROUP=one-user
+WORKERS=3
+WORKER_CLASS=uvicorn.workers.UvicornWorker
+VENV=$DIR/.venv/bin/activate
+BIND=unix:$DIR/run/gunicorn.sock
+LOG_LEVEL=error
 
-    cd $DIR
-    source $VENV
+cd $DIR
+source $VENV
 
-    exec gunicorn main:app \
-    --name $NAME \
-    --workers $WORKERS \
-    --worker-class $WORKER_CLASS \
-    --user=$USER \
-    --group=$GROUP \
-    --bind=$BIND \
-    --log-level=$LOG_LEVEL \
-    --log-file=-
-    """
+exec gunicorn main:app \
+--name $NAME \
+--workers $WORKERS \
+--worker-class $WORKER_CLASS \
+--user=$USER \
+--group=$GROUP \
+--bind=$BIND \
+--log-level=$LOG_LEVEL \
+--log-file=-
+"""
     # Use subprocess to write the config content to the file with sudo
     command = 'echo "{}" | sudo tee /home/one-user/ime-ai/gunicorn_start'.format(config_content.replace('\n', '\\n'))
     subprocess.run(command, shell=True)
@@ -199,14 +199,14 @@ def configure_supervisor():
 
     # Create a Supervisor configuration file
     config_content = """
-    [program:fastapi-app]
-    command=/home/one-user/ime-ai/gunicorn_start
-    user=one-user
-    autostart=true
-    autorestart=true
-    redirect_stderr=true
-    stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
-    """
+[program:fastapi-app]
+command=/home/one-user/ime-ai/gunicorn_start
+user=one-user
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
+"""
 
     # Use subprocess to write the config content to the file with sudo
     command = 'echo "{}" | sudo tee /etc/supervisor/conf.d/fastapi-app.conf'.format(config_content.replace('\n', '\\n'))
