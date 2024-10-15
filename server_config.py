@@ -13,10 +13,10 @@ def make_server_ready():
     # install_packages()
     # unattended_upgrades()
     # create_new_user()
-    # secure_server()
+    secure_server()
     # install_software_tools()
     # clone_repo()
-    create_virtual_env()
+    # create_virtual_env()
     # configure_gunicorn()
     # configure_supervisor()
     # configure_nginx()
@@ -92,13 +92,13 @@ def create_new_user():
 def secure_server():
     # Set up your server so that you connect to it using an SSH key instead of a password.
     os.chdir('/home/one-user')
-    subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh'])
-    subprocess.run(['sudo', 'chmod', '700', '/home/one-user/.ssh'])
+    # subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh'])
+    # subprocess.run(['sudo', 'chmod', '700', '/home/one-user/.ssh'])
     subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/one-user/.ssh/authorized_keys\'', shell=True)
 
     # Disable the root login and password authentication rather than an SSH key for SSH connections.
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
+    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
+    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
 
 
 def install_software_tools():
