@@ -142,11 +142,13 @@ def create_virtual_env():
     os.chdir('/home/one-user/ime-ai')
 
     # Create the virtual environment
-    subprocess.run(["python3.11", "-m", "venv", ".venv"],)
+    subprocess.run(["python3.11", "-m", "venv", ".venv"], check=True)
 
-    # Activate the virtual environment
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
-    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
+    # Activate the virtual environment and install requirements
+    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True, check=True)
+
+    # Run the Uvicorn server
+    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"], check=True)
 
 
 def configure_gunicorn():
