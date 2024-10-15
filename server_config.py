@@ -10,7 +10,7 @@ import os
 
 
 def make_server_ready():
-    install_packages()
+    # install_packages()
     unattended_upgrades()
     create_new_user()
     secure_server()
@@ -75,11 +75,11 @@ def install_packages():
 
 def unattended_upgrades():
     # Configure unattended-upgrades so that it runs automatically.
-    subprocess.run('sudo echo \'APT::Periodic::Update-Package-Lists "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
-    subprocess.run('sudo echo \'APT::Periodic::Unattended-Upgrade "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
-    subprocess.run('sudo echo \'APT::Periodic::AutocleanInterval "7";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
     # System automatically reboots when kernel updates require it
-    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades')
+    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True, check=True)
 
 
 def create_new_user():
