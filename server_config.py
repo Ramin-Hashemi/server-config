@@ -12,133 +12,141 @@ import os
 def make_server_ready():
     install_packages()
     unattended_upgrades()
-    # create_new_user()
+    create_new_user()
     secure_server()
     install_software_tools()
     clone_repo()
     create_virtual_env()
-    configure_gunicorn()
-    configure_supervisor()
-    configure_nginx()
+    # configure_gunicorn()
+    # configure_supervisor()
+    # configure_nginx()
     # ssl_certificate_certbot()
 
 
 def install_packages():
-    subprocess.run(["sudo", "apt-get", "update", "-y"], check=True)
-    subprocess.run(["sudo", "apt-get", "upgrade", "-y"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "unattended-upgrades"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "build-essential"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "checkinstall"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "coreutils"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libreadline-gplv2-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libncurses-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libncursesw5-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libssl-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libsqlite3-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "tk-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libgdbm-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libpq-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libc6-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libbz2-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "zlib1g-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "openssl"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libffi-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "snapd"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "software-properties-common"], check=True)
-    subprocess.run(["sudo", "snap", "install", "core"], check=True)
-    subprocess.run(["sudo", "snap", "refresh", "core"], check=True)
-    subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "uuid-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "lzma-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "wget"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "tree"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "curl"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "vim"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "ca-certificates"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "lsb-release"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "gnupg"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-pip"], check=True)
-    subprocess.run(["sudo", "pip", "install", "--upgrade", "pip"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-dev"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-setuptools"], check=True)
-    subprocess.run(["sudo", "pip", "install", "python-dotenv"], check=True)
-    subprocess.run(["sudo", "pip", "install", "pexpect"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "git"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "postgresql"], check=True)
-    
+    # Recommended for start
+    subprocess.run(["sudo", "apt-get", "update", "-y"])
+    subprocess.run(["sudo", "apt-get", "upgrade", "-y"])
+
+    # Projects required packages
+    subprocess.run(["sudo", "apt-get", "install", "-y", "unattended-upgrades"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "build-essential"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "checkinstall"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "coreutils"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libreadline-gplv2-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libncurses-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libncursesw5-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libssl-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libsqlite3-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "tk-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libgdbm-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libpq-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libc6-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libbz2-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "zlib1g-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "openssl"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libffi-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "software-properties-common"])
+    subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "uuid-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "lzma-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "wget"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "tree"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "curl"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "vim"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "ca-certificates"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "lsb-release"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "gnupg"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-pip"])
+    subprocess.run(["sudo", "pip", "install", "--upgrade", "pip"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-dev"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-setuptools"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "git"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "postgresql"])
+
+    # Not Included by Default:
+    subprocess.run(["sudo", "pip", "install", "pexpect"])
+    subprocess.run(["sudo", "pip", "install", "python-dotenv"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "snapd"])
+    subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"])
+    subprocess.run(["sudo", "snap", "install", "core"])
+    subprocess.run(["sudo", "snap", "refresh", "core"])
+
 
 def unattended_upgrades():
     # Configure unattended-upgrades so that it runs automatically.
-    subprocess.run('echo \'APT::Periodic::Update-Package-Lists "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades', shell=True, check=True)
-    subprocess.run('echo \'APT::Periodic::Unattended-Upgrade "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades', shell=True, check=True)
-    subprocess.run('echo \'APT::Periodic::AutocleanInterval "7";\' >> /etc/apt/apt.conf.d/20auto-upgrades', shell=True, check=True)
+    subprocess.run('sudo echo \'APT::Periodic::Update-Package-Lists "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
+    subprocess.run('sudo echo \'APT::Periodic::Unattended-Upgrade "1";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
+    subprocess.run('sudo echo \'APT::Periodic::AutocleanInterval "7";\' >> /etc/apt/apt.conf.d/20auto-upgrades')
     # System automatically reboots when kernel updates require it
-    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True, check=True)
+    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades')
 
 
 def create_new_user():
-    subprocess.run(["sudo", "adduser", "one-user"], check=True)
-    subprocess.run(["sudo", "gpasswd", "-a", "one-user", "sudo"], check=True)
-    # subprocess.run(["sudo", "-i", "-u", "one-user"], check=True) # Log in as one-user
+    subprocess.run(["sudo", "adduser", "one-user"],)
+    subprocess.run(["sudo", "gpasswd", "-a", "one-user", "sudo"],)
+    # subprocess.run(["sudo", "-i", "-u", "one-user"],) # Log in as one-user
+    # subprocess.run(["su", "-", "one-user"],) # Log in as one-user
 
 
 def secure_server():
     # Set up your server so that you connect to it using an SSH key instead of a password.
     os.chdir('/home/one-user')
-    subprocess.run(['mkdir', '-p', '/home/one-user/.ssh/'], check=True)
-    subprocess.run(['chmod', '700', '/home/one-user/.ssh/'], check=True)
-    subprocess.run(f'echo \'{secret.Public_SSH_key}\' >> /home/one-user/.ssh/authorized_keys', shell=True, check=True)
+    subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh/'],)
+    subprocess.run(['sudo', 'chmod', '700', '-R', '/home/one-user/.ssh/'],)
+    subprocess.run(f'sudo echo \'{secret.Public_SSH_key}\' >> /home/one-user/.ssh/authorized_keys')
 
     # Disable the root login and password authentication rather than an SSH key for SSH connections.
-    subprocess.run(['sed', '-i', 's|#PermitRootLogin yes|PermitRootLogin no|', '/etc/ssh/sshd_config'], check=True)
-    subprocess.run(['sed', '-i', 's|#PasswordAuthentication yes|PasswordAuthentication no|', '/etc/ssh/sshd_config'], check=True)
+    subprocess.run(['sudo', 'sed', '-i', 's|#PermitRootLogin yes|PermitRootLogin no|', '/etc/ssh/sshd_config'],)
+    subprocess.run(['sudo', 'sed', '-i', 's|#PasswordAuthentication yes|PasswordAuthentication no|', '/etc/ssh/sshd_config'],)
 
 
 def install_software_tools():
     # Install Python
-    subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"], check=True)
-    subprocess.run(["sudo", "apt", "update"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "python3.12", "python3.12-venv", "-y"], check=True)
-        
+    subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"],)
+    subprocess.run(["sudo", "apt-get", "update"],)
+    subprocess.run(["sudo", "apt-get", "install", "python3.11", "python3.11-venv", "-y"],)
+
     # Install Resetter
-    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"], check=True)
-    # subprocess.run(["sudo", "apt", "update"], check=True)
-    # subprocess.run(["sudo", "apt", "install", "resetter", "-y"], check=True)
+    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"],)
+    # subprocess.run(["sudo", "apt-get", "update"],)
+    # subprocess.run(["sudo", "apt-get", "install", "resetter", "-y"],)
 
     # Install Supervisor and NGINX
-    subprocess.run(["sudo", "apt-get", "install", "supervisor", "nginx", "-y"], check=True)
-    subprocess.run(["sudo", "systemctl", "enable", "supervisor"], check=True)
-    subprocess.run(["sudo", "systemctl", "start", "supervisor"], check=True)
-        
+    subprocess.run(["sudo", "apt-get", "install", "supervisor", "nginx", "-y"],)
+    subprocess.run(["sudo", "systemctl", "enable", "supervisor"],)
+    subprocess.run(["sudo", "systemctl", "start", "supervisor"],)
+
     # Install JS
-    subprocess.run(["sudo", "apt-get", "install", "-y", "npm"], check=True)
-    subprocess.run(["npm", "i", "ollama"], check=True)
-    
+    subprocess.run(["sudo", "apt-get", "install", "-y", "npm"],)
+    subprocess.run(["npm", "i", "ollama"],)
+
 def install_docker():
     # Add Docker's official GPG key
-    subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg", shell=True, check=True)
-    
+    subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg")
+
     # Set up the stable repository
-    subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null', shell=True, check=True)
-    
+    subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
+
     # Install Docker Engine
-    subprocess.run(["sudo", "apt-get", "update"], check=True)
-    subprocess.run(["sudo", "apt-get", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io"], check=True)
+    subprocess.run(["sudo", "apt-get", "update"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io"])
 
 
 def clone_repo():
     os.chdir('/home/one-user')
-    subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-ai.git"], check=True)
+    subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-ai.git"],)
 
 
 def create_virtual_env():
     os.chdir('/home/one-user/ime-ai')
-    
+
     # Create the virtual environment
-    subprocess.run(["python3.12", "-m", "venv", ".venv"], check=True)
-    
+    subprocess.run(["python3.11", "-m", "venv", ".venv"],)
+
     # Activate the virtual environment
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], check=True)
+    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"],)
+    subprocess.run(["sudo", "uvicorn", "main:app"])
 
 
 def configure_gunicorn():
@@ -172,20 +180,20 @@ exec gunicorn main:app \
 """
     with open("/home/one-user/ime-ai/gunicorn_start", "w") as config_file:
         config_file.write(config_content)
-    
+
     # Make the gunicorn_start script executable
     subprocess.run(["chmod", "u+x", "gunicorn_start"], check=True)
-    
+
     # Create a run folder in your project directory for the Unix socket file
     subprocess.run(["mkdir", "-p", "run"], check=True)
 
 
 def configure_supervisor():
     os.chdir('/home/one-user/ime-ai')
-    
+
     # Create logs directory
     subprocess.run(["mkdir", "-p", "logs"], check=True)
-    
+
     # Create a Supervisor configuration file
     config_content = """
 [program:fastapi-app]
@@ -198,7 +206,7 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 """
     with open("/etc/supervisor/conf.d/fastapi-app.conf", "w") as config_file:
         config_file.write(config_content)
-    
+
     # Reread Supervisor’s configuration file and restart the service
     subprocess.run(["sudo", "supervisorctl", "reread"], check=True)
     subprocess.run(["sudo", "supervisorctl", "update"], check=True)
@@ -207,7 +215,7 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 
 def configure_nginx():
     os.chdir('/home/one-user/ime-ai')
-    
+
     # Create a new NGINX configuration file
     config_content = """
 upstream app_server {
@@ -241,27 +249,27 @@ server {
 """
     with open("/etc/nginx/sites-available/fastapi-app", "w") as config_file:
         config_file.write(config_content)
-    
+
     # Enable the configuration of your site by creating a symbolic link from the file in sites-available into sites-enabled
     subprocess.run(["sudo", "ln", "-s", "/etc/nginx/sites-available/fastapi-app", "/etc/nginx/sites-enabled/"], check=True)
-    
+
     # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user
     # subprocess.run(["sudo", "usermod", "-aG", "main-user", "www-data"], check=True)
-    
+
     # Restart NGINX
     subprocess.run(["sudo", "systemctl", "restart", "nginx"])
 
 
 def ssl_certificate_certbot():
     os.chdir('/home/one-user/ime-ai')
-    
+
     # Install Certbot
     subprocess.run(["sudo", "snap", "install", "--classic", "certbot"], check=True)
     subprocess.run(["sudo", "ln", "-s", "/snap/bin/certbot", "/usr/bin/certbot"], check=True)
-    
+
     # Generate a certificate for your domain
     subprocess.run(["sudo", "certbot", "--nginx"], check=True)
-    
+
     # Certbot will automatically handle the renewal of your certificate. To test that it works, run the following:
     subprocess.run(["sudo", "certbot", "renew", "--dry-run"], check=True)
 

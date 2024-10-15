@@ -9,7 +9,28 @@ Get up and running with iME large language model.
 ## Quickstart
 
 
-1. Import 'server_config' project
+1. Import 'server_config' project (Local)
+    - Open terminal on your local machine.
+    - Run this command to clone the 'server_config' poject from the GitHub repository:
+
+      ```
+      git clone https://github.com/Ramin-Hashemi/server_config.git
+      ```
+
+2. Create your public SSH key.
+    - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
+      (Make sure to replace username@email.com it with your actual email.)
+
+      ```
+      ssh-keygen -t ed25519 -C "username@email.com"
+      ```
+     - Then, copy your public SSH key by using this command and copying the output:
+      ```
+      cat ~/.ssh/id_ed25519.pub
+      ```
+      Then copy your public SSH key in 'secret.py' file in the project repo and push to the GitHub.
+
+3. Import 'server_config' project (Remote Server)
     - Open terminal on remote server.
     - Run this command to clone the 'server_config' poject from the GitHub repository:
 
@@ -17,7 +38,7 @@ Get up and running with iME large language model.
       git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
 
-2. Config the remote server
+4. Config the remote server
     - Run this command to execute the required server config files:
 
       ```
@@ -30,7 +51,7 @@ Get up and running with iME large language model.
       python model_initialize.py initializer
       ```
 
-3. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
+5. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
     - Finally, run the following command in the remote server:
 
       ```
