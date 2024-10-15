@@ -145,7 +145,7 @@ def create_virtual_env():
     subprocess.run(["python3.11", "-m", "venv", ".venv"],)
 
     # Activate the virtual environment
-    subprocess.run(["sudo", "/bin/bash", "-c", "source .venv/bin/activate && apt-get install -r requirements.txt"], shell=True)
+    subprocess.run(["sudo", "/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
     subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 
