@@ -16,9 +16,9 @@ def make_server_ready():
     # secure_server()
     # install_software_tools()
     # clone_repo()
-    create_virtual_env()
-    # configure_gunicorn()
-    # configure_supervisor()
+    # create_virtual_env()
+    configure_gunicorn()
+    configure_supervisor()
     # configure_nginx()
     # ssl_certificate_certbot()
 
@@ -158,9 +158,9 @@ def configure_gunicorn():
 #!/bin/bash
 
 NAME=fastapi-app
-DIR=/home/fastapi-user/fastapi-nginx-gunicorn
-USER=fastapi-user
-GROUP=fastapi-user
+DIR=/home/one-user/ime-ai
+USER=one-user
+GROUP=one-user
 WORKERS=3
 WORKER_CLASS=uvicorn.workers.UvicornWorker
 VENV=$DIR/.venv/bin/activate
@@ -184,17 +184,17 @@ exec gunicorn main:app \
         config_file.write(config_content)
 
     # Make the gunicorn_start script executable
-    subprocess.run(["chmod", "u+x", "gunicorn_start"], check=True)
+    subprocess.run(["chmod", "u+x", "gunicorn_start"])
 
     # Create a run folder in your project directory for the Unix socket file
-    subprocess.run(["mkdir", "-p", "run"], check=True)
+    subprocess.run(["mkdir", "-p", "run"])
 
 
 def configure_supervisor():
     os.chdir('/home/one-user/ime-ai')
 
     # Create logs directory
-    subprocess.run(["mkdir", "-p", "logs"], check=True)
+    subprocess.run(["mkdir", "-p", "logs"])
 
     # Create a Supervisor configuration file
     config_content = """
@@ -210,8 +210,8 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
         config_file.write(config_content)
 
     # Reread Supervisor’s configuration file and restart the service
-    subprocess.run(["sudo", "supervisorctl", "reread"], check=True)
-    subprocess.run(["sudo", "supervisorctl", "update"], check=True)
+    subprocess.run(["sudo", "supervisorctl", "reread"])
+    subprocess.run(["sudo", "supervisorctl", "update"])
     subprocess.run(["sudo", "supervisorctl", "restart", "fastapi-app"])
 
 
