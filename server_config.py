@@ -153,6 +153,7 @@ def create_virtual_env():
 
 def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
+    
     # Create a file to define the parameters you’ll use when running Gunicorn.
     config_content = """
 #!/bin/bash
@@ -166,8 +167,10 @@ WORKER_CLASS=uvicorn.workers.UvicornWorker
 VENV=$DIR/.venv/bin/activate
 BIND=unix:$DIR/run/gunicorn.sock
 LOG_LEVEL=error
+
 cd $DIR
 source $VENV
+
 exec gunicorn main:app \
 --name $NAME \
 --workers $WORKERS \
@@ -178,9 +181,12 @@ exec gunicorn main:app \
 --log-level=$LOG_LEVEL \
 --log-file=-
 """
-    # Use subprocess to write the config content to the file with sudo
-    command = 'echo "{}" | sudo tee /home/one-user/ime-ai/gunicorn_start'.format(config_content.replace('\n', '\\n'))
-    subprocess.run(command, shell=True)
+    script_path = "/home/one-user/ime-ai/gunicorn_start"
+    
+    with open("/tmp/gunicorn_start", "w") as f:
+        f.write(config_content)
+    subprocess.run(["sudo", "mv", "/tmp/gunicorn_start", script_path])
+    subprocess.run(["sudo", "chmod", "+x", script_path])
 
     # Make the gunicorn_start script executable
     subprocess.run(["sudo", "chmod", "u+x", "gunicorn_start"])
@@ -206,9 +212,14 @@ redirect_stderr=true
 stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 """
 
-    # Use subprocess to write the config content to the file with sudo
-    command = 'echo "{}" | sudo tee /etc/supervisor/conf.d/fastapi-app.conf'.format(config_content.replace('\n', '\\n'))
-    subprocess.run(command, shell=True)
+    config_path = "/etc/supervisor/conf.d/fastapi-app.conf"
+    with open("/tmp/fastapi-app.conf", "w") as f:
+        f.write(config_content)
+    subprocess.run(["sudo", "mv", "/tmp/fastapi-app.conf", config_path])
+
+    # Reload Supervisor to apply the new configuration
+    subprocess.run(["sudo", "supervisorctl", "reread"])
+    subprocess.run(["sudo", "supervisorctl", "update"])
 
     # Reread Supervisor’s configuration file and restart the service
     subprocess.run(["sudo", "supervisorctl", "reread"])
