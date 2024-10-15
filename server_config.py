@@ -11,8 +11,8 @@ import os
 
 def make_server_ready():
     # install_packages()
-    unattended_upgrades()
-    create_new_user()
+    # unattended_upgrades()
+    # create_new_user()
     secure_server()
     install_software_tools()
     clone_repo()
@@ -92,41 +92,41 @@ def create_new_user():
 def secure_server():
     # Set up your server so that you connect to it using an SSH key instead of a password.
     os.chdir('/home/one-user')
-    subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh/'],)
-    subprocess.run(['sudo', 'chmod', '700', '-R', '/home/one-user/.ssh/'],)
-    subprocess.run(f'sudo echo \'{secret.Public_SSH_key}\' >> /home/one-user/.ssh/authorized_keys')
+    subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh'])
+    subprocess.run(['sudo', 'chmod', '700', '/home/one-user/.ssh'])
+    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/one-user/.ssh/authorized_keys\'', shell=True)
 
     # Disable the root login and password authentication rather than an SSH key for SSH connections.
-    subprocess.run(['sudo', 'sed', '-i', 's|#PermitRootLogin yes|PermitRootLogin no|', '/etc/ssh/sshd_config'],)
-    subprocess.run(['sudo', 'sed', '-i', 's|#PasswordAuthentication yes|PasswordAuthentication no|', '/etc/ssh/sshd_config'],)
+    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
+    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
 
 
 def install_software_tools():
     # Install Python
-    subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"],)
-    subprocess.run(["sudo", "apt-get", "update"],)
-    subprocess.run(["sudo", "apt-get", "install", "python3.11", "python3.11-venv", "-y"],)
+    subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"])
+    subprocess.run(["sudo", "apt-get", "update"])
+    subprocess.run(["sudo", "apt-get", "install", "python3.11", "python3.11-venv", "-y"])
 
     # Install Resetter
-    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"],)
-    # subprocess.run(["sudo", "apt-get", "update"],)
-    # subprocess.run(["sudo", "apt-get", "install", "resetter", "-y"],)
+    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"])
+    # subprocess.run(["sudo", "apt-get", "update"])
+    # subprocess.run(["sudo", "apt-get", "install", "resetter", "-y"])
 
     # Install Supervisor and NGINX
-    subprocess.run(["sudo", "apt-get", "install", "supervisor", "nginx", "-y"],)
-    subprocess.run(["sudo", "systemctl", "enable", "supervisor"],)
-    subprocess.run(["sudo", "systemctl", "start", "supervisor"],)
+    subprocess.run(["sudo", "apt-get", "install", "supervisor", "nginx", "-y"])
+    subprocess.run(["sudo", "systemctl", "enable", "supervisor"])
+    subprocess.run(["sudo", "systemctl", "start", "supervisor"])
 
     # Install JS
-    subprocess.run(["sudo", "apt-get", "install", "-y", "npm"],)
-    subprocess.run(["npm", "i", "ollama"],)
+    subprocess.run(["sudo", "apt-get", "install", "-y", "npm"])
+    subprocess.run(["npm", "install", "ollama"])
 
 def install_docker():
     # Add Docker's official GPG key
-    subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg")
+    subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg", shell=True)
 
     # Set up the stable repository
-    subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null')
+    subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null', shell=True)
 
     # Install Docker Engine
     subprocess.run(["sudo", "apt-get", "update"])
@@ -145,8 +145,8 @@ def create_virtual_env():
     subprocess.run(["python3.11", "-m", "venv", ".venv"],)
 
     # Activate the virtual environment
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"],)
-    subprocess.run(["sudo", "uvicorn", "main:app"])
+    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
+    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 
 def configure_gunicorn():
