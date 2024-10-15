@@ -18,7 +18,7 @@ def make_server_ready():
     # clone_repo()
     # create_virtual_env()
     configure_gunicorn()
-    configure_supervisor()
+    # configure_supervisor()
     # configure_nginx()
     # ssl_certificate_certbot()
 
