@@ -13,9 +13,9 @@ def make_server_ready():
     # install_packages()
     # unattended_upgrades()
     # create_new_user()
-    secure_server()
-    install_software_tools()
-    clone_repo()
+    # secure_server()
+    # install_software_tools()
+    # clone_repo()
     create_virtual_env()
     # configure_gunicorn()
     # configure_supervisor()
@@ -75,11 +75,11 @@ def install_packages():
 
 def unattended_upgrades():
     # Configure unattended-upgrades so that it runs automatically.
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True, check=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
     # System automatically reboots when kernel updates require it
-    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True, check=True)
+    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
 
 
 def create_new_user():
@@ -145,7 +145,7 @@ def create_virtual_env():
     subprocess.run(["python3.11", "-m", "venv", ".venv"],)
 
     # Activate the virtual environment
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
+    subprocess.run(["sudo", "/bin/bash", "-c", "source .venv/bin/activate && apt-get install -r requirements.txt"], shell=True)
     subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 
