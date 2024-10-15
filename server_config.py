@@ -17,7 +17,7 @@ def make_server_ready():
     # install_software_tools()
     # clone_repo()
     # create_virtual_env()
-    # configure_gunicorn()
+    configure_gunicorn()
     configure_supervisor()
     # configure_nginx()
     # ssl_certificate_certbot()
@@ -216,10 +216,6 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
     with open("/tmp/fastapi-app.conf", "w") as f:
         f.write(config_content)
     subprocess.run(["sudo", "mv", "/tmp/fastapi-app.conf", config_path])
-
-    # Reload Supervisor to apply the new configuration
-    subprocess.run(["sudo", "supervisorctl", "reread"])
-    subprocess.run(["sudo", "supervisorctl", "update"])
 
     # Reread Supervisor’s configuration file and restart the service
     subprocess.run(["sudo", "supervisorctl", "reread"])
