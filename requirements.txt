@@ -3,3 +3,4 @@ gunicorn==23.0.0
 uvicorn==0.31.0
 uvloop==0.20.0
 httptools==0.6.1
+websockets==13.1
