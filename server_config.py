@@ -94,11 +94,13 @@ def secure_server():
     os.chdir('/home/one-user')
     subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh'])
     subprocess.run(['sudo', 'chmod', '700', '/home/one-user/.ssh'])
+    subprocess.run(['sudo', 'chmod', '600', '/home/one-user/.ssh/authorized_keys'])
     subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/one-user/.ssh/authorized_keys\'', shell=True)
 
     # Disable the root login and password authentication rather than an SSH key for SSH connections.
+    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes|', '/etc/ssh/sshd_config'])
     subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
+    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
 
 
 def install_software_tools():
