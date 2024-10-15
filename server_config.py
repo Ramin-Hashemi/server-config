@@ -180,21 +180,21 @@ exec gunicorn main:app \
   --log-level=$LOG_LEVEL \
   --log-file=-
 """
-    with open("/home/one-user/ime-ai/gunicorn_start", "w") as config_file:
+    with open("sudo", "/home/one-user/ime-ai/gunicorn_start", "w") as config_file:
         config_file.write(config_content)
 
     # Make the gunicorn_start script executable
-    subprocess.run(["chmod", "u+x", "gunicorn_start"])
+    subprocess.run(["sudo", "chmod", "u+x", "gunicorn_start"])
 
     # Create a run folder in your project directory for the Unix socket file
-    subprocess.run(["mkdir", "-p", "run"])
+    subprocess.run(["sudo", "mkdir", "-p", "run"])
 
 
 def configure_supervisor():
     os.chdir('/home/one-user/ime-ai')
 
     # Create logs directory
-    subprocess.run(["mkdir", "-p", "logs"])
+    subprocess.run(["sudo", "mkdir", "-p", "logs"])
 
     # Create a Supervisor configuration file
     config_content = """
@@ -206,7 +206,7 @@ autorestart=true
 redirect_stderr=true
 stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
 """
-    with open("/etc/supervisor/conf.d/fastapi-app.conf", "w") as config_file:
+    with open("sudo", "/etc/supervisor/conf.d/fastapi-app.conf", "w") as config_file:
         config_file.write(config_content)
 
     # Reread Supervisor’s configuration file and restart the service
