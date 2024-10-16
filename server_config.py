@@ -10,12 +10,12 @@ import os
 
 
 def make_server_ready():
-    install_packages()
-    unattended_upgrades()
-    create_new_user()
-    secure_server()
-    install_software_tools()
-    clone_repo()
+    # install_packages()
+    # unattended_upgrades()
+    # create_new_user()
+    # secure_server()
+    # install_software_tools()
+    # clone_repo()
     create_virtual_env()
     configure_gunicorn()
     configure_supervisor()
@@ -147,11 +147,15 @@ def create_virtual_env():
     subprocess.run(["python3.11", "-m", "venv", ".venv"])
 
     # Activate the virtual environment and install requirements
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
+    # Method 1
+    activate_script = os.path.join('.venv', 'bin', 'activate')
+    subprocess.run(f"source {activate_script} && pip install -r requirements.txt", shell=True, executable='/bin/bash')
+
+    # Method 2
+    # subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && apt install -r requirements.txt"], shell=True)
 
     # Run the Uvicorn server
-    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
-
+    # subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')

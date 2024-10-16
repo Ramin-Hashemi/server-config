@@ -4,3 +4,5 @@ uvicorn==0.31.0
 uvloop==0.20.0
 httptools==0.6.1
 websockets==13.1
+flake8==7.1.1
+black==24.10.0
