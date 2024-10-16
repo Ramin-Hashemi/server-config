@@ -144,13 +144,13 @@ def create_virtual_env():
     os.chdir('/home/one-user/ime-ai')
 
     # Create the virtual environment
-    subprocess.run(["python3.11", "-m", "venv", ".venv"], check=True)
+    subprocess.run(["python3.11", "-m", "venv", ".venv"])
 
     # Activate the virtual environment and install requirements
-    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True, check=True)
+    subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && pip install -r requirements.txt"], shell=True)
 
     # Run the Uvicorn server
-    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"], check=True)
+    subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 
 def configure_gunicorn():
@@ -263,10 +263,10 @@ server {
         config_file.write(config_content)
 
     # Enable the configuration of your site by creating a symbolic link from the file in sites-available into sites-enabled
-    subprocess.run(["sudo", "ln", "-s", "/etc/nginx/sites-available/fastapi-app", "/etc/nginx/sites-enabled/"], check=True)
+    subprocess.run(["sudo", "ln", "-s", "/etc/nginx/sites-available/fastapi-app", "/etc/nginx/sites-enabled/"])
 
     # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user
-    # subprocess.run(["sudo", "usermod", "-aG", "main-user", "www-data"], check=True)
+    subprocess.run(["sudo", "usermod", "-aG", "main-user", "www-data"])
 
     # Restart NGINX
     subprocess.run(["sudo", "systemctl", "restart", "nginx"])
@@ -276,14 +276,14 @@ def ssl_certificate_certbot():
     os.chdir('/home/one-user/ime-ai')
 
     # Install Certbot
-    subprocess.run(["sudo", "snap", "install", "--classic", "certbot"], check=True)
-    subprocess.run(["sudo", "ln", "-s", "/snap/bin/certbot", "/usr/bin/certbot"], check=True)
+    subprocess.run(["sudo", "snap", "install", "--classic", "certbot"])
+    subprocess.run(["sudo", "ln", "-s", "/snap/bin/certbot", "/usr/bin/certbot"])
 
     # Generate a certificate for your domain
-    subprocess.run(["sudo", "certbot", "--nginx"], check=True)
+    subprocess.run(["sudo", "certbot", "--nginx"])
 
     # Certbot will automatically handle the renewal of your certificate. To test that it works, run the following:
-    subprocess.run(["sudo", "certbot", "renew", "--dry-run"], check=True)
+    subprocess.run(["sudo", "certbot", "renew", "--dry-run"])
 
 
 if __name__ == "__main__":
