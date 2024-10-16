@@ -151,9 +151,6 @@ def create_virtual_env():
     activate_script = os.path.join('.venv', 'bin', 'activate')
     subprocess.run(f"source {activate_script} && pip install -r requirements.txt", shell=True, executable='/bin/bash')
 
-    # Method 2
-    # subprocess.run(["/bin/bash", "-c", "source .venv/bin/activate && apt install -r requirements.txt"], shell=True)
-
     # Run the Uvicorn server
     # subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
@@ -243,7 +240,7 @@ server {
 
     # add here the ip address of your server
     # or a domain pointing to that ip (like example.com or www.example.com)
-    server_name 89.32.250.198;
+    server_name 185.213.165.171;
 
     keepalive_timeout 5;
     client_max_body_size 4G;
@@ -270,7 +267,7 @@ server {
     subprocess.run(["sudo", "ln", "-s", "/etc/nginx/sites-available/fastapi-app", "/etc/nginx/sites-enabled/"])
 
     # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user
-    subprocess.run(["sudo", "usermod", "-aG", "main-user", "www-data"])
+    subprocess.run(["sudo", "usermod", "-aG", "one-user", "www-data"])
 
     # Restart NGINX
     subprocess.run(["sudo", "systemctl", "restart", "nginx"])
