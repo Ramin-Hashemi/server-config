@@ -10,16 +10,16 @@ import os
 
 
 def make_server_ready():
-    # install_packages()
-    # unattended_upgrades()
-    # create_new_user()
-    # secure_server()
-    # install_software_tools()
-    # clone_repo()
-    # create_virtual_env()
+    install_packages()
+    unattended_upgrades()
+    create_new_user()
+    secure_server()
+    install_software_tools()
+    clone_repo()
+    create_virtual_env()
     configure_gunicorn()
     configure_supervisor()
-    # configure_nginx()
+    configure_nginx()
     # ssl_certificate_certbot()
 
 
