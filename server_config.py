@@ -154,7 +154,7 @@ def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
     
     # Activate the virtual environment and,
-    # create a file to define the parameters you’ll use when running Gunicorn.
+    # Create a file to define the parameters you’ll use when running Gunicorn.
     activate_script = os.path.join('.venv', 'bin', 'activate')
 
     config_content = """
@@ -185,7 +185,7 @@ exec gunicorn main:app \
 """
     script_path = "/home/one-user/ime-ai/gunicorn_start"
     
-    with open(f"source {activate_script} && /tmp/gunicorn_start w") as f:
+    with open("/tmp/gunicorn_start", "w") as f:
         f.write(f"source {activate_script} && {config_content}")
     subprocess.run(f"source {activate_script} && sudo mv /tmp/gunicorn_start {script_path}", shell=True, executable='/bin/bash')
     
@@ -203,7 +203,10 @@ def configure_supervisor():
     # Create logs directory
     subprocess.run(["sudo", "mkdir", "-p", "logs"])
 
-    # Create a Supervisor configuration file
+    # Activate the virtual environment and,
+    # Create a Supervisor configuration file.
+    activate_script = os.path.join('.venv', 'bin', 'activate')
+
     config_content = """
 [program:fastapi-app]
 command=/home/one-user/ime-ai/gunicorn_start
@@ -218,13 +221,13 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn.log
 
     config_path = "/etc/supervisor/conf.d/fastapi-app.conf"
     with open("/tmp/fastapi-app.conf", "w") as f:
-        f.write(config_content)
-    subprocess.run(["sudo", "mv", "/tmp/fastapi-app.conf", config_path])
+        f.write(f"source {activate_script} && {config_content}")
+    subprocess.run(f"source {activate_script} && sudo mv /tmp/fastapi-app.conf {config_path}", shell=True, executable='/bin/bash')
 
     # Reread Supervisor’s configuration file and restart the service
-    subprocess.run(["sudo", "supervisorctl", "reread"])
-    subprocess.run(["sudo", "supervisorctl", "update"])
-    subprocess.run(["sudo", "supervisorctl", "restart", "fastapi-app"])
+    subprocess.run(f"source {activate_script} && sudo supervisorctl reread", shell=True, executable='/bin/bash')
+    subprocess.run(f"source {activate_script} && sudo supervisorctl update", shell=True, executable='/bin/bash')
+    subprocess.run(f"source {activate_script} && sudo supervisorctl restart fastapi-app", shell=True, executable='/bin/bash')
 
 
 def configure_nginx():
