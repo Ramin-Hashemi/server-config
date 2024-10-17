@@ -191,7 +191,7 @@ exec gunicorn main:app \
     
 
     # Make the gunicorn_start script executable
-    subprocess.run(f"source {activate_script} && sudo chmod u+x /home/one-user/ime-ai/gunicorn_start", shell=True, executable='/bin/bash')
+    subprocess.run(f"source {activate_script} && sudo chmod u+x gunicorn_start", shell=True, executable='/bin/bash')
 
     # Create a run folder in your project directory for the Unix socket file
     subprocess.run(["sudo", "mkdir", "-p", "run"])
