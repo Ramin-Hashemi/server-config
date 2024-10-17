@@ -18,8 +18,8 @@ def make_server_ready():
     # clone_repo()
     create_virtual_env()
     configure_gunicorn()
-    configure_supervisor()
-    configure_nginx()
+    # configure_supervisor()
+    # configure_nginx()
     # ssl_certificate_certbot()
 
 
@@ -147,17 +147,16 @@ def create_virtual_env():
     subprocess.run(["python3.11", "-m", "venv", ".venv"])
 
     # Activate the virtual environment and install requirements
-    # Method 1
     activate_script = os.path.join('.venv', 'bin', 'activate')
     subprocess.run(f"source {activate_script} && pip install -r requirements.txt", shell=True, executable='/bin/bash')
-
-    # Run the Uvicorn server
-    # subprocess.run(["sudo", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
 
 def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
     
-    # Create a file to define the parameters you’ll use when running Gunicorn.
+    # Activate the virtual environment and,
+    # create a file to define the parameters you’ll use when running Gunicorn.
+    activate_script = os.path.join('.venv', 'bin', 'activate')
+
     config_content = """
 #!/bin/bash
 
@@ -186,13 +185,13 @@ exec gunicorn main:app \
 """
     script_path = "/home/one-user/ime-ai/gunicorn_start"
     
-    with open("/tmp/gunicorn_start", "w") as f:
-        f.write(config_content)
-    subprocess.run(["sudo", "mv", "/tmp/gunicorn_start", script_path])
-    subprocess.run(["sudo", "chmod", "+x", script_path])
+    with open(f"source {activate_script} && /tmp/gunicorn_start w") as f:
+        f.write(f"source {activate_script} && {config_content}")
+    subprocess.run(f"source {activate_script} && sudo mv /tmp/gunicorn_start {script_path}", shell=True, executable='/bin/bash')
+    
 
     # Make the gunicorn_start script executable
-    subprocess.run(["sudo", "chmod", "u+x", "gunicorn_start"])
+    subprocess.run(f"source {activate_script} && sudo chmod u+x /home/one-user/ime-ai/gunicorn_start", shell=True, executable='/bin/bash')
 
     # Create a run folder in your project directory for the Unix socket file
     subprocess.run(["sudo", "mkdir", "-p", "run"])
@@ -208,11 +207,13 @@ def configure_supervisor():
     config_content = """
 [program:fastapi-app]
 command=/home/one-user/ime-ai/gunicorn_start
+directory=/home/one-user/ime-ai
 user=one-user
 autostart=true
 autorestart=true
 redirect_stderr=true
-stdout_logfile=/home/one-user/ime-ai/logs/gunicorn-error.log
+stderr_logfile=/home/one-user/ime-ai/logs/gunicorn.err.log
+stdout_logfile=/home/one-user/ime-ai/logs/gunicorn.log
 """
 
     config_path = "/etc/supervisor/conf.d/fastapi-app.conf"
