@@ -152,11 +152,8 @@ def create_virtual_env():
 
 def configure_gunicorn():
     os.chdir('/home/one-user/ime-ai')
-    
-    # Activate the virtual environment and,
-    # Create a file to define the parameters you’ll use when running Gunicorn.
-    activate_script = os.path.join('.venv', 'bin', 'activate')
 
+    # Create a file to define the parameters you’ll use when running Gunicorn.
     config_content = """
 #!/bin/bash
 
@@ -190,8 +187,9 @@ exec gunicorn main:app \
         f.write(config_content)
     subprocess.run(["sudo", "mv", "/tmp/gunicorn_start", script_path])
     
-
-    # Make the gunicorn_start script executable
+    # Activate the virtual environment and,
+    # Make the gunicorn_start script executable.
+    activate_script = os.path.join('.venv', 'bin', 'activate')
     subprocess.run(f"source {activate_script} && sudo chmod u+x gunicorn_start", shell=True, executable='/bin/bash')
 
     # Create a run folder in your project directory for the Unix socket file
@@ -204,10 +202,7 @@ def configure_supervisor():
     # Create logs directory
     subprocess.run(["sudo", "mkdir", "-p", "logs"])
 
-    # Activate the virtual environment and,
     # Create a Supervisor configuration file.
-    activate_script = os.path.join('.venv', 'bin', 'activate')
-
     config_content = """
 [program:fastapi-app]
 command=/home/one-user/ime-ai/gunicorn_start
@@ -225,7 +220,9 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn.log
         f.write(config_content)
     subprocess.run(["sudo", "mv", "/tmp/fastapi-app.conf", config_path])
 
-    # Reread Supervisor’s configuration file and restart the service
+    # Activate the virtual environment and,
+    # Reread Supervisor’s configuration file and restart the service.
+    activate_script = os.path.join('.venv', 'bin', 'activate')
     subprocess.run(f"source {activate_script} && sudo supervisorctl reread", shell=True, executable='/bin/bash')
     subprocess.run(f"source {activate_script} && sudo supervisorctl update", shell=True, executable='/bin/bash')
     subprocess.run(f"source {activate_script} && sudo supervisorctl restart fastapi-app", shell=True, executable='/bin/bash')
@@ -268,14 +265,17 @@ server {
     with open("/etc/nginx/sites-available/fastapi-app", "w") as config_file:
         config_file.write(config_content)
 
+    # Activate the virtual environment and,
+    activate_script = os.path.join('.venv', 'bin', 'activate')
+
     # Enable the configuration of your site by creating a symbolic link from the file in sites-available into sites-enabled
-    subprocess.run(["sudo", "ln", "-s", "/etc/nginx/sites-available/fastapi-app", "/etc/nginx/sites-enabled/"])
+    subprocess.run(f"source {activate_script} && sudo ln -s /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/", shell=True, executable='/bin/bash')
 
     # If you get a permission error telling you that NGINX cannot access the unix socket, you can add the www-data user
-    subprocess.run(["sudo", "usermod", "-aG", "one-user", "www-data"])
+    subprocess.run(f"source {activate_script} && sudo usermod -aG one-user www-data", shell=True, executable='/bin/bash')
 
     # Restart NGINX
-    subprocess.run(["sudo", "systemctl", "restart", "nginx"])
+    subprocess.run(f"source {activate_script} && sudo systemctl restart nginx", shell=True, executable='/bin/bash')
 
 
 def ssl_certificate_certbot():
