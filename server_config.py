@@ -174,14 +174,15 @@ cd $DIR
 source $VENV
 
 exec gunicorn main:app \
---name $NAME \
---workers $WORKERS \
---worker-class $WORKER_CLASS \
---user=$USER \
---group=$GROUP \
---bind=$BIND \
---log-level=$LOG_LEVEL \
---log-file=-
+  --name $NAME \
+  --workers $WORKERS \
+  --worker-class $WORKER_CLASS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOG_LEVEL \
+  --log-file=-
+
 """
     script_path = "/home/one-user/ime-ai/gunicorn_start"
     
@@ -258,7 +259,7 @@ server {
         proxy_redirect off;
 
         if (!-f $request_filename) {
-            proxy_pass http://app_server;
+            proxy_pass http://185.213.165.171;
             break;
         }
     }
