@@ -19,8 +19,8 @@ def make_server_ready():
     create_virtual_env()
     configure_gunicorn()
     configure_supervisor()
-    # configure_nginx()
-    # ssl_certificate_certbot()
+    configure_nginx()
+    ssl_certificate_certbot()
 
 
 def install_packages():
@@ -61,6 +61,7 @@ def install_packages():
     subprocess.run(["sudo", "pip", "install", "--upgrade", "pip"])
     subprocess.run(["sudo", "apt-get", "install", "-y", "python3-dev"])
     subprocess.run(["sudo", "apt-get", "install", "-y", "python3-setuptools"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "virtualenv"])
     subprocess.run(["sudo", "apt-get", "install", "-y", "git"])
     subprocess.run(["sudo", "apt-get", "install", "-y", "postgresql"])
 
@@ -71,39 +72,8 @@ def install_packages():
     subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"])
     subprocess.run(["sudo", "snap", "install", "core"])
     subprocess.run(["sudo", "snap", "refresh", "core"])
+    subprocess.run(["sudo", "apt-get", "install", "-y", "policycoreutils-python-utils"])
 
-
-def unattended_upgrades():
-    # Configure unattended-upgrades so that it runs automatically.
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    # System automatically reboots when kernel updates require it
-    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
-
-
-def create_new_user():
-    subprocess.run(["sudo", "adduser", "one-user"],)
-    subprocess.run(["sudo", "gpasswd", "-a", "one-user", "sudo"],)
-    # subprocess.run(["sudo", "-i", "-u", "one-user"],) # Log in as one-user
-    # subprocess.run(["su", "-", "one-user"],) # Log in as one-user
-
-
-def secure_server():
-    # Set up your server so that you connect to it using an SSH key instead of a password.
-    os.chdir('/home/one-user')
-    subprocess.run(['sudo', 'mkdir', '-p', '/home/one-user/.ssh'])
-    subprocess.run(['sudo', 'chmod', '700', '/home/one-user/.ssh'])
-    subprocess.run(['sudo', 'chmod', '600', '/home/one-user/.ssh/authorized_keys'])
-    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/one-user/.ssh/authorized_keys\'', shell=True)
-
-    # Disable the root login and password authentication rather than an SSH key for SSH connections.
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes|', '/etc/ssh/sshd_config'])
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
-    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
-
-
-def install_software_tools():
     # Install Python
     subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"])
     subprocess.run(["sudo", "apt-get", "update"])
@@ -121,37 +91,97 @@ def install_software_tools():
 
     # Install JS
     subprocess.run(["sudo", "apt-get", "install", "-y", "npm"])
+
+    # Install Ollama
     subprocess.run(["npm", "install", "ollama"])
 
-def install_docker():
+    # install_docker
     # Add Docker's official GPG key
     subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg", shell=True)
-
     # Set up the stable repository
     subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null', shell=True)
-
     # Install Docker Engine
     subprocess.run(["sudo", "apt-get", "update"])
     subprocess.run(["sudo", "apt-get", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io"])
 
 
+def unattended_upgrades():
+    # Configure unattended-upgrades so that it runs automatically.
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
+    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
+    # System automatically reboots when kernel updates require it
+    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
+
+
+def create_new_user():
+
+    # Create a new group
+    subprocess.run(["sudo", "addgroup", "--system", "ime-users"])
+
+    # Add the new group to the sudo group
+    subprocess.run(["sudo", "gpasswd", "-a", "ime-users", "sudo"])
+
+    # Create a new user for your app, and assign to a system group
+    subprocess.run(["sudo", "adduser", "--system", "--gid", "ime-users", "--shell", "/bin/bash", "--home", "/webapps/", "one-user"])
+    
+    # Add the user to the new group
+    # subprocess.run(["sudo", "gpasswd", "-a", "one-user", "ime-users"])
+
+    # Create a directory to store your application
+    subprocess.run(["sudo", "mkdir", "-p", "/webapps/"])
+
+    # Change the owner of that directory to your application user
+    subprocess.run(["sudo", "chown", "one-user", "/webapps/"])
+
+
+def secure_server():
+    # Set up your server so that you connect to it using an SSH key instead of a password.
+    os.chdir('/home/webapps')
+    subprocess.run(['sudo', 'mkdir', '-p', '/home/webapps/.ssh'])
+    subprocess.run(['sudo', 'chmod', '700', '/home/webapps/.ssh'])
+    subprocess.run(['sudo', 'chmod', '600', '/home/webapps/.ssh/authorized_keys'])
+    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/webapps/.ssh/authorized_keys\'', shell=True)
+
+    # Disable the root login and password authentication rather than an SSH key for SSH connections.
+    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes|', '/etc/ssh/sshd_config'])
+    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
+    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
+
+
 def clone_repo():
-    os.chdir('/home/one-user')
+    # Clone iME project from GitHub
+    os.chdir('/home/webapps')
     subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-ai.git"],)
 
 
 def create_virtual_env():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/webapps/ime-ai')
 
     # Create the virtual environment
-    subprocess.run(["python3.11", "-m", "venv", ".venv"])
+
+    # Using vnenv:
+    # subprocess.run(["python3.11", "-m", "venv", ".venv"])
+
+    # Using virtualenv:
+    subprocess.run(["python3.11", "-m", "virtualenv", ".venv"])
 
     # Activate the virtual environment and install requirements
     activate_script = os.path.join('.venv', 'bin', 'activate')
     subprocess.run(f"source {activate_script} && pip install -r requirements.txt", shell=True, executable='/bin/bash')
 
+
+def create_django_project():
+    os.chdir('/home/webapps/ime-ai')
+
+    # Create an empty Django project
+
+    activate_script = os.path.join('.venv', 'bin', 'activate')
+    subprocess.run(f"source {activate_script} && django-admin.py startproject iME", shell=True, executable='/bin/bash')
+
+
 def configure_gunicorn():
-    os.chdir('/home/one-user/ime-ai')
+    os.chdir('/home/webapps/ime-ai')
 
     # Create a file to define the parameters you’ll use when running Gunicorn.
     config_content = """
@@ -190,7 +220,7 @@ exec gunicorn main:app \
     # Activate the virtual environment and,
     # Make the gunicorn_start script executable.
     activate_script = os.path.join('.venv', 'bin', 'activate')
-    subprocess.run(f"source {activate_script} && sudo chmod u+x gunicorn_start", shell=True, executable='/bin/bash')
+    subprocess.run(f"source {activate_script} && sudo chmod +x /home/webspps/ime-ai/gunicorn_start", shell=True, executable='/bin/bash')
 
     # Create a run folder in your project directory for the Unix socket file
     subprocess.run(["sudo", "mkdir", "-p", "run"])
@@ -206,7 +236,6 @@ def configure_supervisor():
     config_content = """
 [program:fastapi-app]
 command=/home/one-user/ime-ai/gunicorn_start
-directory=/home/one-user/ime-ai
 user=one-user
 autostart=true
 autorestart=true
@@ -238,7 +267,7 @@ upstream app_server {
 }
 
 server {
-    listen 80;
+    listen 8000;
 
     # add here the ip address of your server
     # or a domain pointing to that ip (like example.com or www.example.com)
@@ -293,11 +322,12 @@ def ssl_certificate_certbot():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        func_name = sys.argv[1]
-        if func_name == "make_server_ready":
-            make_server_ready()
-        else:
-            print(f"No function named {func_name} found.")
-    else:
+    if len(sys.argv) < 2:
         print("Please provide a function name to run.")
+        sys.exit(1)
+    
+    function_name = sys.argv[1]
+    if function_name == "make_server_ready":
+        make_server_ready()
+    else:
+        print(f"Function {function_name} not found.")
