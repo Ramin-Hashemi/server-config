@@ -186,8 +186,8 @@ exec gunicorn main:app \
     script_path = "/home/one-user/ime-ai/gunicorn_start"
     
     with open("/tmp/gunicorn_start", "w") as f:
-        f.write(f"source {activate_script} && {config_content}")
-    subprocess.run(f"source {activate_script} && sudo mv /tmp/gunicorn_start {script_path}", shell=True, executable='/bin/bash')
+        f.write(config_content)
+    subprocess.run(["sudo", "mv", "/tmp/gunicorn_start", script_path])
     
 
     # Make the gunicorn_start script executable
@@ -221,8 +221,8 @@ stdout_logfile=/home/one-user/ime-ai/logs/gunicorn.log
 
     config_path = "/etc/supervisor/conf.d/fastapi-app.conf"
     with open("/tmp/fastapi-app.conf", "w") as f:
-        f.write(f"source {activate_script} && {config_content}")
-    subprocess.run(f"source {activate_script} && sudo mv /tmp/fastapi-app.conf {config_path}", shell=True, executable='/bin/bash')
+        f.write(config_content)
+    subprocess.run(["sudo", "mv", "/tmp/fastapi-app.conf", config_path])
 
     # Reread Supervisor’s configuration file and restart the service
     subprocess.run(f"source {activate_script} && sudo supervisorctl reread", shell=True, executable='/bin/bash')
