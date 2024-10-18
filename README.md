@@ -2,14 +2,14 @@
  <img alt="iME" height="300px" src="assets/ime_logo.png">
 </div>
 
-# iME
+# iME AI Project
 
 Get up and running with iME large language model.
 
 ## Quickstart
 
 
-1. Import 'server_config' project (Local)
+# 1. Import 'server_config' project (Local)
     - Open terminal on your local machine.
     - Run this command to clone the 'server_config' poject from the GitHub repository:
 
@@ -17,7 +17,7 @@ Get up and running with iME large language model.
       git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
 
-2. Create your public SSH key.
+# 2. Create your public SSH key.
     - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
       (Make sure to replace username@email.com it with your actual email.)
 
@@ -30,7 +30,7 @@ Get up and running with iME large language model.
       ```
       Then copy your public SSH key in 'secret.py' file in the project repo and push to the GitHub.
 
-3. Import 'server_config' project (Remote Server)
+# 3. Import 'server_config' project (Remote Server)
     - Open terminal on remote server.
     - Run this command to clone the 'server_config' poject from the GitHub repository:
 
@@ -38,7 +38,7 @@ Get up and running with iME large language model.
       git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
 
-4. Config the remote server
+# 4. Config the remote server
     - Run this command to execute the required server config files:
 
       ```
@@ -51,12 +51,35 @@ Get up and running with iME large language model.
       python model_initialize.py initializer
       ```
 
-5. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
+# 5. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
     - Finally, run the following command in the remote server:
 
       ```
       ollama run iME
       ```
+
+
+# 6. Configure PostgreSQL
+    - PostgreSQL database with the name of `ime-app-db` will be created.
+    - Then respond to the prompts to create database user.
+    # Prompts:
+    - Enter name of role to add: ime-app-db-user
+    - Enter password for new role: 
+    - Enter it again: 
+    - Shall the new role be a superuser? (y/n) n
+    - Shall the new role be allowed to create databases? (y/n) n
+    - Shall the new role be allowed to create more new roles? (y/n) n
+
+
+
+
+
+
+
+
+
+
+
 ### Enjoy!
 
 ## Model library
@@ -493,3 +516,45 @@ See the [API documentation](./docs/api.md) for all endpoints.
 
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) project founded by Georgi Gerganov.
 
+
+
+## Helps:
+
+
+- Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL.
+  https://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/
+
+
+
+# Final directory structure
+
+/webapps/hello_django/
+├── bin                          <= Directory created by virtualenv
+│   ├── activate                 <= Environment activation script
+│   ├── django-admin.py
+│   ├── gunicorn
+│   ├── gunicorn_django
+│   ├── gunicorn_start           <= Script to start application with Gunicorn
+│   └── python
+├── hello                        <= Django project directory, add this to PYTHONPATH
+│   ├── manage.py
+│   ├── project_application_1
+│   ├── project_application_2
+│   └── hello                    <= Project settings directory
+│       ├── __init__.py
+│       ├── settings.py          <= hello.settings - settings module Gunicorn will use
+│       ├── urls.py
+│       └── wsgi.py              <= hello.wsgi - WSGI module Gunicorn will use
+├── include
+│   └── python2.7 -> /usr/include/python2.7
+├── lib
+│   └── python2.7
+├── lib64 -> /webapps/hello_django/lib
+├── logs                         <= Application logs directory
+│   ├── gunicorn_supervisor.log
+│   ├── nginx-access.log
+│   └── nginx-error.log
+├── media                        <= User uploaded files folder
+├── run
+│   └── gunicorn.sock 
+└── static                       <= Collect and serve static files from here
