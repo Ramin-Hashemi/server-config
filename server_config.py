@@ -142,7 +142,6 @@ def create_new_users():
     # Command to switch to root user and execute these commands
     command = """
     su - root -c '
-    groupadd --system ime-app-server-users &&                             # Create a new user group
     gpasswd -a ime-app-server-users sudo &&                               # Add the new group to the sudo group
     useradd --system ime-app-server-admin &&                              # Create a new user
     usermod -g ime-app-server-users ime-app-server-admin &&               # Assign the user to the group
@@ -155,7 +154,13 @@ def create_new_users():
     subprocess.run(command, shell=True, executable='/bin/bash')
 
 
-
+groupadd --system ime-app-server-users &&                             # Create a new user group
+gpasswd -a ime-app-server-users sudo &&                               # Add the new group to the sudo group
+useradd --system ime-app-server-admin &&                              # Create a new user
+usermod -g ime-app-server-users ime-app-server-admin &&               # Assign the user to the group
+usermod --shell /bin/bash ime-app-server-admin &&                     # Set the shell for the user
+usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the home directory for the user
+chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory
 
 
 def secure_server():
