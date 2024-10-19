@@ -13,7 +13,7 @@ def ime_app_server_configurations():
     # install_packages()
     # unattended_upgrades()
     clone_repo()
-    create_new_users()
+    # create_new_users()
     # secure_server()
     # create_virtual_env()
     # create_django_project()
