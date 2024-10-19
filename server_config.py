@@ -139,21 +139,23 @@ def clone_github_repository():
 
 
 def create_new_users():
-
-    # Command to switch root user, and execute these commands
+    # Command to switch to root user and execute these commands
     command = """
     su - root -c '
-    sudo groupadd --system ime-app-server-users &&                             # Create a new user group
-    sudo gpasswd -a ime-app-server-users sudo &&                               # Add the new group to the sudo group
-    sudo useradd --system ime-app-server-admin &&                              # Create a new user
-    sudo usermod -g ime-app-server-users ime-app-server-admin &&                          # Assign the user to the group
-    sudo usermod --shell /bin/bash ime-app-server-admin &&                     # Set the shell for the user
-    sudo usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the home directory for the user
-    sudo chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory
+    groupadd --system ime-app-server-users &&                             # Create a new user group
+    gpasswd -a ime-app-server-users sudo &&                               # Add the new group to the sudo group
+    useradd --system ime-app-server-admin &&                              # Create a new user
+    usermod -g ime-app-server-users ime-app-server-admin &&               # Assign the user to the group
+    usermod --shell /bin/bash ime-app-server-admin &&                     # Set the shell for the user
+    usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the home directory for the user
+    chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory
     '
     """
     # Execute the command
     subprocess.run(command, shell=True, executable='/bin/bash')
+
+
+
 
 
 def secure_server():
