@@ -528,7 +528,7 @@ See the [API documentation](./docs/api.md) for all endpoints.
 
 # Final directory structure
 
-/webapps/hello_django/
+/web-apps/ime-app/
 ├── bin                          <= Directory created by virtualenv
 │   ├── activate                 <= Environment activation script
 │   ├── django-admin.py
@@ -536,7 +536,7 @@ See the [API documentation](./docs/api.md) for all endpoints.
 │   ├── gunicorn_django
 │   ├── gunicorn_start           <= Script to start application with Gunicorn
 │   └── python
-├── hello                        <= Django project directory, add this to PYTHONPATH
+├── ime-app-django               <= Django project directory, add this to PYTHONPATH
 │   ├── manage.py
 │   ├── project_application_1
 │   ├── project_application_2

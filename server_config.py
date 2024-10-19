@@ -9,14 +9,14 @@ import sys
 import os
 
 
-def prepare_server():
-    install_packages()
-    unattended_upgrades()
+def prepare_iem_app_server():
+    # install_packages()
+    # unattended_upgrades()
+    clone_repo()
     create_new_users()
     # secure_server()
-    clone_repo()
-    create_virtual_env()
-    create_django_project()
+    # create_virtual_env()
+    # create_django_project()
     # configure_gunicorn()
     # configure_supervisor()
     # configure_nginx()
@@ -124,46 +124,85 @@ def unattended_upgrades():
     subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
 
 
-def create_new_users():
+def clone_repo():
+    
+    # Command to switch root user
+    command = """
+    su - root -c '
+    sudo mkdir -p /home/web-apps &&                                                 # Create a directory to store web applications on server
+    cd /home/web-apps &&                                                            # Change directory to web-apps
+    git clone https://github.com/Ramin-Hashemi/ime-app.git &&                       # Clone iME project from GitHub
+    '
+    """
+    # Execute the command
+    subprocess.run(command, shell=True, executable='/bin/bash')    
 
-    # Create a new system user
-    subprocess.run(["sudo", "adduser", "--system", "ramin-hashemi"])
-    # Add the new user to the sudo group
-    subprocess.run(["sudo", "usermod", "-g", "sudo", "ramin-hashemi"])
 
-    # Create a new user group for ime-app users
-    subprocess.run(["sudo", "addgroup", "--system", "ime-users"])
-    # Add the ime-app users group to the sudo group
-    subprocess.run(["sudo", "gpasswd", "-a", "ime-users", "sudo"])
-
-    # Create a new user for ime-app
-    subprocess.run(["sudo", "adduser", "--system", "ime-user-1"])
-    # Assign the user to the group
-    subprocess.run(["sudo", "usermod", "-g", "ime-users", "ime-user-1"])
-    # Set the user’s shell
-    subprocess.run(["sudo", "usermod", "--shell", "/bin/bash", "ime-user-1"])
-    # Set the user’s home directory
-    subprocess.run(["sudo", "usermod", "--home", "/webapps/ime-app", "ime-user-1"])
-
-    # Add the user to the new group (used for secondary membership)
-    # subprocess.run(["sudo", "gpasswd", "-a", "ime-user-1", "ime-users"])
+    # os.chdir('/home/web-apps/')
 
     # Create a directory to store your application
-    subprocess.run(["sudo", "mkdir", "-p", "/webapps/ime-app"])
+    # subprocess.run(["sudo", "mkdir", "-p", "/home/web-apps/ime-app"])
+
+    # Clone iME project from GitHub
+    # os.chdir('/home/web-apps')
+    # subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-app.git"])
+
+
+def create_new_users():
+
+    # Command to switch root user, execute these commands
+    command = """
+    su - root -c '
+    sudo addgroup --system ime-users &&                                        # Create a new user group for ime-app users
+    sudo gpasswd -a ime-users sudo &&                                          # Add the ime-app users group to the sudo group
+    sudo adduser --system ime-user-super-admin &&                              # Create a new user for ime-app
+    sudo usermod -g ime-users ime-user-super-admin &&                          # Assign the user to the group
+    sudo usermod --shell /bin/bash ime-user-super-admin &&                     # Set the user's shell
+    sudo usermod --home /home/web-apps/ime-app ime-user-super-admin &&         # Set the user's home directory
+    sudo chown ime-user-super-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory to ime-user-super-admin 
+    
+    # Allowing other users write access to the application directory
+    sudo chown -R ime-user-v:users /home/web-apps/ime-app &&
+    sudo chmod -R g+w /home/web-apps/ime-app &&
+    sudo usermod -a -G users ime-user-super-admin
+    '
+    """
+    # Execute the command
+    subprocess.run(command, shell=True, executable='/bin/bash')
+
+
+    # Create a new user group for ime-app users
+    # subprocess.run(["sudo", "addgro/up", "--system", "ime-users"])
+    # Add the ime-app users group to the sudo group
+    # subprocess.run(["sudo", "gpasswd", "-a", "ime-users", "sudo"])
+
+    # Create a new user for ime-app
+    # subprocess.run(["sudo", "adduser", "--system", "ime-user-super-admin"])
+    # Assign the user to the group
+    # subprocess.run(["sudo", "usermod", "-g", "ime-users", "ime-user-super-admin"])
+    # Set the user’s shell
+    # subprocess.run(["sudo", "usermod", "--shell", "/bin/bash", "ime-user-super-admin"])
+    # Set the user’s home directory
+    # subprocess.run(["sudo", "usermod", "--home", "/home/webapps/ime-app", "ime-user-super-admin"])
+    # Change the owner of ime-app directory to ime-user-super-admin
+    # subprocess.run(["sudo", "chown", "ime-user-super-admin", "/home/web-apps/ime-app"])
+
+    # Add the user to the new group (used for secondary membership)
+    # subprocess.run(["sudo", "gpasswd", "-a", "ime-user-super-admin", "ime-users"])
 
     # Allowing other users write access to the application directory
-    subprocess.run(["sudo", "chown", "-R", "ime-user-1:users", "/webapps/ime-app"])
-    subprocess.run(["sudo", "chmod", "-R", "g+w", "/webapps/ime-app"])
-    subprocess.run(["sudo", "usermod", "-a", "-G", "users", "ime-user-1"])
+    # subprocess.run(["sudo", "chown", "-R", "ime-user-v:users", "/home/web-apps/ime-app"])
+    # subprocess.run(["sudo", "chmod", "-R", "g+w", "/home/web-apps/ime-app"])
+    # subprocess.run(["sudo", "usermod", "-a", "-G", "users", "ime-user-super-admin"])
 
 
 def secure_server():
     # Set up your server so that you connect to it using an SSH key instead of a password.
     os.chdir('/home/webapps')
-    subprocess.run(['sudo', 'mkdir', '-p', '/home/webapps/.ssh'])
-    subprocess.run(['sudo', 'chmod', '700', '/home/webapps/.ssh'])
-    subprocess.run(['sudo', 'chmod', '600', '/home/webapps/.ssh/authorized_keys'])
-    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/webapps/.ssh/authorized_keys\'', shell=True)
+    subprocess.run(['sudo', 'mkdir', '-p', '/home/web-apps/.ssh'])
+    subprocess.run(['sudo', 'chmod', '700', '/home/web-apps/.ssh'])
+    subprocess.run(['sudo', 'chmod', '600', '/home/web-apps/.ssh/authorized_keys'])
+    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/web-apps/.ssh/authorized_keys\'', shell=True)
 
     # Disable the root login and password authentication rather than an SSH key for SSH connections.
     subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes|', '/etc/ssh/sshd_config'])
@@ -171,29 +210,12 @@ def secure_server():
     # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
 
 
-def clone_repo():
-    os.chdir('/home/ramin-hashemi')
-    # Create a directory to store ime-app
-    subprocess.run(["sudo", "mkdir", "-p", "web-apps"])
-    
-    # Clone iME project from GitHub
-    os.chdir('/home/ramin-hashemi/web-apps')
-    subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-app.git"])
-
-    # Change the owner of ime-app directory to ime-app first user
-    subprocess.run(["sudo", "chown", "ime-user-1", "/webapps/ime-app"])
-
-
 def create_virtual_env():
     
     # Command to switch user, change directory, and activate virtual environment
     command = """
     su - ime-user-1 -c '
-    cd /web-apps/ime-app &&
-    # Using vnenv
-    # python3.11 -m venv .venv &&
-    # source .venv/bin/activate &&
-    # 
+    cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
@@ -208,18 +230,14 @@ def create_django_project():
 
     # Command to switch user, change directory, and create an empty Django project
     command = """
-    su - ime-user-1 -c '
-    cd /web-apps/ime-app &&
-    # Using vnenv
-    # python3.11 -m venv .venv &&
-    # source .venv/bin/activate &&
-    # 
+    su - ime-user-super-admin -c '
+    cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
     django-admin.py &&
     startproject &&
-    ime-app
+    ime-app-django
     '
     """
     # Execute the command
@@ -232,10 +250,6 @@ def configure_postgre_sql():
     # Create a database user and a new database for the ime-app
     command = """
     su - postgres -c '
-    # Using vnenv
-    # python3.11 -m venv .venv &&
-    # source .venv/bin/activate &&
-    # 
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
@@ -252,11 +266,7 @@ def configure_postgre_sql():
     # Install database adapter
     command = """
     su - ime-user-1 -c '
-    cd /web-apps/ime-app &&
-    # Using vnenv
-    # python3.11 -m venv .venv &&
-    # source .venv/bin/activate &&
-    # 
+    cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
@@ -272,15 +282,15 @@ def configure_postgre_sql():
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hello',
-        'USER': 'ime-ai',
-        'PASSWORD': '1Ak5RTQt7mtw0OREsfPhJYzXIak41gnrm5NWYEosCeIduJck10awIzoys1wvbL8',
+        'NAME': 'ime_app_db',
+        'USER': 'ime-app-db-user',
+        'PASSWORD': '123456789',
         'HOST': 'localhost',
         'PORT': '',                      # Set to empty string for default.
     }
 }
 """
-    script_path = "/home/webapps/ime-ai/settings.py"
+    script_path = "/home/web-apps/ime-app/ime-app-settings/settings.py"
     
     with open("/tmp/settings.py", "w") as f:
         f.write(config_content)
@@ -290,11 +300,7 @@ DATABASES = {
     # Build the initial database for Django
     command = """
     su - ime-user-1 -c '
-    cd /web-apps/ime-app &&
-    # Using vnenv
-    # python3.11 -m venv .venv &&
-    # source .venv/bin/activate &&
-    # 
+    cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
@@ -308,25 +314,25 @@ DATABASES = {
 
 
 def configure_gunicorn():
-    os.chdir('/webapps/ime-app')
+    os.chdir('/home/web-apps/ime-app')
 
-    # Create a file to define the parameters you’ll use when running Gunicorn.
+    # Create a file to define the parameters when running Gunicorn.
     config_content = """
 #!/bin/bash
 
-NAME=ime-app
-DJANGODIR=/webapps/ime-app/ime-user-1
-SOCKFILE=/webapps/ime-app/run/gunicorn.sock
-USER=ime-user-1
-GROUP=ime-users
-NUM_WORKERS=3
+NAME=ime-app-gunicorn                                   # Name of the application
+DJANGODIR=/home/we-apps/ime-app-django                  # Django project directory
+SOCKFILE=/home/web-apps/ime-app/run/gunicorn.sock       # we will communicte using this unix socket
+USER=ime-user-1                                         # the user to run as
+GROUP=ime-users                                         # the group to run as
+NUM_WORKERS=3                                           # how many worker processes should Gunicorn spawn
 WORKER_CLASS=uvicorn.workers.UvicornWorker
-VENV=$DIR/.venv/bin/activate
-DJANGO_SETTINGS_MODULE=hello.settings
-DJANGO_WSGI_MODULE=hello.wsgi
+VENV=$DIR/bin/activate
+DJANGO_SETTINGS_MODULE=ime-app-django.settings          # which settings file should Django use
+DJANGO_WSGI_MODULE=ime-app-django.wsgi                  # WSGI module name
 LOG_LEVEL=error
 
-echo "Starting $NAME as `whoami`"
+echo "Starting $NAME as `iME Agent`"
 
 # Activate the virtual environment
 cd $DJANGODIR
@@ -334,20 +340,23 @@ source $VENV
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
+# Create the run directory in the project directory for the Unix socket file if it doesn't exist
+RUNDIR=$(dirname $SOCKFILE)
+test -d $RUNDIR || mkdir -p $RUNDIR
+
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-exec gunicorn main:app \
+exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
   --user=$USER --group=$GROUP \
   --workers $NUM_WORKERS \
   --worker-class $WORKER_CLASS \
   --bind=unix:$SOCKFILE \
   --log-level=$LOG_LEVEL \
-  --log-level=debug \
   --log-file=-
 """
 
-    script_path = "/web-apps/ime-app/gunicorn_start"
+    script_path = "/home/web-apps/ime-app/bin/gunicorn_start"
     
     with open("/tmp/gunicorn_start", "w") as f:
         f.write(config_content)
@@ -355,15 +364,12 @@ exec gunicorn main:app \
     
     # Activate the virtual environment and,
     # Make the gunicorn_start script executable.
-    activate_script = os.path.join('.venv', 'bin', 'activate')
-    subprocess.run(f"source {activate_script} && sudo chmod u+x /home/webspps/ime-ai/gunicorn_start", shell=True, executable='/bin/bash')
-
-    # Create a run folder in your project directory for the Unix socket file
-    subprocess.run(["sudo", "mkdir", "-p", "run"])
+    activate_script = os.path.join('bin', 'activate')
+    subprocess.run(f"source {activate_script} && sudo chmod u+x /home/web-apps/ime-app/bin/gunicorn_start", shell=True, executable='/bin/bash')
 
 
 def configure_supervisor():
-    os.chdir('/home/one-user/web-apps/ime-app')
+    os.chdir('/home/ime-user-1/web-apps/ime-app')
 
     # Create logs directory
     subprocess.run(["sudo", "mkdir", "-p", "logs"])
@@ -372,13 +378,12 @@ def configure_supervisor():
     # Create a Supervisor configuration file.
     config_content = """
 [program:ime-app]
-command=/home/one-user/webapps/ime-app/gunicorn_start
-user=one-user
+command=/web-apps/ime-app/bin/gunicorn_start
+user=ime-app-super-admin
 autostart=true
 autorestart=true
+stdout_logfile=/home/web-apps/ime-app/logs/gunicorn-supervisor.log
 redirect_stderr=true
-stderr_logfile=/home/one-user/webapps/ime-app/logs/gunicorn.error.log
-stdout_logfile=/home/one-user/webapps/ime-app/logs/gunicorn.log
 environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8
 """
 
