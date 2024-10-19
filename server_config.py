@@ -10,7 +10,7 @@ import os
 
 
 def ime_app_server_configurations():
-    # install_packages()
+    install_packages()
     unattended_upgrades()
     clone_github_repository()
     create_new_users()
@@ -24,104 +24,123 @@ def ime_app_server_configurations():
 
 
 def install_packages():
-    # Recommended for start
-    subprocess.run(["sudo", "apt-get", "update", "-y"])
-    subprocess.run(["sudo", "apt-get", "upgrade", "-y"])
+    command = """
+    su - root -c '
+    # Update package lists
+    sudo apt-get update -y
+
+    # Upgrade all packages
+    sudo apt-get upgrade -y
 
     # Projects required packages
-    subprocess.run(["sudo", "apt-get", "install", "-y", "unattended-upgrades"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "build-essential"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "checkinstall"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "coreutils"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libreadline-gplv2-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libncurses-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libncursesw5-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libssl-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libsqlite3-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "tk-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libgdbm-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libc6-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libbz2-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "zlib1g-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "openssl"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libffi-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "software-properties-common"])
-    subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "uuid-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "lzma-dev"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "wget"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "tree"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "curl"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "vim"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "ca-certificates"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "lsb-release"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "gnupg"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-pip"])
-    subprocess.run(["sudo", "pip", "install", "--upgrade", "pip"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-setuptools"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "virtualenv"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "git"])
+    sudo apt-get install -y unattended-upgrades
+    sudo apt-get install -y build-essential
+    sudo apt-get install -y checkinstall
+    sudo apt-get install -y coreutils
+    sudo apt-get install -y libreadline-gplv2-dev
+    sudo apt-get install -y libncurses-dev
+    sudo apt-get install -y libncursesw5-dev
+    sudo apt-get install -y libssl-dev
+    sudo apt-get install -y libsqlite3-dev
+    sudo apt-get install -y tk-dev
+    sudo apt-get install -y libgdbm-dev
+    sudo apt-get install -y libc6-dev
+    sudo apt-get install -y libbz2-dev
+    sudo apt-get install -y zlib1g-dev
+    sudo apt-get install -y openssl
+    sudo apt-get install -y libffi-dev
+    sudo apt-get install -y software-properties-common
+    sudo systemctl enable --now snapd.socket
+    sudo apt-get install -y uuid-dev
+    sudo apt-get install -y lzma-dev
+    sudo apt-get install -y wget
+    sudo apt-get install -y tree
+    sudo apt-get install -y curl
+    sudo apt-get install -y vim
+    sudo apt-get install -y ca-certificates
+    sudo apt-get install -y lsb-release
+    sudo apt-get install -y gnupg
+    sudo apt-get install -y python3-pip
+    sudo pip install --upgrade pip
+    sudo apt-get install -y python3-setuptools
+    sudo apt-get install -y virtualenv
+    sudo apt-get install -y git
 
-    # Install Python and its related packages
-    subprocess.run(["sudo", "add-apt-repository", "ppa:deadsnakes/ppa", "-y"])
-    subprocess.run(["sudo", "apt-get", "update"])
-    subprocess.run(["sudo", "apt-get", "install", "python3.11", "-y"])
-    subprocess.run(["sudo", "apt-get", "install", "python3.11-venv", "-y"])
-    subprocess.run(["sudo", "apt-get", "install", "python-virtualenv", "-y"])
+    # Add the deadsnakes PPA for newer Python versions
+    sudo add-apt-repository ppa:deadsnakes/ppa -y
+
+    # Install Python 3.11 and related packages
+    sudo apt-get install -y python3.11
+    sudo apt-get install -y python3.11-venv
+    sudo apt-get install -y python-virtualenv
 
     # Building Python modules
-    subprocess.run(["sudo", "apt-get", "install", "-y", "python3-dev"])
+    sudo apt-get install -y python3-dev
 
     # Install PostgreSQL
-    subprocess.run(["sudo", "apt-get", "install", "-y", "postgresql"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "postgresql-contrib"])
+    sudo apt-get install -y postgresql
+    sudo apt-get install -y postgresql-contrib
 
-    # library for communication with Postgres
-    subprocess.run(["sudo", "apt-get", "install", "-y", "libpq-dev"])
+    # Library for communication with Postgres
+    sudo apt-get install -y libpq-dev
 
     # Dependencies
-    subprocess.run(["sudo", "pip", "install", "pexpect"])
-    subprocess.run(["sudo", "pip", "install", "python-dotenv"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "snapd"])
-    subprocess.run(["sudo", "systemctl", "enable", "--now", "snapd.socket"])
-    subprocess.run(["sudo", "snap", "install", "core"])
-    subprocess.run(["sudo", "snap", "refresh", "core"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "policycoreutils-python-utils"])
-
-    # Install Resetter
-    # subprocess.run(["sudo", "add-apt-repository", "ppa:resetter/ppa", "-y"])
-    # subprocess.run(["sudo", "apt-get", "update"])
-    # subprocess.run(["sudo", "apt-get", "install", "resetter", "-y"])
+    sudo pip install pexpect
+    sudo pip install python-dotenv
+    sudo apt-get install -y snapd
+    sudo systemctl enable --now snapd.socket
+    sudo snap install core
+    sudo snap refresh core
+    sudo apt-get install -y policycoreutils-python-utils
 
     # Install Supervisor and NGINX
-    subprocess.run(["sudo", "apt-get", "install", "supervisor", "-y"])
-    subprocess.run(["sudo", "apt-get", "install", "nginx", "-y"])
-    subprocess.run(["sudo", "systemctl", "enable", "supervisor"])
-    subprocess.run(["sudo", "systemctl", "start", "supervisor"])
+    sudo apt-get install -y supervisor
+    sudo apt-get install -y nginx
+    sudo systemctl enable supervisor
+    sudo systemctl start supervisor
 
-    # Install JS
-    subprocess.run(["sudo", "apt-get", "install", "-y", "npm"])
+    # Install Resetter
+    sudo add-apt-repository ppa:resetter/ppa -y
+    sudo apt-get install -y resetter
+
+    # Install npm (JavaScript package manager)
+    sudo apt-get install -y npm
 
     # Install Ollama
-    subprocess.run(["npm", "install", "ollama"])
+    npm install ollama
 
-    # install_docker
+    # Install Docker
     # Add Docker's official GPG key
-    subprocess.run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg", shell=True)
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
     # Set up the stable repository
-    subprocess.run('echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null', shell=True)
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
     # Install Docker Engine
-    subprocess.run(["sudo", "apt-get", "update"])
-    subprocess.run(["sudo", "apt-get", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io"])
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+    # Update package lists
+    sudo apt-get update -y
+
+    # Upgrade all packages
+    sudo apt-get upgrade -y
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<install_packages> function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error occurred:", e.stderr)
 
 
 def unattended_upgrades():
-    # Configure unattended-upgrades so that it runs automatically
+    # Configure unattended-upgrades to run automatically
     command = """
     su - root -c '
-    bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
-    bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
-    bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
+    echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades &&
+    echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades &&
+    echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades &&
     sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades
     '
     """
@@ -153,10 +172,10 @@ def clone_github_repository():
 def create_new_users():
     command = """
     su - root -c '
-    groupadd --system ime-app-group &&                                      # Create a new user group
-    gpasswd -a ime-app-group sudo &&                                        # Add the new group to the sudo group
     useradd --system ime-app-server-admin &&                                # Create a new user
+    groupadd --system ime-app-group &&                                      # Create a new user group
     gpasswd -a ime-app-server-admin ime-app-group &&                        # Add the new user to the new group
+    gpasswd -a ime-app-group sudo &&                                        # Add the new group to the sudo group
     usermod --shell /bin/bash ime-app-server-admin &&                       # Set the shell for the user
     usermod --home /home/web-apps/ime-app ime-app-server-admin &&           # Set the home directory for the user
     chown ime-app-server-admin /home/web-apps/ime-app                       # Change the owner of ime-app directory
@@ -227,8 +246,8 @@ def configure_postgre_sql():
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
-    sudo createuser --interactive -P
-    sudo createdb --owner ime-app-db-user ime_app_db
+    sudo createuser --interactive -P &&
+    sudo createdb --owner ime-app-db-user ime_app_db &&
     sudo logout
     '
     """
