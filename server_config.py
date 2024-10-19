@@ -143,13 +143,13 @@ def create_new_users():
     # Command to switch root user, and execute these commands
     command = """
     su - root -c '
-    sudo groupadd --system ime-users &&                                        # Create a new user group for ime-app users
-    sudo gpasswd -a ime-users sudo &&                                          # Add the ime-app users group to the sudo group
-    sudo useradd --system ime-app-server-admin &&                              # Create a new user for ime-app
-    sudo usermod -g ime-users ime-app-server-admin &&                          # Assign the user to the group
-    sudo usermod --shell /bin/bash ime-app-server-admin &&                     # Set the user's shell
-    sudo usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the user's home directory
-    sudo chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory to ime-app-server-admin 
+    sudo groupadd --system ime-app-server-users &&                             # Create a new user group
+    sudo gpasswd -a ime-app-server-users sudo &&                               # Add the new group to the sudo group
+    sudo useradd --system ime-app-server-admin &&                              # Create a new user
+    sudo usermod -g ime-app-server-users ime-app-server-admin &&                          # Assign the user to the group
+    sudo usermod --shell /bin/bash ime-app-server-admin &&                     # Set the shell for the user
+    sudo usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the home directory for the user
+    sudo chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory
     '
     """
     # Execute the command
