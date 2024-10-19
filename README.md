@@ -9,17 +9,17 @@ Get up and running with iME large language model.
 ## Quickstart
 
 
-# 1. Import 'server_config' project (Local)
+# 1. Import <server_configurations> project (Local)
     - Open terminal on your local machine.
-    - Run this command to clone the 'server_config' poject from the GitHub repository:
+    - Run this command to clone the <server_configurations> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/server_config.git
+      git clone https://github.com/Ramin-Hashemi/server_configurations.git
       ```
 
-# 2. Create your public SSH key.
+# 2. Create & add your public SSH key.
     - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
-      (Make sure to replace username@email.com it with your actual email.)
+      (Make sure to replace <username@email.com> with your actual email.)
 
       ```
       ssh-keygen -t ed25519 -C "username@email.com"
@@ -28,58 +28,48 @@ Get up and running with iME large language model.
       ```
       cat ~/.ssh/id_ed25519.pub
       ```
-      Then copy your public SSH key in 'secret.py' file in the project repo and push to the GitHub.
+      Then paste your public SSH key in 'secret.py' file in the local project repsitory and push to the GitHub.
 
-# 3. Import 'server_config' project (Remote Server)
+# 3. Import 'server_configurations' project (Remote Server)
     - Open terminal on remote server.
-    - Run this command to clone the 'server_config' poject from the GitHub repository:
+    - Change directory to </home>
+    - Run this command to clone the <server_configurations> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/server_config.git
+      git clone https://github.com/Ramin-Hashemi/server_configurations.git
       ```
 
-# 4. Config the remote server
-    - Run this command to execute the required server config files:
+# 4. Configure the remote server
+  ## 4.1. Run configurations script
+    - Change directory to </home/server_configurations/>
+    - Run this command to execute the required server configurations shell commands:
 
       ```
-      python server_config.py make_server_ready
+      sudo python3 server_configurations.py ime_app_server_configurations
       ```
-
-    - Run this command to execute the iME 'model_initialize' file:
-
-      ```
-      python model_initialize.py initializer
-      ```
-
-# 5. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
-    - Finally, run the following command in the remote server:
-
-      ```
-      ollama run iME
-      ```
-
-
-# 6. Configure PostgreSQL
+  ## 4.2. Configure PostgreSQL
     - PostgreSQL database with the name of `ime-app-db` will be created.
     - Then respond to the prompts to create database user.
     # Prompts:
-    - Enter name of role to add: ime-app-db-user
+    - Enter name of role to add: ime-app-db-admin
     - Enter password for new role: 
     - Enter it again: 
     - Shall the new role be a superuser? (y/n) n
     - Shall the new role be allowed to create databases? (y/n) n
     - Shall the new role be allowed to create more new roles? (y/n) n
+    - 
 
+# 5. Initialize iME Agent
+  ## 5.1. Run this command to execute the 'model_initialize' file:
+      ```
+      sudo python3 model_initialize.py ime_model_initializer
+      ```
+  ## 5.2. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
+    - Finally, run the following command in the remote server:
 
-
-
-
-
-
-
-
-
-
+      ```
+      ollama run iME
+      ```
 ### Enjoy!
 
 ## Model library

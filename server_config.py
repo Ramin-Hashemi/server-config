@@ -140,7 +140,7 @@ def clone_github_repository():
 
 def create_new_users():
 
-    # Command to switch root user, execute these commands
+    # Command to switch root user, and execute these commands
     command = """
     su - root -c '
     sudo groupadd --system ime-users &&                                        # Create a new user group for ime-app users
