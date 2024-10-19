@@ -536,10 +536,10 @@ See the [API documentation](./docs/api.md) for all endpoints.
 │       ├── urls.py
 │       └── wsgi.py              <= hello.wsgi - WSGI module Gunicorn will use
 ├── include
-│   └── python2.7 -> /usr/include/python2.7
+│   └── python3.12 -> /usr/include/python3.12
 ├── lib
 │   └── python2.7
-├── lib64 -> /webapps/hello_django/lib
+├── lib64 -> /web-apps/ime-app/lib
 ├── logs                         <= Application logs directory
 │   ├── gunicorn_supervisor.log
 │   ├── nginx-access.log
