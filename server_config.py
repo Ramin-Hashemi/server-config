@@ -11,8 +11,8 @@ import os
 
 def ime_app_server_configurations():
     # install_packages()
-    # unattended_upgrades()
-    # clone_github_repository()
+    unattended_upgrades()
+    clone_github_repository()
     create_new_users()
     # secure_server()
     # create_virtual_env()
@@ -116,16 +116,24 @@ def install_packages():
 
 
 def unattended_upgrades():
-    # Configure unattended-upgrades so that it runs automatically.
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    subprocess.run('sudo bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\'', shell=True)
-    # System automatically reboots when kernel updates require it
-    subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
+    # Configure unattended-upgrades so that it runs automatically
+    command = """
+    su - root -c '
+    bash -c \'echo "APT::Periodic::Update-Package-Lists \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
+    bash -c \'echo "APT::Periodic::Unattended-Upgrade \\"1\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
+    bash -c \'echo "APT::Periodic::AutocleanInterval \\"7\\";" >> /etc/apt/apt.conf.d/20auto-upgrades\' &&
+    sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<unattended_upgrades> function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error occurred:", e.stderr)
 
 
 def clone_github_repository():
-
     # Command to switch root user
     command = """
     su - root -c '
@@ -134,12 +142,15 @@ def clone_github_repository():
     git clone https://github.com/Ramin-Hashemi/ime-app.git                          # Clone iME project from GitHub
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')    
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<clone_github_repository> function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error occurred:", e.stderr)
 
 
 def create_new_users():
-    # Command to switch to root user and execute these commands
     command = """
     su - root -c '
     groupadd --system ime-app-server-users &&                             # Create a new user group
@@ -151,8 +162,12 @@ def create_new_users():
     chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<create_new_users> function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error occurred:", e.stderr)
 
 
 def secure_server():
