@@ -131,7 +131,7 @@ def clone_repo():
     su - root -c '
     sudo mkdir -p /home/web-apps &&                                                 # Create a directory to store web applications on server
     cd /home/web-apps &&                                                            # Change directory to web-apps
-    git clone https://github.com/Ramin-Hashemi/ime-app.git &&                       # Clone iME project from GitHub
+    git clone https://github.com/Ramin-Hashemi/ime-app.git                          # Clone iME project from GitHub
     '
     """
     # Execute the command
@@ -162,7 +162,7 @@ def create_new_users():
     sudo chown ime-user-super-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory to ime-user-super-admin 
     
     # Allowing other users write access to the application directory
-    sudo chown -R ime-user-v:users /home/web-apps/ime-app &&
+    sudo chown -R ime-user-super-admin:users /home/web-apps/ime-app &&
     sudo chmod -R g+w /home/web-apps/ime-app &&
     sudo usermod -a -G users ime-user-super-admin
     '
