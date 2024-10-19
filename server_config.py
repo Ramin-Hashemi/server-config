@@ -12,8 +12,8 @@ import os
 def ime_app_server_configurations():
     # install_packages()
     # unattended_upgrades()
-    clone_github_repository()
-    # create_new_users()
+    # clone_github_repository()
+    create_new_users()
     # secure_server()
     # create_virtual_env()
     # create_django_project()
@@ -125,7 +125,7 @@ def unattended_upgrades():
 
 
 def clone_github_repository():
-    
+
     # Command to switch root user
     command = """
     su - root -c '
@@ -138,16 +138,6 @@ def clone_github_repository():
     subprocess.run(command, shell=True, executable='/bin/bash')    
 
 
-    # os.chdir('/home/web-apps/')
-
-    # Create a directory to store your application
-    # subprocess.run(["sudo", "mkdir", "-p", "/home/web-apps/ime-app"])
-
-    # Clone iME project from GitHub
-    # os.chdir('/home/web-apps')
-    # subprocess.run(["git", "clone", "https://github.com/Ramin-Hashemi/ime-app.git"])
-
-
 def create_new_users():
 
     # Command to switch root user, execute these commands
@@ -155,45 +145,15 @@ def create_new_users():
     su - root -c '
     sudo groupadd --system ime-users &&                                        # Create a new user group for ime-app users
     sudo gpasswd -a ime-users sudo &&                                          # Add the ime-app users group to the sudo group
-    sudo useradd --system ime-user-super-admin &&                              # Create a new user for ime-app
-    sudo usermod -g ime-users ime-user-super-admin &&                          # Assign the user to the group
-    sudo usermod --shell /bin/bash ime-user-super-admin &&                     # Set the user's shell
-    sudo usermod --home /home/web-apps/ime-app ime-user-super-admin &&         # Set the user's home directory
-    sudo chown ime-user-super-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory to ime-user-super-admin 
-    
-    # Allowing other users write access to the application directory
-    sudo chown -R ime-user-super-admin:users /home/web-apps/ime-app &&
-    sudo chmod -R g+w /home/web-apps/ime-app &&
-    sudo usermod -a -G users ime-user-super-admin
+    sudo useradd --system ime-app-server-admin &&                              # Create a new user for ime-app
+    sudo usermod -g ime-users ime-app-server-admin &&                          # Assign the user to the group
+    sudo usermod --shell /bin/bash ime-app-server-admin &&                     # Set the user's shell
+    sudo usermod --home /home/web-apps/ime-app ime-app-server-admin &&         # Set the user's home directory
+    sudo chown ime-app-server-admin /home/web-apps/ime-app                     # Change the owner of ime-app directory to ime-app-server-admin 
     '
     """
     # Execute the command
     subprocess.run(command, shell=True, executable='/bin/bash')
-
-
-    # Create a new user group for ime-app users
-    # subprocess.run(["sudo", "addgro/up", "--system", "ime-users"])
-    # Add the ime-app users group to the sudo group
-    # subprocess.run(["sudo", "gpasswd", "-a", "ime-users", "sudo"])
-
-    # Create a new user for ime-app
-    # subprocess.run(["sudo", "adduser", "--system", "ime-user-super-admin"])
-    # Assign the user to the group
-    # subprocess.run(["sudo", "usermod", "-g", "ime-users", "ime-user-super-admin"])
-    # Set the user’s shell
-    # subprocess.run(["sudo", "usermod", "--shell", "/bin/bash", "ime-user-super-admin"])
-    # Set the user’s home directory
-    # subprocess.run(["sudo", "usermod", "--home", "/home/webapps/ime-app", "ime-user-super-admin"])
-    # Change the owner of ime-app directory to ime-user-super-admin
-    # subprocess.run(["sudo", "chown", "ime-user-super-admin", "/home/web-apps/ime-app"])
-
-    # Add the user to the new group (used for secondary membership)
-    # subprocess.run(["sudo", "gpasswd", "-a", "ime-user-super-admin", "ime-users"])
-
-    # Allowing other users write access to the application directory
-    # subprocess.run(["sudo", "chown", "-R", "ime-user-v:users", "/home/web-apps/ime-app"])
-    # subprocess.run(["sudo", "chmod", "-R", "g+w", "/home/web-apps/ime-app"])
-    # subprocess.run(["sudo", "usermod", "-a", "-G", "users", "ime-user-super-admin"])
 
 
 def secure_server():
