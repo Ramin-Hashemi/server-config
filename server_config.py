@@ -12,7 +12,7 @@ import os
 def ime_app_server_configurations():
     # install_packages()
     # unattended_upgrades()
-    clone_repo()
+    clone_github_repository()
     # create_new_users()
     # secure_server()
     # create_virtual_env()
@@ -124,7 +124,7 @@ def unattended_upgrades():
     subprocess.run('sudo sed -i \'s|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|\' /etc/apt/apt.conf.d/50unattended-upgrades', shell=True)
 
 
-def clone_repo():
+def clone_github_repository():
     
     # Command to switch root user
     command = """
@@ -153,9 +153,9 @@ def create_new_users():
     # Command to switch root user, execute these commands
     command = """
     su - root -c '
-    sudo addgroup --system ime-users &&                                        # Create a new user group for ime-app users
+    sudo groupadd --system ime-users &&                                        # Create a new user group for ime-app users
     sudo gpasswd -a ime-users sudo &&                                          # Add the ime-app users group to the sudo group
-    sudo adduser --system ime-user-super-admin &&                              # Create a new user for ime-app
+    sudo useradd --system ime-user-super-admin &&                              # Create a new user for ime-app
     sudo usermod -g ime-users ime-user-super-admin &&                          # Assign the user to the group
     sudo usermod --shell /bin/bash ime-user-super-admin &&                     # Set the user's shell
     sudo usermod --home /home/web-apps/ime-app ime-user-super-admin &&         # Set the user's home directory
