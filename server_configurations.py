@@ -109,24 +109,23 @@ def install_packages():
     try:
         # Execute the command
         result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<install_packages> Function executed successfully:", result.stdout)
+        print("<install_packages>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<install_packages> Error occurred:", e.stderr)
+        print("<install_packages>>>>> Error occurred:", e.stderr)
 
 
 def clone_github_repository():
-    # Command to switch root user
     command = """
     su - root -c '
-    sudo mkdir -p /home/web-apps &&                                                 # Create a directory to store web applications on server
-    cd /home/web-apps &&                                                            # Change directory to web-apps
-    git clone https://github.com/Ramin-Hashemi/ime-app.git                          # Clone iME project from GitHub
+    sudo mkdir -p /home/web-apps &&
+    cd /home/web-apps &&
+    git clone https://github.com/Ramin-Hashemi/ime-app.git
     '
     """
     try:
         # Execute the command
         result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<clone_github_repository> Function executed successfully:", result.stdout)
+        print("<clone_github_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<clone_github_repository>>>>> Error occurred:", e.stderr)
 
@@ -143,9 +142,9 @@ def create_new_users():
     try:
         # Execute the command
         result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<create_new_users> function executed successfully:", result.stdout)
+        print("<create_new_users>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("Error occurred:", e.stderr)
+        print("<create_new_users>>>>> Error occurred:", e.stderr)
 
 
 def secure_server():
