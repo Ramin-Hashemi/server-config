@@ -9,7 +9,7 @@ import sys
 import os
 
 
-def prepare_iem_app_server():
+def ime_app_server_configurations():
     # install_packages()
     # unattended_upgrades()
     clone_repo()
@@ -510,7 +510,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     function_name = sys.argv[1]
-    if function_name == "prepare_server":
-        prepare_server()
+    if function_name == "ime_app_server_configurations":
+        ime_app_server_configurations()
     else:
         print(f"Function {function_name} not found.")
