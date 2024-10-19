@@ -10,8 +10,8 @@ import os
 
 
 def ime_app_server_configurations():
-    install_packages()
-    clone_github_repository()
+    # install_packages()
+    # clone_github_repository()
     create_new_users()
     # secure_server()
     # create_virtual_env()
@@ -32,7 +32,6 @@ def install_packages():
     sudo apt-get upgrade -y
 
     # Projects required packages
-    apt-get install -y unattended-upgrades
     apt-get install -y build-essential
     apt-get install -y checkinstall
     apt-get install -y coreutils
@@ -60,7 +59,6 @@ def install_packages():
     apt-get install -y lsb-release
     apt-get install -y gnupg
     apt-get install -y python3-pip
-    pip install --upgrade pip
     apt-get install -y python3-setuptools
     apt-get install -y virtualenv
     apt-get install -y git
@@ -68,9 +66,9 @@ def install_packages():
     # Add the deadsnakes PPA for newer Python versions
     add-apt-repository ppa:deadsnakes/ppa -y
 
-    # Install Python 3.11 and related packages
-    apt-get install -y python3.11
-    apt-get install -y python3.11-venv
+    # Install Python 3.13 and related packages
+    apt-get install -y python3.13
+    apt-get install -y python3.13-venv
     apt-get install -y python-virtualenv
 
     # Building Python modules
@@ -137,10 +135,9 @@ def create_new_users():
     command = """
     su - root -c '
     # Create a new group
-    groupadd --system ime-app-group &&                                     
-    # Create a new user, Add to the new group, Set the shell for the user, Set the home directory, 
-    useradd --system --gid ime-app-group --shell /bin/bash --home /home/web-apps/ime-app ime-app-server-admin &&
-    # Change the owner of ime-app directory
+    groupadd --system ime-app-group &&
+    # Create a new user, Add to the new group, Set the shell & home directory for the user
+    useradd --system --gid ime-app-group --shell /bin/bash --home /home/web-apps/ime-app ime-app-server-admin
     '
     """
     try:
