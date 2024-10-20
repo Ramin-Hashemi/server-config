@@ -530,9 +530,9 @@ See the [API documentation](./docs/api.md) for all endpoints.
 │   ├── manage.py
 │   ├── project_application_1
 │   ├── project_application_2
-│   └── hello                    <= Project settings directory
+│   └── ime-app-settings                    <= Project settings directory
 │       ├── __init__.py
-│       ├── settings.py          <= hello.settings - settings module Gunicorn will use
+│       ├── settings.py          <= ime-app.settings - settings module Gunicorn will use
 │       ├── urls.py
 │       └── wsgi.py              <= hello.wsgi - WSGI module Gunicorn will use
 ├── include

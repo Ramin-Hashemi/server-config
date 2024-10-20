@@ -9,16 +9,20 @@ import sys
 import os
 
 
-def ime_app_server_configurations():
-    # install_packages()
-    # clone_github_repository()
-    create_new_users()
+def ime_app_server_configs():
+    install_packages()
+    clone_github_repository()
+    # create_new_users()
     # secure_server()
     # create_virtual_env()
     # create_django_project()
-    # configure_gunicorn()
-    # configure_supervisor()
-    # configure_nginx()
+    # create_postgres_database()
+    # database_adapter()
+    # database_settings()
+    # build_django_database()
+    # config_gunicorn()
+    # config_supervisor()
+    # config_nginx()
     # ssl_certificate_certbot()
 
 
@@ -31,7 +35,7 @@ def install_packages():
     # Upgrade all packages
     sudo apt-get upgrade -y
 
-    # Projects required packages
+    # To be reviewed ??????
     apt-get install -y build-essential
     apt-get install -y checkinstall
     apt-get install -y coreutils
@@ -48,7 +52,6 @@ def install_packages():
     apt-get install -y openssl
     apt-get install -y libffi-dev
     apt-get install -y software-properties-common
-    systemctl enable --now snapd.socket
     apt-get install -y uuid-dev
     apt-get install -y lzma-dev
     apt-get install -y wget
@@ -58,18 +61,18 @@ def install_packages():
     apt-get install -y ca-certificates
     apt-get install -y lsb-release
     apt-get install -y gnupg
-    apt-get install -y python3-pip
-    apt-get install -y python3-setuptools
+    
+    # Projects required packages
     apt-get install -y virtualenv
-    apt-get install -y git
-
-    # Add the deadsnakes PPA for newer Python versions
-    add-apt-repository ppa:deadsnakes/ppa -y
 
     # Install Python 3.13 and related packages
     apt-get install -y python3.13
+    apt-get install -y python3-pip
+    apt-get install -y python3-setuptools
     apt-get install -y python3.13-venv
     apt-get install -y python-virtualenv
+    apt-get install -y policycoreutils-python-utils
+    pip install python-dotenv
 
     # Building Python modules
     apt-get install -y python3-dev
@@ -81,14 +84,14 @@ def install_packages():
     # Library for communication with Postgres
     apt-get install -y libpq-dev
 
-    # Dependencies
-    pip install pexpect
-    pip install python-dotenv
+    # snapd universal package management
     apt-get install -y snapd
     systemctl enable --now snapd.socket
     snap install core
     snap refresh core
-    apt-get install -y policycoreutils-python-utils
+
+    # Add the deadsnakes PPA for newer Python versions
+    add-apt-repository ppa:deadsnakes/ppa -y
 
     # Install Supervisor and NGINX
     apt-get install -y supervisor
@@ -148,24 +151,29 @@ def create_new_users():
 
 
 def secure_server():
-    # Set up your server so that you connect to it using an SSH key instead of a password.
-    os.chdir('/home/webapps')
-    subprocess.run(['sudo', 'mkdir', '-p', '/home/web-apps/.ssh'])
-    subprocess.run(['sudo', 'chmod', '700', '/home/web-apps/.ssh'])
-    subprocess.run(['sudo', 'chmod', '600', '/home/web-apps/.ssh/authorized_keys'])
-    subprocess.run(f'sudo bash -c \'echo "{secret.Public_SSH_key}" >> /home/web-apps/.ssh/authorized_keys\'', shell=True)
-
-    # Disable the root login and password authentication rather than an SSH key for SSH connections.
-    subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes|', '/etc/ssh/sshd_config'])
-    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PermitRootLogin .*|PermitRootLogin no|', '/etc/ssh/sshd_config'])
-    # subprocess.run(['sudo', 'sed', '-i', 's|^#\\?PasswordAuthentication .*|PasswordAuthentication no|', '/etc/ssh/sshd_config'])
+    # Set up your server so that you connect to it using an SSH key instead of a password
+    command = """
+    su - root -c '
+    mkdir -p /home/web-apps/.ssh &&
+    chmod 700 /home/web-apps/.ssh &&
+    chmod 600 /home/web-apps/.ssh/authorized_keys &&
+    echo "{secret.Public_SSH_key}" >> /home/web-apps/.ssh/authorized_keys &&
+    sed -i s|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes| /etc/ssh/sshd_config &&
+    sed -i s|^#\\?PasswordAuthentication .*|PasswordAuthentication yes| /etc/ssh/sshd_config &&
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<secure_server>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<secure_server>>>>> Error occurred:", e.stderr)
 
 
 def create_virtual_env():
-    
     # Command to switch user, change directory, and activate virtual environment
     command = """
-    su - ime-user-1 -c '
+    su - ime-app-super-admin -c '
     cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
@@ -173,15 +181,18 @@ def create_virtual_env():
     pip install -r requirements.txt
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<create_virtual_env>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<create_virtual_env>>>>> Error occurred:", e.stderr)
 
 
 def create_django_project():
-
     # Command to switch user, change directory, and create an empty Django project
     command = """
-    su - ime-user-super-admin -c '
+    su - ime-app-super-admin -c '
     cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
@@ -191,32 +202,40 @@ def create_django_project():
     ime-app-django
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<create_django_project>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<create_django_project>>>>> Error occurred:", e.stderr)
 
 
-def configure_postgre_sql():
-
+def create_postgres_database():
     # Command to switch user, change directory, and;
-    # Create a database user and a new database for the ime-app
+    # Create a new database user and a new database for the ime-app
     command = """
     su - postgres -c '
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
     sudo createuser --interactive -P &&
-    sudo createdb --owner ime-app-db-user ime_app_db &&
+    sudo createdb --owner ime-app-db-admin ime_app_db &&
     sudo logout
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<configure_postgre_sql>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<configure_postgre_sql>>>>> Error occurred:", e.stderr)
 
 
+def database_adapter():
     # Command to switch user, change directory, and;
     # Install database adapter
     command = """
-    su - ime-user-1 -c '
+    su - ime-app-super-admin -c '
     cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
@@ -224,33 +243,43 @@ def configure_postgre_sql():
     pip install psycopg2
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<database_adapter>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<database_adapter>>>>> Error occurred:", e.stderr)
 
 
+def database_settings():
     # Configure the databases section in your settings.py
     config_content = """
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ime_app_db',
-        'USER': 'ime-app-db-user',
+        'USER': 'ime-app-db-admin',
         'PASSWORD': '123456789',
         'HOST': 'localhost',
         'PORT': '',                      # Set to empty string for default.
     }
 }
 """
-    script_path = "/home/web-apps/ime-app/ime-app-settings/settings.py"
-    
-    with open("/tmp/settings.py", "w") as f:
-        f.write(config_content)
-    subprocess.run(["sudo", "mv", "/tmp/settings.py", script_path])
+    try:
+        # Execute the command
+        script_path = "/home/web-apps/ime-app/ime-app-settings/settings.py"
+        with open("/tmp/settings.py", "w") as f:
+            f.write(config_content)
+        result = subprocess.run("sudo", "mv", "/tmp/settings.py", {script_path}, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<database_settings>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<database_settings>>>>> Error occurred:", e.stderr)
 
-    
+
+def build_django_database():
     # Build the initial database for Django
     command = """
-    su - ime-user-1 -c '
+    su - ime-app-super-admin -c '
     cd /home/web-apps/ime-app &&
     # Using virtualenv
     virtualenv . &&
@@ -260,66 +289,84 @@ DATABASES = {
     migrate
     '
     """
-    # Execute the command
-    subprocess.run(command, shell=True, executable='/bin/bash')
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<build_django_database>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<build_django_database>>>>> Error occurred:", e.stderr)
 
 
-def configure_gunicorn():
-    os.chdir('/home/web-apps/ime-app')
-
-    # Create a file to define the parameters when running Gunicorn.
+def config_gunicorn():
+        # Create a file to define the parameters when running Gunicorn.
     config_content = """
-#!/bin/bash
+    #!/bin/bash
 
-NAME=ime-app-gunicorn                                   # Name of the application
-DJANGODIR=/home/we-apps/ime-app-django                  # Django project directory
-SOCKFILE=/home/web-apps/ime-app/run/gunicorn.sock       # we will communicte using this unix socket
-USER=ime-user-1                                         # the user to run as
-GROUP=ime-users                                         # the group to run as
-NUM_WORKERS=3                                           # how many worker processes should Gunicorn spawn
-WORKER_CLASS=uvicorn.workers.UvicornWorker
-VENV=$DIR/bin/activate
-DJANGO_SETTINGS_MODULE=ime-app-django.settings          # which settings file should Django use
-DJANGO_WSGI_MODULE=ime-app-django.wsgi                  # WSGI module name
-LOG_LEVEL=error
+    NAME=ime-app-gunicorn                                   # Name of the application
+    DJANGODIR=/home/we-apps/ime-app-django                  # Django project directory
+    SOCKFILE=/home/web-apps/ime-app/run/gunicorn.sock       # we will communicte using this unix socket
+    USER=ime-user-1                                         # the user to run as
+    GROUP=ime-users                                         # the group to run as
+    NUM_WORKERS=3                                           # how many worker processes should Gunicorn spawn
+    WORKER_CLASS=uvicorn.workers.UvicornWorker
+    VENV=$DIR/bin/activate
+    DJANGO_SETTINGS_MODULE=ime-app-django.settings          # which settings file should Django use
+    DJANGO_WSGI_MODULE=ime-app-django.wsgi                  # WSGI module name
+    LOG_LEVEL=error
 
-echo "Starting $NAME as `iME Agent`"
+    echo "Starting $NAME as `iME Agent`"
 
-# Activate the virtual environment
-cd $DJANGODIR
-source $VENV
-export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
-export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+    # Activate the virtual environment
+    cd $DJANGODIR
+    source $VENV
+    export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+    export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
-# Create the run directory in the project directory for the Unix socket file if it doesn't exist
-RUNDIR=$(dirname $SOCKFILE)
-test -d $RUNDIR || mkdir -p $RUNDIR
+    # Create the run directory in the project directory for the Unix socket file if it doesn't exist
+    RUNDIR=$(dirname $SOCKFILE)
+    test -d $RUNDIR || mkdir -p $RUNDIR
 
-# Start your Django Unicorn
-# Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
-  --name $NAME \
-  --user=$USER --group=$GROUP \
-  --workers $NUM_WORKERS \
-  --worker-class $WORKER_CLASS \
-  --bind=unix:$SOCKFILE \
-  --log-level=$LOG_LEVEL \
-  --log-file=-
-"""
+    # Start your Django Unicorn
+    # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
+    exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+    --name $NAME \
+    --user=$USER --group=$GROUP \
+    --workers $NUM_WORKERS \
+    --worker-class $WORKER_CLASS \
+    --bind=unix:$SOCKFILE \
+    --log-level=$LOG_LEVEL \
+    --log-file=-
+    """
+    try:
+        # Execute the command
+        script_path = "/home/web-apps/ime-app/bin/gunicorn_start"
+        with open("/tmp/gunicorn_start", "w") as f:
+            f.write(config_content)
+        result = subprocess.run("sudo", "mv", "/tmp/gunicorn_start", {script_path}, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<config_gunicorn>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<config_gunicorn>>>>> Error occurred:", e.stderr)
 
-    script_path = "/home/web-apps/ime-app/bin/gunicorn_start"
-    
-    with open("/tmp/gunicorn_start", "w") as f:
-        f.write(config_content)
-    subprocess.run(["sudo", "mv", "/tmp/gunicorn_start", script_path])
-    
     # Activate the virtual environment and,
     # Make the gunicorn_start script executable.
-    activate_script = os.path.join('bin', 'activate')
-    subprocess.run(f"source {activate_script} && sudo chmod u+x /home/web-apps/ime-app/bin/gunicorn_start", shell=True, executable='/bin/bash')
+    command = """
+    su - ime-app-super-admin -c '
+    cd /home/web-apps/ime-app &&
+    # Using virtualenv
+    virtualenv . &&
+    source bin/activate &&
+    sudo chmod u+x /home/web-apps/ime-app/bin/gunicorn_start
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<config_gunicorn>>>>> Activated successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<config_gunicorn>>>>> Activation error occurred:", e.stderr)
 
 
-def configure_supervisor():
+def config_supervisor():
     os.chdir('/home/ime-user-1/web-apps/ime-app')
 
     # Create logs directory
@@ -351,7 +398,7 @@ environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8
     subprocess.run(f"source {activate_script} && sudo supervisorctl restart ime-app", shell=True, executable='/bin/bash')
 
 
-def configure_nginx():
+def config_nginx():
     os.chdir('/home/one-user/webapps/ime-app')
 
     # Create a new NGINX configuration file

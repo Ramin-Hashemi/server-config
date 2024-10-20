@@ -9,7 +9,7 @@ import sys
 import os
 
 
-def ime_app_server_configurations():
+def ime_app_server_configs_optionals():
     unattended_upgrades()
 
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     function_name = sys.argv[1]
-    if function_name == "ime_app_server_configurations":
-        ime_app_server_configurations()
+    if function_name == "ime_app_server_configs_optional":
+        ime_app_server_configs_optional()
     else:
         print(f"Function {function_name} not found.")
