@@ -1,0 +1,83 @@
+# Ignore all log files.
+*.log
+
+# Ignore all Databases files.
+*.sqlite3
+
+# Ignore the temp directory.
+temp/
+
+# Ignore compiled Java class files, object files, and shared libraries.
+*.class
+*.o
+*.so
+
+# Ignore macOS and Windows system files.
+.DS_Store
+Thumbs.db
+
+# Ignore directories commonly used for dependencies in Node.js and PHP projects.
+node_modules/
+vendor/
+
+# Ignore directories used for build outputs.
+/dist
+/build
+
+# Ignore Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env/
+
+# Ignore environment variable files.
+.env
+.env.*
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Ignore Python cache directories and compiled files (Python-Specific Patterns).
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ignore Model files and checkpoints (LLM-Specific Patterns).
+# models/
+checkpoints/
+*.ckpt
+*.h5
+*.pt
+
+# Ignore temporary files and swap files.
+*.tmp
+*.swp
+
+# Ignore configuration files and directories for various IDEs and text editors.
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore a specific file.
+secret.txt
