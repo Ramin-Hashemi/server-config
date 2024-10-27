@@ -41,17 +41,11 @@ def install_packages():
 
 
 def clone_github_repository():
-    # Set your GitHub personal access token as an environment variable
-    github_pat = os.getenv('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')
-    if not github_pat:
-        print("<clone_github_repository>>>>> Error: GITHUB_PAT environment variable not set.")
-        return
-
     command = f"""
     su - root -c '
     mkdir -p /home/web-apps &&
     cd /home/web-apps &&
-    git clone https://Ramin-Hashemi:{github_pat}@github.com/CognitiveLearn-Innovations/wiki.git
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL}
     '
     """
     try:
@@ -98,7 +92,7 @@ def create_new_users():
 def create_virtual_env():
     # Command to switch user, change directory, and activate virtual environment
     command = """
-    su - ime-app-super-admin -c '
+    su - ime-app-server-admin -c '
     cd /home/web-apps/wiki &&
     # Using virtualenv
     virtualenv . &&
@@ -117,7 +111,7 @@ def create_virtual_env():
 def install_dependencies():
     # Install and build the required application dependencies
     command = """
-    su - ime-app-super-admin -c '
+    su - ime-app-server-admin -c '
     cd /home/web-apps/wiki &&
     # Using virtualenv
     virtualenv . &&
@@ -138,7 +132,7 @@ def create_database():
     # Command to switch user, change directory, and;
     # Create a new database  for the wiki
     command = """
-    su - ime-app-super-admin -c '
+    su - ime-app-server-admin -c '
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&
@@ -166,7 +160,7 @@ def create_database():
 
 def start_app():
     command = """
-    su - ime-app-super-admin -c '
+    su - ime-app-server-admin -c '
     # Using virtualenv
     virtualenv . &&
     source bin/activate &&

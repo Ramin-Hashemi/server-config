@@ -15,4 +15,6 @@ DATABASE_PASSWORD = ''
 ### Git
 GIT_DIR = '~/wiki'
 GIT_DEFAULT_BRANCH = 'master'
-REPO_URL = 'https://github.com/CognitiveLearn-Innovations/wiki.git'
+REPO_URL = 'github.com/CognitiveLearn-Innovations/wiki.git'
+GITHUB_USERNAME = 'Ramin-Hashemi'
+GITHUB_PAT = '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'
