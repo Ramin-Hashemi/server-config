@@ -41,11 +41,17 @@ def install_packages():
 
 
 def clone_github_repository():
-    command = """
+    # Set your GitHub personal access token as an environment variable
+    github_pat = os.getenv('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')
+    if not github_pat:
+        print("<clone_github_repository>>>>> Error: GITHUB_PAT environment variable not set.")
+        return
+
+    command = f"""
     su - root -c '
-    sudo mkdir -p /home/web-apps &&
+    mkdir -p /home/web-apps &&
     cd /home/web-apps &&
-    git clone https://Ramin-Hashemi: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@github.com/CognitiveLearn-Innovations/wiki.git
+    git clone https://Ramin-Hashemi:{github_pat}@github.com/CognitiveLearn-Innovations/wiki.git
     '
     """
     try:
@@ -58,16 +64,32 @@ def clone_github_repository():
 
 def create_new_users():
     command = """
-    su - root -c '
-    # Create a new group
-    groupadd --system ime-app-group &&
-    # Create a new user, Add to the new group, Set the shell & home directory for the user
-    useradd --system --gid ime-app-group --shell /bin/bash --home /home/web-apps ime-app-server-admin
-    '
+    # Variables
+    GROUP_NAME="ime-app-group"
+    user="ime-app-server-admin"
+    USER_HOME="/home/web-apps"
+    USER_SHELL="/bin/bash"
+
+    # Check if group exists, if not, create it
+    if ! getent group "$GROUP_NAME" > /dev/null 2>&1; then
+        groupadd "$GROUP_NAME"
+        echo "Group $GROUP_NAME created."
+    else
+        echo "Group $GROUP_NAME already exists."
+    fi
+
+    # Check if user exists, if not, create it
+    if ! id -u "$user" > /dev/null 2>&1; then
+        useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$user"
+        echo "User $user created."
+    else
+        echo "User $user already exists."
+    fi
     """
+
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command as root
+        result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
         print("<create_new_users>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_new_users>>>>> Error occurred:", e.stderr)
