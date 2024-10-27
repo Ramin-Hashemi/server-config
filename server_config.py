@@ -29,7 +29,7 @@ def install_packages():
     sudo apt-get upgrade -y
 
     # Projects required packages
-    apt-get install -y virtualenv
+    apt-get install -y python3-venv
     '
     """
     try:
@@ -94,9 +94,9 @@ def create_virtual_env():
     command = """
     su - ime-app-server-admin -c '
     cd /home/web-apps/wiki &&
-    # Using virtualenv
-    virtualenv . &&
-    source bin/activate &&
+    # Using venv
+    python3 -m venv venv &&
+    source venv/bin/activate &&
     pip install -r requirements.txt
     '
     """
@@ -113,9 +113,9 @@ def install_dependencies():
     command = """
     su - ime-app-server-admin -c '
     cd /home/web-apps/wiki &&
-    # Using virtualenv
-    virtualenv . &&
-    source bin/activate &&
+    # Using venv
+    python3 -m venv venv &&
+    source venv/bin/activate &&
     yarn install --frozen-lockfile &&
     yarn build
     '
@@ -133,9 +133,9 @@ def create_database():
     # Create a new database  for the wiki
     command = """
     su - ime-app-server-admin -c '
-    # Using virtualenv
-    virtualenv . &&
-    source bin/activate &&
+    # Using venv
+    python3 -m venv venv &&
+    source venv/bin/activate &&
     # Create the database
     # yarn sequelize db:create &&
 
@@ -161,9 +161,9 @@ def create_database():
 def start_app():
     command = """
     su - ime-app-server-admin -c '
-    # Using virtualenv
-    virtualenv . &&
-    source bin/activate &&
+    # Using venv
+    python3 -m venv venv &&
+    source venv/bin/activate &&
     # Start the app
     yarn start
     '
