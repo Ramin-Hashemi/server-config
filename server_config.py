@@ -29,6 +29,7 @@ def install_packages():
     sudo apt-get upgrade -y
 
     # Projects required packages
+    apt-get install -y virtualenv
     '
     """
     try:
