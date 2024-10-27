@@ -42,7 +42,7 @@ def install_packages():
 
 def clone_github_repository():
     # Set your GitHub personal access token as an environment variable
-    github_pat = os.getenv('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')
+    github_pat = os.getenv('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')
     if not github_pat:
         print("<clone_github_repository>>>>> Error: GITHUB_PAT environment variable not set.")
         return
