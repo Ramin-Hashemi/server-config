@@ -45,7 +45,7 @@ def clone_github_repository():
     su - root -c '
     sudo mkdir -p /home/web-apps &&
     cd /home/web-apps &&
-    git clone https://github.com/CognitiveLearn-Innovations/wiki.git
+    git clone https://Ramin-Hashemi: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@github.com/CognitiveLearn-Innovations/wiki.git
     '
     """
     try:
