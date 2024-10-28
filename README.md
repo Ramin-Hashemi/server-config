@@ -10,12 +10,12 @@ Get up and config the server to run the iME Wiki.
 # Quickstart
 
 ## 1. Import <server_config> project (Local)
-    Open terminal on your local machine.
-    Run this command to clone the <server-config> poject from the GitHub repository:
+Open terminal on your local machine.
+Run this command to clone the <server-config> poject from the GitHub repository:
 
-        ```
-        git clone https://github.com/Ramin-Hashemi/server-config.git
-        ```
+    ```
+    git clone https://github.com/Ramin-Hashemi/server-config.git
+    ```
 ## 2. Add required fields in <secret.py> file
   ### 2.1. Create & add your public SSH key
     If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
