@@ -2,6 +2,8 @@
 # File secret.py #
 ##################
 
+SSH_KEY_PATH = '~/.ssh/'
+PUBLIC_SSH_KEY = ''
 
 ### Git
 GITHUB_USERNAME = 'Ramin-Hashemi'

@@ -9,14 +9,14 @@ Get up and config the server to run the iME projects.
 
 # Quick Start
 
-## 1. Import <server-config> project (Local)
+## 1. Import "server-config" project (Local)
 - Open terminal on your local machine.
-- Run this command to clone the <server-config> poject from the GitHub repository:
+- Run this command to clone the "server-config" poject from the GitHub repository:
 ```
 git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
-## 2. Add required fields in <secret.py> file
-  ### 2.1. Create & add your public SSH key
+## 2. Add required fields in "secret.py" file
+  ### 2.1. Create & add your <PUBLIC_SSH_KEY>
   - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
   (Make sure to replace <username@email.com> with your actual email.)
   ```
@@ -26,21 +26,21 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
   ```
   cat ~/.ssh/id_ed25519.pub
   ```
-  - Then paste your public SSH key in <secret.py> file in the local project repsitory.
+  - Then paste your <PUBLIC_SSH_KEY> in "secret.py" file in the local project repsitory.
   ### 2.2. Add your <GITHUB_PAT>
   - Copy GitHup Personal Access Token (classic) from your GitHub profile.
-  - Paste your <GITHUB_PAT> in the <secret.py> file.
+  - Paste your <GITHUB_PAT> in the "secret.py" file.
   - Then push the local project repsitory to the GitHub.
-## 3. Import <server_config> project (Remote Server)
+## 3. Import "server-config" project (Remote Server)
 - Open terminal on remote server.
-- Change directory to </home>
-- Run this command to clone the <server-config> poject from the GitHub repository:
+- Change directory to "./home"
+- Run this command to clone the "server-config" poject from the GitHub repository:
 ```
 git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
 ## 4. Configure the remote server
   ### 4.1. Run configurations script
-  - Change directory to </home/server_config/>
+  - Change directory to "./home/server_config/"
   - Run this command to execute the required server configurations shell commands:
   ```
   sudo python3 server_config.py run
