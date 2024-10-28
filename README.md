@@ -6,17 +6,18 @@
 
 Get up and config the server to run the iME Wiki.
 
-## Quickstart
 
-# 1. Import <wiki_server_config> project (Local)
+# Quickstart
+
+## 1. Import <server_config> project (Local)
     - Open terminal on your local machine.
-    - Run this command to clone the <wiki_server_config> poject from the GitHub repository:
+    - Run this command to clone the <server_config> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/wiki_server_config.git
+      git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
 
-# 2. Create & add your public SSH key.
+## 2. Create & add your public SSH key.
     - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
       (Make sure to replace <username@email.com> with your actual email.)
 
@@ -29,38 +30,27 @@ Get up and config the server to run the iME Wiki.
       ```
       Then paste your public SSH key in 'secret.py' file in the local project repsitory and push to the GitHub.
 
-# 3. Import 'wiki_server_config' project (Remote Server)
+## 3. Import 'server_config' project (Remote Server)
     - Open terminal on remote server.
     - Change directory to </home>
-    - Run this command to clone the <wiki_server_config> poject from the GitHub repository:
+    - Run this command to clone the <server_config> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/wiki_server_config.git
+      git clone https://github.com/Ramin-Hashemi/server_config.git
       ```
-# 4. Configure the remote server
-  ## 4.1. Run configurations script
-    - Change directory to </home/wiki_server_config/>
+
+## 4. Configure the remote server
+  ### 4.1. Run configurations script
+    - Change directory to </home/server_config/>
     - Run this command to execute the required server configurations shell commands:
 
       ```
-      sudo python3 server_config.py wiki_server_config
+      sudo python3 server_config.py run
       ```
 
-# 5. Initialize iME Agent
-  ## 5.1. Run this command to execute the 'model_initialize' file:
-      ```
-      sudo python3 model_initialize.py ime_model_initializer
-      ```
-  ## 5.2. To run and chat with [iME Agent](http://00.00.00.00/iME_Agent):
-    - Finally, run the following command in the remote server:
-
-      ```
-      ollama run iME
-      ```
 ### Enjoy!
 
 
 ## Helps:
 
-- This guide contains documentation for installing and configuring the Outline knowledge base.
-  https://docs.getoutline.com/s/hosting/doc/hosting-outline-nipGaCRBDu
+

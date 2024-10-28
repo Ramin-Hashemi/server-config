@@ -9,11 +9,10 @@ import sys
 import os
 
 
-def wiki_server_config():
+def run():
     install_packages()
     clone_github_repository()
-    # create_new_users()
-    # create_virtual_env()
+    create_admin_user()
     install_docker()
     install_dependencies()
     create_database()
@@ -44,9 +43,17 @@ def install_packages():
 def clone_github_repository():
     command = f"""
     su - root -c '
-    mkdir -p /home/web-apps &&
-    cd /home/web-apps &&
-    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL}
+    mkdir -p /home/apps-source &&
+    mkdir -p /home/images &&
+    cd /home/apps-source &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_1}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_2}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_3}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_4}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_5}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_6}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_7}
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_8}
     '
     """
     try:
@@ -57,12 +64,12 @@ def clone_github_repository():
         print("<clone_github_repository>>>>> Error occurred:", e.stderr)
 
 
-def create_new_users():
+def create_admin_user():
     command = """
     # Variables
     GROUP_NAME="ime-app-group"
-    user="ime-app-server-admin"
-    USER_HOME="/home/web-apps"
+    user="ime-server-admin"
+    USER_HOME="/home"
     USER_SHELL="/bin/bash"
 
     # Check if group exists, if not, create it
@@ -88,21 +95,6 @@ def create_new_users():
         print("<create_new_users>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_new_users>>>>> Error occurred:", e.stderr)
-
-
-def create_virtual_env():
-    # Command to switch user, change directory, and activate virtual environment
-    command = """
-    su - root -c '
-    pip install -r requirements.txt
-    '
-    """
-    try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<create_virtual_env>>>>> Function executed successfully:", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("<create_virtual_env>>>>> Error occurred:", e.stderr)
 
 
 def install_docker():
@@ -161,73 +153,13 @@ def install_docker():
         print("<install_dependencies>>>>> Error occurred:", e.stderr)
 
 
-
-def install_dependencies():
-    # Install and build the required application dependencies
-    command = """
-    su - root -c '
-    pip install -r requirements.txt &&
-    yarn install --frozen-lockfile &&
-    yarn build
-    '
-    """
-    try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<install_dependencies>>>>> Function executed successfully:", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("<install_dependencies>>>>> Error occurred:", e.stderr)
-
-
-def create_database():
-    # Command to switch user, change directory, and;
-    # Create a new database  for the wiki
-    command = """
-    su - root -c '
-    # Create the database
-    # yarn sequelize db:create &&
-
-    # If you are not using SSL then use this command
-    yarn sequelize db:create --env=production-ssl-disabled &&
-
-
-    # Migrate the new database to add needed tables, indexes, etc
-    # yarn sequelize db:migrate
-
-    # If you are not using SSL then use this command
-    yarn sequelize db:migrate --env=production-ssl-disabled
-    '
-    """
-    try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<create_database>>>>> Function executed successfully:", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("<create_database>>>>> Error occurred:", e.stderr)
-
-
-def start_app():
-    command = """
-    su - root -c '
-    # Start the app
-    yarn start
-    '
-    """
-    try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<start_app>>>>> Function executed successfully:", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("<start_app>>>>> Error occurred:", e.stderr)
-
-
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Please provide a function name to run.")
         sys.exit(1)
     
     function_name = sys.argv[1]
-    if function_name == "wiki_server_config":
-        wiki_server_config()
+    if function_name == "run":
+        run()
     else:
         print(f"Function {function_name} not found.")

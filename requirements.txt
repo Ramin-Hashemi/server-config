@@ -1,4 +1,0 @@
-node.js==23.1.0
-yarn==1.22.19
-postgres==15.4
-redis==7.2.0
