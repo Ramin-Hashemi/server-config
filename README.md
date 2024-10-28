@@ -30,7 +30,7 @@ Run this command to clone the <server-config> poject from the GitHub repository:
       ```
       Then paste your public SSH key in 'secret.py' file in the local project repsitory and push to the GitHub.
   ### 2.2. Add your <GITHUB_PAT>
-    -Copy GitHup Personal Access Token (classic) from your GitHub profile and paste in the <secret.py> file.
+  Copy GitHup Personal Access Token (classic) from your GitHub profile and paste in the <secret.py> file.
 
 ## 3. Import 'server-config' project (Remote Server)
     - Open terminal on remote server.
