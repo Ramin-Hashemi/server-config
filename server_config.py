@@ -11,7 +11,7 @@ import os
 
 def run():
     install_packages()
-    clone_github_repository()
+    # clone_github_repository()
     create_admin_user()
     docker_repository()
     docker_engine()
