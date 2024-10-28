@@ -31,14 +31,14 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
   - Copy GitHup Personal Access Token (classic) from your GitHub profile.
   - Paste your <GITHUB_PAT> in the `secret.py` file.
   - Then push the local project repsitory to the GitHub.
-## 3. Import "server-config" Project (Remote Server)
+## 3. Import `server-config` Project (Remote Server)
 - Open terminal on remote server.
 - Change directory to `./home`
 - Run this command to clone the `server-config` poject from the GitHub repository:
 ```
 git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
-## 4. Configure Tte Remote Server
+## 4. Configure the Remote Server
   ### 4.1. Run Configurations Script
   - Change directory to `./home/server_config/`
   - Run this command to execute the required server configurations shell commands:
