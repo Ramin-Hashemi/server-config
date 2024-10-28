@@ -10,15 +10,16 @@ Get up and config the server to run the iME Wiki.
 # Quickstart
 
 ## 1. Import <server_config> project (Local)
-    - Open terminal on your local machine.
-    - Run this command to clone the <server_config> poject from the GitHub repository:
+    Open terminal on your local machine.
+    Run this command to clone the <server-config> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/server_config.git
+      git clone https://github.com/Ramin-Hashemi/server-config.git
       ```
-
-## 2. Create & add your public SSH key.
-    - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
+Add required fields in <secret.py> file
+## 2. Add required fields in <secret.py> file
+  ### 2.1. Create & add your public SSH key
+    -If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
       (Make sure to replace <username@email.com> with your actual email.)
 
       ```
@@ -29,14 +30,16 @@ Get up and config the server to run the iME Wiki.
       cat ~/.ssh/id_ed25519.pub
       ```
       Then paste your public SSH key in 'secret.py' file in the local project repsitory and push to the GitHub.
+  ### 2.1. Add your <GITHUB_PAT>
+    -Copy GitHup Personal Access Token (classic) from your GitHub profile and paste in the <secret.py> file.
 
-## 3. Import 'server_config' project (Remote Server)
+## 3. Import 'server-config' project (Remote Server)
     - Open terminal on remote server.
     - Change directory to </home>
-    - Run this command to clone the <server_config> poject from the GitHub repository:
+    - Run this command to clone the <server-config> poject from the GitHub repository:
 
       ```
-      git clone https://github.com/Ramin-Hashemi/server_config.git
+      git clone https://github.com/Ramin-Hashemi/server-config.git
       ```
 
 ## 4. Configure the remote server
