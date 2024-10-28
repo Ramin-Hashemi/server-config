@@ -12,8 +12,9 @@ import os
 def wiki_server_config():
     install_packages()
     clone_github_repository()
-    create_new_users()
-    create_virtual_env()
+    # create_new_users()
+    # create_virtual_env()
+    install_docker()
     install_dependencies()
     create_database()
     start_app()
@@ -92,11 +93,7 @@ def create_new_users():
 def create_virtual_env():
     # Command to switch user, change directory, and activate virtual environment
     command = """
-    su - ime-app-server-admin -c '
-    cd /home/web-apps/wiki &&
-    # Using venv
-    python3 -m venv venv &&
-    source venv/bin/activate &&
+    su - root -c '
     pip install -r requirements.txt
     '
     """
@@ -108,14 +105,68 @@ def create_virtual_env():
         print("<create_virtual_env>>>>> Error occurred:", e.stderr)
 
 
+def install_docker():
+    # Install and build the required application dependencies
+    command = """
+    su - root -c '
+    modprobe kvm &&
+    modprobe kvm_intel &&  # Intel processors
+    modprobe kvm_amd &&    # AMD processors
+
+    # If the above commands fail, you can view the diagnostics by running:
+    kvm-ok
+
+    # To check if the KVM modules are enabled, run:
+    lsmod | grep kvm
+
+    # To check ownership of /dev/kvm, run:
+    ls -al /dev/kvm
+
+    # Add your user to the kvm group in order to access the kvm device:
+    sudo usermod -aG kvm $user
+
+    apt install gnome-terminal
+
+    # Add Docker's official GPG key:
+    apt-get update &&
+    apt-get install ca-certificates curl &&
+    install -m 0755 -d /etc/apt/keyrings &&
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+    chmod a+r /etc/apt/keyrings/docker.asc &&
+
+    # Add the repository to Apt sources:
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
+    apt-get update &&
+
+    # Download and Install the latest DEB package
+    wget -O latest-package.deb https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb &&
+    dpkg -i latest-package.deb &&
+    apt-get install -f &&
+
+    apt-get update &&
+    apt-get install -y ./docker-desktop-amd64.deb &&
+
+    systemctl --user start docker-desktop &&
+    systemctl --user enable docker-desktop &&
+    docker compose version &&
+    docker --version &&
+    docker version
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<install_dependencies>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<install_dependencies>>>>> Error occurred:", e.stderr)
+
+
+
 def install_dependencies():
     # Install and build the required application dependencies
     command = """
-    su - ime-app-server-admin -c '
-    cd /home/web-apps/wiki &&
-    # Using venv
-    python3 -m venv venv &&
-    source venv/bin/activate &&
+    su - root -c '
+    pip install -r requirements.txt &&
     yarn install --frozen-lockfile &&
     yarn build
     '
@@ -132,10 +183,7 @@ def create_database():
     # Command to switch user, change directory, and;
     # Create a new database  for the wiki
     command = """
-    su - ime-app-server-admin -c '
-    # Using venv
-    python3 -m venv venv &&
-    source venv/bin/activate &&
+    su - root -c '
     # Create the database
     # yarn sequelize db:create &&
 
@@ -160,10 +208,7 @@ def create_database():
 
 def start_app():
     command = """
-    su - ime-app-server-admin -c '
-    # Using venv
-    python3 -m venv venv &&
-    source venv/bin/activate &&
+    su - root -c '
     # Start the app
     yarn start
     '
