@@ -17,7 +17,8 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
 ## 2. Add required fields in <secret.py> file
   ### 2.1. Create & add your public SSH key
-  - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key: (Make sure to replace <username@email.com> with your actual email.)
+  - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
+  (Make sure to replace <username@email.com> with your actual email.)
   ```
   ssh-keygen -t ed25519 -C "username@email.com"
   ```
@@ -30,7 +31,7 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
   - Copy GitHup Personal Access Token (classic) from your GitHub profile.
   - Paste your <GITHUB_PAT> in the <secret.py> file.
   - Then push the local project repsitory to the GitHub.
-## 3. Import 'server-config' project (Remote Server)
+## 3. Import <server_config> project (Remote Server)
 - Open terminal on remote server.
 - Change directory to </home>
 - Run this command to clone the <server-config> poject from the GitHub repository:
