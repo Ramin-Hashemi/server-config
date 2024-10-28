@@ -15,8 +15,11 @@ def run():
     create_admin_user()
     docker_repository()
     docker_engine()
+    gnome_extension()
+    initialize_pass()
     # docker_desktop()
     docker_post_install()
+    secure_server()
 
 
 def install_packages():
@@ -40,6 +43,9 @@ def install_packages():
     # To delete all images, containers, and volumes
     rm -rf /var/lib/docker
     rm -rf /var/lib/containerd
+
+    # chrome-gnome-shell and gnome-browser-connector
+    apt-get install -y gnome-browser-connector
     '
     """
     try:
@@ -53,9 +59,15 @@ def install_packages():
 def clone_github_repository():
     command = f"""
     su - root -c '
-    mkdir -p /home/apps-source &&
-    mkdir -p /home/images &&
-    cd /home/apps-source &&
+    if [ ! -d "/home/app-source" ]; then
+      mkdir -p /home/app-source
+    fi
+
+    if [ ! -d "/home/images" ]; then
+      mkdir -p /home/images
+    fi
+
+    cd /home/app-source &&
     git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_1}
     git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_2}
     git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_3}
@@ -153,52 +165,153 @@ def docker_engine():
         print("<docker_engine>>>>> Error occurred:", e.stderr)
 
 
+def gnome_extension():
+    command = """
+    su - root -c '
+    # Update package lists
+    apt-get update -y
+
+    # Install necessary dependencies
+    apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1
+
+    # Clone the extension repository
+    git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator
+
+    # Checkout the latest version (v59)
+    cd /tmp/gnome-shell-extension-appindicator
+    git checkout v59
+
+    # Build and install the extension
+    meson build
+    ninja -C build install
+
+    # Enable the extension
+    gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
+
+    # Clean up
+    rm -rf /tmp/gnome-shell-extension-appindicator
+
+    # Restart GNOME Shell (only necessary under X11)
+    if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+      echo "Restarting GNOME Shell..."
+      gnome-shell --replace &
+    fi
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<gnome_extension>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<gnome_extension>>>>> Error occurred:", e.stderr)
+
+
+def initialize_pass():
+    command = """
+    su - root -c '
+    # Variables
+    NAME_REAL="Ramin-Hashemi"
+    NAME_EMAIL="ramin.hashemi.myself@gmail.com"
+
+    # Check if gpg and pass are installed
+    if ! command -v gpg &> /dev/null || ! command -v pass &> /dev/null; then
+        echo "gpg and pass are required but not installed. Please install them first."
+        exit 1
+    fi
+
+    # Generate a new GPG key
+    echo "Generating a new GPG key..."
+    gpg --batch --gen-key <<EOF
+    %no-protection
+    Key-Type: RSA
+    Key-Length: 4096
+    Subkey-Type: RSA
+    Subkey-Length: 4096
+    Name-Real: $NAME_REAL
+    Name-Email: $NAME_EMAIL
+    Expire-Date: 0
+    EOF
+
+    # Get the GPG key ID
+    GPG_KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5 | tail -n1)
+
+    # Initialize pass with the GPG key
+    echo "Initializing pass with GPG key ID: $GPG_KEY_ID"
+    pass init "$GPG_KEY_ID"
+
+    # Configure Docker to use pass for credential storage
+    DOCKER_CONFIG_FILE="$HOME/.docker/config.json"
+    mkdir -p "$(dirname "$DOCKER_CONFIG_FILE")"
+    if [ -f "$DOCKER_CONFIG_FILE" ]; then
+        jq '.credsStore = "pass"' "$DOCKER_CONFIG_FILE" > "$DOCKER_CONFIG_FILE.tmp" && mv "$DOCKER_CONFIG_FILE.tmp" "$DOCKER_CONFIG_FILE"
+    else
+        echo '{"credsStore": "pass"}' > "$DOCKER_CONFIG_FILE"
+    fi
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<initialize_pass>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<initialize_pass>>>>> Error occurred:", e.stderr)
+
+
+
 def docker_desktop():
     # Install the Docker packages (latest)
     command = """
     su - root -c '
-    modprobe kvm &&
-    modprobe kvm_intel &&  # Intel processors
-    modprobe kvm_amd &&    # AMD processors
+    # Variables
+    USER="ime-server-admin"
 
-    # If the above commands fail, you can view the diagnostics by running:
-    kvm-ok
-
-    # To check if the KVM modules are enabled, run:
-    lsmod | grep kvm
-
-    # To check ownership of /dev/kvm, run:
-    ls -al /dev/kvm
+    # Update package list and install docker prerequisites
+    apt-get update -y
+    apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release \
+        gnome-terminal
 
     # Add your user to the kvm group in order to access the kvm device:
-    sudo usermod -aG kvm $user
+    sudo usermod -aG kvm $USER
 
-    apt install gnome-terminal
-
-    # Add Docker's official GPG key:
-    apt-get update &&
-    apt-get install ca-certificates curl &&
+    # Add Docker's official GPG key
     install -m 0755 -d /etc/apt/keyrings &&
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
-    chmod a+r /etc/apt/keyrings/docker.asc &&
+    chmod a+r /etc/apt/keyrings/docker.asc
 
     # Add the repository to Apt sources:
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
-    apt-get update &&
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+    # Update package list again
+    apt-get update
 
-    # Download and Install the latest DEB package
+    # Install Docker Desktop dependencies
+    apt-get install -y \
+        qemu-kvm \
+        libvirt-daemon-system \
+        libvirt-clients \
+        bridge-utils \
+        virt-manager
+
+    # Download and Install the latest Docker Desktop DEB package
     wget -O latest-package.deb https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb &&
     dpkg -i latest-package.deb &&
     apt-get install -f &&
 
+    # Install Docker Desktop
     apt-get update &&
     apt-get install -y ./docker-desktop-amd64.deb &&
 
-    systemctl --user start docker-desktop &&
+    # Enable and start Docker Desktop service
     systemctl --user enable docker-desktop &&
-    docker compose version &&
-    docker --version &&
-    docker version
+    systemctl --user start docker-desktop &&
     '
     """
     try:
@@ -235,14 +348,79 @@ def docker_post_install():
     # To automatically start Docker and containerd on boot
     systemctl enable docker.service &&
     systemctl enable containerd.service
+
+    # Check if the source file exists
+    if [ ! -f /usr/local/bin/com.docker.cli ]; then
+        echo "Source file /usr/local/bin/com.docker.cli does not exist."
+        exit 1
+    fi
+
+    # Creates a symlink from /usr/local/bin/com.docker.cli to /usr/bin/docker
+    # Create the symbolic link
+    ln -s /usr/local/bin/com.docker.cli /usr/bin/docker
+
+    # Verify the symlink creation
+    if [ -L /usr/bin/docker ]; then
+        echo "Symlink created successfully: /usr/bin/docker -> /usr/local/bin/com.docker.cli"
+    else
+        echo "Failed to create symlink."
+        exit 1
+    fi
+
+    # Adds a DNS name for Kubernetes to /etc/hosts
+    # Check if the script is run as root
+    if [ "$EUID" -ne 0 ]; then
+        echo "Please run as root"
+        exit 1
+    fi
+
+    # Variables
+    HOSTNAME="kubernetes.local"
+    IP_ADDRESS="192.168.1.100"  # Replace with your Kubernetes cluster IP
+
+    # Backup the current /etc/hosts file
+    cp /etc/hosts /etc/hosts.bak
+
+    # Add the DNS entry to /etc/hosts
+    echo "$IP_ADDRESS $HOSTNAME" >> /etc/hosts
+
+    # Verify the entry
+    if grep -q "$HOSTNAME" /etc/hosts; then
+        echo "DNS entry added successfully: $IP_ADDRESS $HOSTNAME"
+    else
+        echo "Failed to add DNS entry."
+        exit 1
+    fi
     """
 
     try:
         # Execute the command as root
         result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
-        print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
+        print("<docker_post_install>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<create_admin_user>>>>> Error occurred:", e.stderr)
+        print("<docker_post_install>>>>> Error occurred:", e.stderr)
+
+
+def secure_server():
+    # Set up your server so that you connect to it using an SSH key instead of a password
+    command = """
+    su - root -c '
+    if [ ! -d "/home/.ssh" ]; then
+      mkdir -p /home/.ssh
+    fi &&
+    chmod 700 /home/.ssh &&
+    chmod 600 /home/.ssh/authorized_keys &&
+    echo "{secret.PUBLIC_SSH_KEY}" >> /home/.ssh/authorized_keys &&
+    sed -i s|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes| /etc/ssh/sshd_config &&
+    sed -i s|^#\\?PasswordAuthentication .*|PasswordAuthentication yes| /etc/ssh/sshd_config
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<secure_server>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<secure_server>>>>> Error occurred:", e.stderr)
 
 
 if __name__ == "__main__":
