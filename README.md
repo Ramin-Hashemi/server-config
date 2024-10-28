@@ -13,24 +13,23 @@ Get up and config the server to run the iME Wiki.
     Open terminal on your local machine.
     Run this command to clone the <server-config> poject from the GitHub repository:
 
-      ```
-      git clone https://github.com/Ramin-Hashemi/server-config.git
-      ```
-Add required fields in <secret.py> file
+        ```
+        git clone https://github.com/Ramin-Hashemi/server-config.git
+        ```
 ## 2. Add required fields in <secret.py> file
   ### 2.1. Create & add your public SSH key
-    -If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
+    If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:
       (Make sure to replace <username@email.com> with your actual email.)
 
       ```
       ssh-keygen -t ed25519 -C "username@email.com"
       ```
-     - Then, copy your public SSH key by using this command and copying the output:
+    Then, copy your public SSH key by using this command and copying the output:
       ```
       cat ~/.ssh/id_ed25519.pub
       ```
       Then paste your public SSH key in 'secret.py' file in the local project repsitory and push to the GitHub.
-  ### 2.1. Add your <GITHUB_PAT>
+  ### 2.2. Add your <GITHUB_PAT>
     -Copy GitHup Personal Access Token (classic) from your GitHub profile and paste in the <secret.py> file.
 
 ## 3. Import 'server-config' project (Remote Server)
