@@ -13,10 +13,10 @@ def run():
     install_packages()
     clone_github_repository()
     create_admin_user()
-    install_docker()
-    install_dependencies()
-    create_database()
-    start_app()
+    docker_repository()
+    docker_engine()
+    # docker_desktop()
+    docker_post_install()
 
 
 def install_packages():
@@ -26,10 +26,20 @@ def install_packages():
     apt-get update -y
 
     # Upgrade all packages
-    sudo apt-get upgrade -y
+    apt-get upgrade -y
 
     # Projects required packages
     apt-get install -y python3-venv
+
+    # Run the following command to uninstall all conflicting packages
+    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+    
+    # Uninstall the Docker Engine, CLI, containerd, and Docker Compose packages
+    apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+    
+    # To delete all images, containers, and volumes
+    rm -rf /var/lib/docker
+    rm -rf /var/lib/containerd
     '
     """
     try:
@@ -68,7 +78,7 @@ def create_admin_user():
     command = """
     # Variables
     GROUP_NAME="ime-app-group"
-    user="ime-server-admin"
+    USER="ime-server-admin"
     USER_HOME="/home"
     USER_SHELL="/bin/bash"
 
@@ -81,24 +91,70 @@ def create_admin_user():
     fi
 
     # Check if user exists, if not, create it
-    if ! id -u "$user" > /dev/null 2>&1; then
-        useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$user"
-        echo "User $user created."
+    if ! id -u "$USER" > /dev/null 2>&1; then
+        useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$USER"
+        echo "User $USER created."
     else
-        echo "User $user already exists."
+        echo "User $USER already exists."
     fi
+
+    # Activate the changes to groups
+    newgrp $GROUP_NAME
     """
 
     try:
         # Execute the command as root
         result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
-        print("<create_new_users>>>>> Function executed successfully:", result.stdout)
+        print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<create_new_users>>>>> Error occurred:", e.stderr)
+        print("<create_admin_user>>>>> Error occurred:", e.stderr)
 
 
-def install_docker():
-    # Install and build the required application dependencies
+def docker_repository():
+    # Set up Docker's apt repository
+    command = """
+    su - root -c '
+    # Add Docker's official GPG key:
+    apt-get update
+    apt-get install ca-certificates curl
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources:
+    # If you use an Ubuntu derivative distro, such as Linux Mint, you may need to use UBUNTU_CODENAME instead of VERSION_CODENAME
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<docker_repository>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<docker_repository>>>>> Error occurred:", e.stderr)
+
+
+def docker_engine():
+    # Install the Docker packages (latest)
+    command = """
+    su - root -c '
+    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    '
+    """
+    try:
+        # Execute the command
+        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        print("<docker_engine>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<docker_engine>>>>> Error occurred:", e.stderr)
+
+
+def docker_desktop():
+    # Install the Docker packages (latest)
     command = """
     su - root -c '
     modprobe kvm &&
@@ -148,9 +204,45 @@ def install_docker():
     try:
         # Execute the command
         result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
-        print("<install_dependencies>>>>> Function executed successfully:", result.stdout)
+        print("<docker_desktop>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<install_dependencies>>>>> Error occurred:", e.stderr)
+        print("<docker_desktop>>>>> Error occurred:", e.stderr)
+
+
+def docker_post_install():
+    command = """
+    # Variables
+    GROUP_NAME_DOCKER="docker"
+    USER="ime-server-admin"
+
+    # Check if group exists, if not, create it
+    if ! getent group "$GROUP_NAME_DOCKER" > /dev/null 2>&1; then
+        groupadd "$GROUP_NAME_DOCKER"
+        echo "Group $GROUP_NAME_DOCKER created."
+    else
+        echo "Group $GROUP_NAME_DOCKER already exists."
+    fi
+
+    usermod -aG $GROUP_NAME_DOCKER $USER
+
+    # Activate the changes to groups
+    newgrp $GROUP_NAME_DOCKER
+
+    # Change ~/.docker/ directory ownership and permissions
+    chown "$USER":"$USER" /home/"$USER"/.docker -R &&
+    chmod g+rwx "$HOME/.docker" -R
+
+    # To automatically start Docker and containerd on boot
+    systemctl enable docker.service &&
+    systemctl enable containerd.service
+    """
+
+    try:
+        # Execute the command as root
+        result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
+        print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<create_admin_user>>>>> Error occurred:", e.stderr)
 
 
 if __name__ == "__main__":
