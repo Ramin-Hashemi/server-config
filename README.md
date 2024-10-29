@@ -52,3 +52,31 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
 ## Helps:
 
 
+ Final server directory structure
+
+/home/
+├── app-source
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+├── images
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+│   ├── 
+└──  bin                          <= Directory created by venv
+    ├── 
+    └── 
