@@ -11,9 +11,8 @@ import time
 
 
 def run():
-
     install_packages()
-    clone_github_repository()
+    # clone_github_repository()
     create_admin_user()
     docker_repository()
     docker_engine()
@@ -145,20 +144,20 @@ def create_admin_user():
 
 def docker_repository():
     # Set up Docker's apt repository
-    command = [
-        "sudo", "bash", "-c", """
-        # Add Docker's official GPG key:
-        apt-get update &&
-        apt-get install -y ca-certificates curl &&
-        install -m 0755 -d /etc/apt/keyrings &&
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
-        chmod a+r /etc/apt/keyrings/docker.asc &&
+    command = """
+    su - root -c '
+    # Add Docker's official GPG key:
+    apt-get update &&
+    apt-get install -y ca-certificates curl &&
+    install -m 0755 -d /etc/apt/keyrings &&
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+    chmod a+r /etc/apt/keyrings/docker.asc &&
 
-        # Add the repository to Apt sources:
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
-        apt-get update
-        """
-    ]
+    # Add the repository to Apt sources:
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
+    apt-get update
+    '
+    """
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
@@ -175,12 +174,12 @@ def docker_repository():
 
 def docker_engine():
     # Command to install the Docker packages (latest)
-    command = [
-        "sudo", "bash", "-c", """
-        apt-get update -y &&
-        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-        """
-    ]
+    command = """
+    su - root -c '
+    apt-get update -y &&
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    '
+    """
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_engine", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
