@@ -13,8 +13,8 @@ def run():
     # install_packages()
     # clone_github_repository()
     # create_admin_user()
-    docker_repository()
-    # docker_engine()
+    # docker_repository()
+    docker_engine()
     # gnome_extension()
     # initialize_pass()
     # docker_desktop()
@@ -156,11 +156,11 @@ def docker_repository():
 
 def docker_engine():
     # Install the Docker packages (latest)
-    command = """
-    su - root -c '
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    '
-    """
+    command = [
+        "sudo", "bash", "-c", """
+        apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        """
+    ]
     try:
         # Execute the command
         result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
