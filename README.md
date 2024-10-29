@@ -41,6 +41,14 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
 ## 4. Configure the Remote Server
   ### 4.1. Run Configurations Script
   - Change directory to `./home/server_config/`
+  - Run this command to change the `run_script.sh` file permissions to make it executable:
+  ```
+  chmod +x run_script.sh
+  ```
+  - Run this command to execute the `run_script.sh` script from the terminal:
+  ```
+  ./run_script.sh
+  ```
   - Run this command to execute the required server configurations shell commands:
   ```
   sudo python3 server_config.py run

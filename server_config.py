@@ -6,20 +6,12 @@
 import subprocess
 import secret
 import sys
+from tqdm import tqdm
+import time
 
 
 def run():
-    command = [
-        "su", "-", "root", "-c", "apt-get install -y python3-tqdm"
-    ]
-    try:
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("", e.stderr)
-    except Exception as e:
-        print("", str(e))
-    
+
     install_packages()
     clone_github_repository()
     create_admin_user()
@@ -30,10 +22,6 @@ def run():
     # docker_desktop()
     # docker_post_install()
     # secure_server()
-
-
-from tqdm import tqdm
-import time
 
 
 def install_packages():
