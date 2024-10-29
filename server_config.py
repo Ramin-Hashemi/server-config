@@ -54,6 +54,8 @@ def install_packages():
         print("<install_packages>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<install_packages>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def clone_github_repository():
@@ -86,11 +88,12 @@ def clone_github_repository():
         print("<clone_github_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<clone_github_repository>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def create_admin_user():
     command = """
-    su - root -c '
     # Variables
     GROUP_NAME="ime-app-group"
     USER="ime-server-admin"
@@ -115,16 +118,16 @@ def create_admin_user():
 
     # Activate the changes to groups
     newgrp $GROUP_NAME
-    '
     """
     try:
         # Execute the command as root
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
         print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_admin_user>>>>> Error occurred:", e.stderr)
     except Exception as e:
         print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+
 
 def docker_repository():
     # Set up Docker's apt repository
@@ -152,6 +155,8 @@ def docker_repository():
         print("<docker_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_repository>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_engine():
@@ -167,6 +172,8 @@ def docker_engine():
         print("<docker_engine>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_engine>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def gnome_extension():
@@ -208,6 +215,8 @@ def gnome_extension():
         print("<gnome_extension>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<gnome_extension>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def initialize_pass():
@@ -259,7 +268,8 @@ def initialize_pass():
         print("<initialize_pass>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<initialize_pass>>>>> Error occurred:", e.stderr)
-
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_desktop():
@@ -324,6 +334,8 @@ def docker_desktop():
         print("<docker_desktop>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_desktop>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_post_install():
@@ -396,13 +408,14 @@ def docker_post_install():
         exit 1
     fi
     """
-
     try:
         # Execute the command as root
         result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
         print("<docker_post_install>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_post_install>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def secure_server():
@@ -425,6 +438,8 @@ def secure_server():
         print("<secure_server>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<secure_server>>>>> Error occurred:", e.stderr)
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 if __name__ == "__main__":
