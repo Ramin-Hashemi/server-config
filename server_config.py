@@ -35,7 +35,7 @@ def install_packages():
 
     # Projects required packages
     apt-get install -y python3-venv
-    pip install tqdm
+    apt-get install -y python3-tqdm
 
     # Run the following command to uninstall all conflicting packages
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
