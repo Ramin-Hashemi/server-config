@@ -116,9 +116,6 @@ def create_admin_user():
     else
         echo "User $USER already exists."
     fi
-
-    # Activate the changes to groups
-    newgrp $GROUP_NAME
     '
     """
     try:
