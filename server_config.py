@@ -146,22 +146,19 @@ def docker_repository():
     # Set up Docker's apt repository
     command = """
     su - root -c '
-    # Add Docker's official GPG key:
-    apt-get update
-    apt-get install -y ca-certificates curl
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
-
-    # Add the repository to Apt sources:
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update &&
+    apt-get install -y ca-certificates curl &&
+    install -m 0755 -d /etc/apt/keyrings &&
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+    chmod a+r /etc/apt/keyrings/docker.asc &&
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
     apt-get update
     '
     """
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
