@@ -53,7 +53,7 @@ def install_packages():
     """
     try:
         # Execute the command and show progress
-        with tqdm(total=100, desc="Setting up Docker repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+        with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
             result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
@@ -62,7 +62,7 @@ def install_packages():
     except subprocess.CalledProcessError as e:
         print("<install_packages>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<install_packages>>>>> Unexpected error occurred:", str(e))
 
 
 def clone_github_repository():
@@ -90,8 +90,12 @@ def clone_github_repository():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="clone_github_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<clone_github_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<clone_github_repository>>>>> Error occurred:", e.stderr)
@@ -126,8 +130,12 @@ def create_admin_user():
     '
     """
     try:
-        # Execute the command as root
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="create_admin_user", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_admin_user>>>>> Error occurred:", e.stderr)
@@ -152,8 +160,12 @@ def docker_repository():
         """
     ]
     try:
-        # Execute the command
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="docker_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<docker_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_repository>>>>> Error occurred:", e.stderr)
@@ -164,13 +176,11 @@ def docker_repository():
 def docker_engine():
     # Command to install the Docker packages (latest)
     command = """
-    su - root -c '
     apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    '
     """
     try:
         # Execute the command and show progress
-        with tqdm(total=100, desc="Setting up Docker repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+        with tqdm(total=100, desc="docker_engine", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
             result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
@@ -216,13 +226,17 @@ def gnome_extension():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="gnome_extension", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<gnome_extension>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<gnome_extension>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<gnome_extension>>>>> Unexpected error occurred:", str(e))
 
 
 def initialize_pass():
@@ -269,13 +283,17 @@ def initialize_pass():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="initialize_pass", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<initialize_pass>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<initialize_pass>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<initialize_pass>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_desktop():
@@ -335,13 +353,17 @@ def docker_desktop():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="docker_desktop", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<docker_desktop>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_desktop>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<docker_desktop>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_post_install():
@@ -415,13 +437,17 @@ def docker_post_install():
     fi
     """
     try:
-        # Execute the command as root
-        result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="docker_post_install", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<docker_post_install>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_post_install>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<docker_post_install>>>>> Unexpected error occurred:", str(e))
 
 
 def secure_server():
@@ -439,13 +465,17 @@ def secure_server():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="secure_server", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<secure_server>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<secure_server>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<secure_server>>>>> Unexpected error occurred:", str(e))
 
 
 if __name__ == "__main__":
