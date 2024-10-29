@@ -7,7 +7,7 @@ PUBLIC_SSH_KEY = ''
 
 ### Git
 GITHUB_USERNAME = 'Ramin-Hashemi'
-GITHUB_PAT = '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'
+GITHUB_PAT = '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'
 
 REPO_URL_1 = 'github.com/CognitiveLearn-Innovations/apache-server.git'
 REPO_URL_2 = 'github.com/CognitiveLearn-Innovations/nginx-server.git'
