@@ -45,6 +45,12 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
   ```
   sudo python3 server_config.py run
   ```
+## 5. Don't Forget to Remove!!!
+- Change directory to `./home`
+- Run this command to remove the `server-config` directory from the server:
+```
+sudo rm -r server-config
+```
 
 ### Enjoy!
 
