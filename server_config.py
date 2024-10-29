@@ -6,12 +6,20 @@
 import subprocess
 import secret
 import sys
-import os
-from tqdm import tqdm
-import time
 
 
 def run():
+    command = [
+        "su", "-", "root", "-c", "apt-get install -y python3-tqdm"
+    ]
+    try:
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("", e.stderr)
+    except Exception as e:
+        print("", str(e))
+    
     install_packages()
     clone_github_repository()
     create_admin_user()
@@ -22,6 +30,10 @@ def run():
     # docker_desktop()
     # docker_post_install()
     # secure_server()
+
+
+from tqdm import tqdm
+import time
 
 
 def install_packages():
@@ -58,11 +70,11 @@ def install_packages():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<install_packages>>>>> Function executed successfully:", result.stdout)
+        print("<install_packages>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<install_packages>>>>> Error occurred:", e.stderr)
+        print("<install_packages>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<install_packages>>>>> Unexpected error occurred:", str(e))
+        print("<install_packages>>>>> Unexpected error occurred", str(e))
 
 
 def clone_github_repository():
@@ -96,11 +108,11 @@ def clone_github_repository():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<clone_github_repository>>>>> Function executed successfully:", result.stdout)
+        print("<clone_github_repository>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<clone_github_repository>>>>> Error occurred:", e.stderr)
+        print("<clone_github_repository>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<create_admin_user>>>>> Unexpected error occurred", str(e))
 
 
 def create_admin_user():
@@ -136,11 +148,11 @@ def create_admin_user():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
+        print("<create_admin_user>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<create_admin_user>>>>> Error occurred:", e.stderr)
+        print("<create_admin_user>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<create_admin_user>>>>> Unexpected error occurred", str(e))
 
 
 def docker_repository():
@@ -166,11 +178,11 @@ def docker_repository():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<docker_repository>>>>> Function executed successfully:", result.stdout)
+        print("<docker_repository>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<docker_repository>>>>> Error occurred:", e.stderr)
+        print("<docker_repository>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<docker_repository>>>>> Unexpected error occurred:", str(e))
+        print("<docker_repository>>>>> Unexpected error occurred", str(e))
 
 
 def docker_engine():
@@ -188,11 +200,11 @@ def docker_engine():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<docker_engine>>>>> Function executed successfully:", result.stdout)
+        print("<docker_engine>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<docker_engine>>>>> Error occurred:", e.stderr)
+        print("<docker_engine>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<docker_engine>>>>> Unexpected error occurred:", str(e))
+        print("<docker_engine>>>>> Unexpected error occurred", str(e))
 
 
 def gnome_extension():
@@ -235,11 +247,11 @@ def gnome_extension():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<gnome_extension>>>>> Function executed successfully:", result.stdout)
+        print("<gnome_extension>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<gnome_extension>>>>> Error occurred:", e.stderr)
+        print("<gnome_extension>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<gnome_extension>>>>> Unexpected error occurred:", str(e))
+        print("<gnome_extension>>>>> Unexpected error occurred", str(e))
 
 
 def initialize_pass():
@@ -292,11 +304,11 @@ def initialize_pass():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<initialize_pass>>>>> Function executed successfully:", result.stdout)
+        print("<initialize_pass>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<initialize_pass>>>>> Error occurred:", e.stderr)
+        print("<initialize_pass>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<initialize_pass>>>>> Unexpected error occurred:", str(e))
+        print("<initialize_pass>>>>> Unexpected error occurred", str(e))
 
 
 def docker_desktop():
@@ -362,11 +374,11 @@ def docker_desktop():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<docker_desktop>>>>> Function executed successfully:", result.stdout)
+        print("<docker_desktop>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<docker_desktop>>>>> Error occurred:", e.stderr)
+        print("<docker_desktop>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<docker_desktop>>>>> Unexpected error occurred:", str(e))
+        print("<docker_desktop>>>>> Unexpected error occurred", str(e))
 
 
 def docker_post_install():
@@ -446,11 +458,11 @@ def docker_post_install():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<docker_post_install>>>>> Function executed successfully:", result.stdout)
+        print("<docker_post_install>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<docker_post_install>>>>> Error occurred:", e.stderr)
+        print("<docker_post_install>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<docker_post_install>>>>> Unexpected error occurred:", str(e))
+        print("<docker_post_install>>>>> Unexpected error occurred", str(e))
 
 
 def secure_server():
@@ -474,11 +486,11 @@ def secure_server():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<secure_server>>>>> Function executed successfully:", result.stdout)
+        print("<secure_server>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<secure_server>>>>> Error occurred:", e.stderr)
+        print("<secure_server>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<secure_server>>>>> Unexpected error occurred:", str(e))
+        print("<secure_server>>>>> Unexpected error occurred", str(e))
 
 
 if __name__ == "__main__":
