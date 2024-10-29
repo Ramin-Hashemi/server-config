@@ -7,6 +7,8 @@ import subprocess
 import secret
 import sys
 import os
+from tqdm import tqdm
+import time
 
 
 def run():
@@ -33,6 +35,7 @@ def install_packages():
 
     # Projects required packages
     apt-get install -y python3-venv
+    pip install tqdm
 
     # Run the following command to uninstall all conflicting packages
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
@@ -49,8 +52,12 @@ def install_packages():
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="Setting up Docker repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<install_packages>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<install_packages>>>>> Error occurred:", e.stderr)
@@ -155,20 +162,24 @@ def docker_repository():
 
 
 def docker_engine():
-    # Install the Docker packages (latest)
+    # Command to install the Docker packages (latest)
     command = """
     su - root -c '
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     '
     """
     try:
-        # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        # Execute the command and show progress
+        with tqdm(total=100, desc="Setting up Docker repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
         print("<docker_engine>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_engine>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<docker_engine>>>>> Unexpected error occurred:", str(e))
 
 
 def gnome_extension():
