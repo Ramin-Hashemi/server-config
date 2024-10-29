@@ -175,9 +175,12 @@ def docker_repository():
 
 def docker_engine():
     # Command to install the Docker packages (latest)
-    command = """
-    apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    """
+    command = [
+        "sudo", "bash", "-c", """
+        apt-get update &&
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        """
+    ]
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_engine", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
