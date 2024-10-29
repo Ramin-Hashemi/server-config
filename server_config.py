@@ -54,8 +54,6 @@ def install_packages():
         print("<install_packages>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<install_packages>>>>> Error occurred:", e.stderr)
-    except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 
 def clone_github_repository():
@@ -123,7 +121,8 @@ def create_admin_user():
         print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_admin_user>>>>> Error occurred:", e.stderr)
-
+    except Exception as e:
+        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
 
 def docker_repository():
     # Set up Docker's apt repository
