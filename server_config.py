@@ -94,10 +94,11 @@ def clone_github_repository():
 
 def create_admin_user():
     command = """
+    su - root -c '
     # Variables
     GROUP_NAME="ime-app-group"
     USER="ime-server-admin"
-    USER_HOME="/home"
+    USER_HOME="/home/app-source"
     USER_SHELL="/bin/bash"
 
     # Check if group exists, if not, create it
@@ -118,10 +119,11 @@ def create_admin_user():
 
     # Activate the changes to groups
     newgrp $GROUP_NAME
+    '
     """
     try:
         # Execute the command as root
-        result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
         print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_admin_user>>>>> Error occurred:", e.stderr)
