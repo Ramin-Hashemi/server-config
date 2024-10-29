@@ -117,7 +117,6 @@ def create_admin_user():
     # Activate the changes to groups
     newgrp $GROUP_NAME
     """
-
     try:
         # Execute the command as root
         result = subprocess.run(['su', '-', 'root', '-c', command], check=True, capture_output=True, text=True)
