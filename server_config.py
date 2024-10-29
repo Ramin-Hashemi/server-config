@@ -98,7 +98,7 @@ def create_admin_user():
     # Variables
     GROUP_NAME="ime-app-group"
     USER="ime-server-admin"
-    USER_HOME="/home/app-source"
+    USER_HOME="/home"
     USER_SHELL="/bin/bash"
 
     # Check if group exists, if not, create it
