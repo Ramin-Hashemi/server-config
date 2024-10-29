@@ -12,8 +12,8 @@ import os
 def run():
     # install_packages()
     # clone_github_repository()
-    create_admin_user()
-    # docker_repository()
+    # create_admin_user()
+    docker_repository()
     # docker_engine()
     # gnome_extension()
     # initialize_pass()
@@ -134,10 +134,10 @@ def docker_repository():
     su - root -c '
     # Add Docker's official GPG key:
     apt-get update
-    apt-get install ca-certificates curl
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
+    apt-get install ca-certificates curl &&
+    install -m 0755 -d /etc/apt/keyrings &&
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+    chmod a+r /etc/apt/keyrings/docker.asc &&
 
     # Add the repository to Apt sources:
     # If you use an Ubuntu derivative distro, such as Linux Mint, you may need to use UBUNTU_CODENAME instead of VERSION_CODENAME
