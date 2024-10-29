@@ -17,7 +17,7 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
 ## 2. Add Required Fields in `secret.py` File
   ### 2.1. Create & Add Your <PUBLIC_SSH_KEY>
-  - If you don’t already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:  
+  - If you don't already have an SSH key, open a new terminal on your local machine and run the following command. Otherwise, skip this step, and move directly to copy your public SSH key:  
   (Make sure to replace <username@email.com> with your actual email.)
   ```
   ssh-keygen -t ed25519 -C "username@email.com"
