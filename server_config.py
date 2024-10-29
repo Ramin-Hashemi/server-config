@@ -130,32 +130,28 @@ def create_admin_user():
 
 def docker_repository():
     # Set up Docker's apt repository
-    command = """
-    su - root -c '
-    # Add Docker's official GPG key:
-    apt-get update
-    apt-get install ca-certificates curl &&
-    install -m 0755 -d /etc/apt/keyrings &&
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
-    chmod a+r /etc/apt/keyrings/docker.asc &&
+    command = [
+        "sudo", "bash", "-c", """
+        # Add Docker's official GPG key:
+        apt-get update &&
+        apt-get install -y ca-certificates curl &&
+        install -m 0755 -d /etc/apt/keyrings &&
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+        chmod a+r /etc/apt/keyrings/docker.asc &&
 
-    # Add the repository to Apt sources:
-    # If you use an Ubuntu derivative distro, such as Linux Mint, you may need to use UBUNTU_CODENAME instead of VERSION_CODENAME
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-      tee /etc/apt/sources.list.d/docker.list > /dev/null
-    apt-get update
-    '
-    """
+        # Add the repository to Apt sources:
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
+        apt-get update
+        """
+    ]
     try:
         # Execute the command
-        result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
         print("<docker_repository>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<docker_repository>>>>> Error occurred:", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred:", str(e))
+        print("<docker_repository>>>>> Unexpected error occurred:", str(e))
 
 
 def docker_engine():
