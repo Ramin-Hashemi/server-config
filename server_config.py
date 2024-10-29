@@ -123,7 +123,7 @@ def create_admin_user():
     """
     try:
         # Execute the command as root
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
         print("<create_admin_user>>>>> Function executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
         print("<create_admin_user>>>>> Error occurred:", e.stderr)
