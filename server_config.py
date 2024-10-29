@@ -12,10 +12,10 @@ import time
 
 
 def run():
-    # install_packages()
-    # clone_github_repository()
-    # create_admin_user()
-    # docker_repository()
+    install_packages()
+    clone_github_repository()
+    create_admin_user()
+    docker_repository()
     docker_engine()
     # gnome_extension()
     # initialize_pass()
@@ -177,14 +177,14 @@ def docker_engine():
     # Command to install the Docker packages (latest)
     command = [
         "sudo", "bash", "-c", """
-        apt-get update &&
+        apt-get update -y &&
         apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         """
     ]
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_engine", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
