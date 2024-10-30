@@ -15,7 +15,6 @@ def run():
     # clone_github_repository()
     create_admin_user()
     remove_docker()
-    # kvm_virtualization()
     # docker_repository()
     # docker_engine()
     gnome_extension()
@@ -39,7 +38,7 @@ def install_packages():
     ]
     try:
         with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -48,7 +47,6 @@ def install_packages():
         print("<install_packages>>>>> Error occurred", e.stderr)
     except Exception as e:
         print("<install_packages>>>>> Unexpected error occurred", str(e))
-
 
 def clone_github_repository():
     command = f"""
@@ -158,7 +156,7 @@ def remove_docker():
     ]
     try:
         with tqdm(total=100, desc="remove_docker", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -167,29 +165,6 @@ def remove_docker():
         print("<remove_docker>>>>> Error occurred", e.stderr)
     except Exception as e:
         print("<remove_docker>>>>> Unexpected error occurred", str(e))
-
-
-def kvm_virtualization():
-    command = f"""
-    su - root -c '
-    # Variables
-    USER="{secret.USER}"
-    modprobe kvm
-    modprobe kvm_amd
-    usermod -aG kvm $USER
-    '
-    """
-    try:
-        with tqdm(total=100, desc="kvm_virtualization", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
-            for _ in range(10):
-                time.sleep(0.1)  # Simulate progress
-                pbar.update(10)
-        print("<kvm_virtualization>>>>> Function executed successfully", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("<kvm_virtualization>>>>> Error occurred", e.stderr)
-    except Exception as e:
-        print("<kvm_virtualization>>>>> Unexpected error occurred", str(e))
 
 
 def docker_repository():
@@ -328,7 +303,7 @@ def initialize_pass():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="initialize_pass", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -388,7 +363,7 @@ def docker_desktop():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_desktop", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -475,7 +450,7 @@ def docker_post_install():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_post_install", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -504,7 +479,7 @@ def secure_server():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="secure_server", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
