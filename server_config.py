@@ -56,7 +56,7 @@ def install_packages():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -94,7 +94,7 @@ def clone_github_repository():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="clone_github_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -134,7 +134,7 @@ def create_admin_user():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="create_admin_user", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -228,7 +228,7 @@ def gnome_extension():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="gnome_extension", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -243,8 +243,8 @@ def initialize_pass():
     command = """
     su - root -c '
     # Variables
-    NAME_REAL="Ramin-Hashemi"
-    NAME_EMAIL="ramin.hashemi.myself@gmail.com"
+    NAME_REAL="{secret.NAME_REAL}"
+    NAME_EMAIL="{secret.NAME_EMAIL}"
 
     # Check if gpg and pass are installed
     if ! command -v gpg &> /dev/null || ! command -v pass &> /dev/null; then
@@ -285,7 +285,7 @@ def initialize_pass():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="initialize_pass", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -344,7 +344,7 @@ def docker_desktop():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_desktop", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -409,7 +409,7 @@ def docker_post_install():
 
     # Variables
     HOSTNAME="kubernetes.local"
-    IP_ADDRESS="192.168.1.100"  # Replace with your Kubernetes cluster IP
+    IP_ADDRESS="185.213.165.171"  # Replace with your Kubernetes cluster IP
 
     # Backup the current /etc/hosts file
     cp /etc/hosts /etc/hosts.bak
@@ -428,7 +428,7 @@ def docker_post_install():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_post_install", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -456,7 +456,7 @@ def secure_server():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="secure_server", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, shell=True, executable='/bin/bash', check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)

@@ -5,7 +5,7 @@
 SSH_KEY_PATH = '~/.ssh/'
 PUBLIC_SSH_KEY = ''
 
-### Git
+### GitHub
 GITHUB_USERNAME = 'Ramin-Hashemi'
 GITHUB_PAT = 'ghp_********'
 
@@ -19,3 +19,8 @@ REPO_URL_7 = 'github.com/CognitiveLearn-Innovations/solutions.git'
 REPO_URL_8 = 'github.com/CognitiveLearn-Innovations/ime-agent.git'
 REPO_URL_9 = 'github.com/CognitiveLearn-Innovations/wiki.git'
 REPO_URL_10 = 'github.com/CognitiveLearn-Innovations/ime-nft.git'
+
+
+# Docker Hub Credentials
+NAME_REAL="raminhashemi"
+NAME_EMAIL="ramin.hashemi@usa.com"
