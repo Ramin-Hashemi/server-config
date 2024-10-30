@@ -30,7 +30,7 @@ def install_packages():
         '''
         apt-get update -y &&
         apt-get upgrade -y &&
-        apt-get install -y python3-venv python3-tqdm &&
+        apt-get install -y python3-venv &&
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
