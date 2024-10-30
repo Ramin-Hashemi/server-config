@@ -214,36 +214,36 @@ def docker_engine():
 
 
 def gnome_extension():
-    command = """
-    su - root -c '
-    # Update package lists
-    apt-get update -y &&
+    command = [
+        "su", "-", "root", "-c",
+        '''
+        # Update package lists
+        apt-get update -y &&
 
-    # Install necessary dependencies
-    apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 &&
+        # Install necessary dependencies
+        apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 &&
 
-    # Clone the extension repository
-    rm -rf /tmp/gnome-shell-extension-appindicator
-    git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
-    
-    # Build and install the extension
-    meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build &&
-    ninja -C /tmp/g-s-appindicators-build install &&
+        # Clone the extension repository
+        rm -rf /tmp/gnome-shell-extension-appindicator
+        git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
+        
+        # Build and install the extension
+        meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build &&
+        ninja -C /tmp/g-s-appindicators-build install &&
 
-    # Enable the extension
-    gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com &&
+        # Enable the extension
+        gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com &&
 
-    # Clean up
-    rm -rf /tmp/gnome-shell-extension-appindicator &&
+        # Clean up
+        rm -rf /tmp/gnome-shell-extension-appindicator &&
 
-    # Restart GNOME Shell (only necessary under X11)
-    if [ "$XDG_SESSION_TYPE" = "x11" ]; then
-        echo "Restarting GNOME Shell..."
-        gnome-shell --replace &
-    fi
-    '
-    """
-    
+        # Restart GNOME Shell (only necessary under X11)
+        if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+            echo "Restarting GNOME Shell..."
+            gnome-shell --replace &
+        fi
+        '''
+    ]
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="gnome_extension", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
