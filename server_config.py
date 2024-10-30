@@ -24,32 +24,45 @@ def run():
 
 
 def install_packages():
-    command = """
-    su - root -c '
-    # Update package lists
-    apt-get update -y &&
+    command = [
+        "su", "-", "root", "-c",
+        '''
+        # Update package lists
+        apt-get update -y &&
 
-    # Upgrade all packages
-    apt-get upgrade -y &&
+        # Upgrade all packages
+        apt-get upgrade -y &&
 
-    # Install required packages
-    apt-get install -y python3-venv python3-tqdm &&
+        # Install required packages
+        apt-get install -y python3-venv python3-tqdm &&
 
-    # Remove conflicting Docker packages
-    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-        apt-get remove -y $pkg
-    done &&
+        # Remove conflicting Docker packages
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+            if dpkg -l | grep -q $pkg; then
+                apt-get remove -y $pkg
+            fi
+        done &&
 
-    # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
-    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras &&
+        # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
+        for pkg in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras; do
+            if dpkg -l | grep -q $pkg; then
+                apt-get purge -y $pkg
+            fi
+        done &&
+        
+        # Delete all Docker images, containers, and volumes
+        if [ -d /var/lib/docker ]; then
+            rm -rf /var/lib/docker
+        fi
+        if [ -d /var/lib/containerd ]; then
+            rm -rf /var/lib/containerd
+        fi &&
 
-    # Delete all Docker images, containers, and volumes
-    rm -rf /var/lib/docker /var/lib/containerd &&
-
-    # Install GNOME Desktop
-    apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
-    '
-    """
+        # Install GNOME Desktop
+        apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
+        '
+        '''
+    ]
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="system_setup", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
@@ -57,11 +70,11 @@ def install_packages():
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<system_setup>>>>> Function executed successfully", result.stdout)
+        print("<install_packages>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<system_setup>>>>> Error occurred", e.stderr)
+        print("<install_packages>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<system_setup>>>>> Unexpected error occurred", str(e))
+        print("<install_packages>>>>> Unexpected error occurred", str(e))
 
 
 def clone_github_repository():
