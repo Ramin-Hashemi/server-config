@@ -11,14 +11,14 @@ import time
 
 
 def run():
-    # install_packages()
+    install_packages()
     # clone_github_repository()
-    # create_admin_user()
-    # docker_repository()
-    # docker_engine()
-    # gnome_extension()
+    create_admin_user()
+    docker_repository()
+    docker_engine()
+    gnome_extension()
     initialize_pass()
-    # docker_desktop()
+    docker_desktop()
     # docker_post_install()
     # secure_server()
 
@@ -35,6 +35,7 @@ def install_packages():
     # Projects required packages
     apt-get install -y python3-venv
     apt-get install -y python3-tqdm
+    apt-get upgrade -y qemu
 
     # Run the following command to uninstall all conflicting packages
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
@@ -46,7 +47,9 @@ def install_packages():
     rm -rf /var/lib/docker
     rm -rf /var/lib/containerd
 
-    # chrome-gnome-shell and gnome-browser-connector
+    # Install GNOME Desktop
+    apt-get install -y ubuntu-gnome-desktop
+    apt-get install -y install gnome-terminal
     apt-get install -y gnome-browser-connector
     '
     """
@@ -313,19 +316,8 @@ def docker_desktop():
     # Add your user to the kvm group in order to access the kvm device:
     sudo usermod -aG kvm $USER
 
-    # Add Docker's official GPG key
-    install -m 0755 -d /etc/apt/keyrings &&
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
-    chmod a+r /etc/apt/keyrings/docker.asc
-
-    # Add the repository to Apt sources:
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-      tee /etc/apt/sources.list.d/docker.list > /dev/null
-    
     # Update package list again
-    apt-get update
+    apt-get update -y
 
     # Install Docker Desktop dependencies
     apt-get install -y \
@@ -341,7 +333,7 @@ def docker_desktop():
     apt-get install -f &&
 
     # Install Docker Desktop
-    apt-get update &&
+    apt-get update -y &&
     apt-get install -y ./docker-desktop-amd64.deb &&
 
     # Enable and start Docker Desktop service
