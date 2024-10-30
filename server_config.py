@@ -17,7 +17,7 @@ def run():
     remove_docker()
     # docker_repository()
     # docker_engine()
-    gnome_extension()
+    # gnome_extension()
     initialize_pass()
     docker_desktop()
     docker_post_install()
