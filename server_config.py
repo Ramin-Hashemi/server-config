@@ -65,7 +65,7 @@ def install_packages():
     ]
     try:
         # Execute the command and show progress
-        with tqdm(total=100, desc="system_setup", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+        with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
             result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
