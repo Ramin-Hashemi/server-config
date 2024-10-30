@@ -89,16 +89,16 @@ cd /home/app-source
 
 # Clone repositories
 for repo in {secret.REPO_URL_1} \
-    {secret.REPO_URL_2} \
-    {secret.REPO_URL_3} \
-    {secret.REPO_URL_4} \
-    {secret.REPO_URL_5} \
-    {secret.REPO_URL_6} \
-    {secret.REPO_URL_7} \
-    {secret.REPO_URL_8} \
-    {secret.REPO_URL_9} \
-    {secret.REPO_URL_10}; do
-    if git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@$repo; then
+    $REPO_URL_2 \
+    $REPO_URL_3 \
+    $REPO_URL_4 \
+    $REPO_URL_5 \
+    $REPO_URL_6 \
+    $REPO_URL_7 \
+    $REPO_URL_8 \
+    $REPO_URL_9 \
+    $REPO_URL_10; do
+    if git clone https://$GITHUB_USERNAME:$GITHUB_PAT@$repo; then
         echo "Successfully cloned $repo"
     else
         echo "Failed to clone $repo" >&2
