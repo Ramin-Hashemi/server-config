@@ -15,9 +15,10 @@ def run():
     # clone_github_repository()
     create_admin_user()
     remove_docker()
+    kvm_virtualization()
     # docker_repository()
     # docker_engine()
-    # gnome_extension()
+    gnome_extension()
     initialize_pass()
     docker_desktop()
     docker_post_install()
@@ -31,6 +32,10 @@ def install_packages():
         apt-get update -y &&
         apt-get upgrade -y &&
         apt-get install -y python3-venv &&
+        apt-get install build-essential &&
+        apt-get install qemu &&
+        apt-get install qemu-kvm &&
+        apt-get install virt-manager &&
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
@@ -164,6 +169,29 @@ def remove_docker():
         print("<remove_docker>>>>> Error occurred", e.stderr)
     except Exception as e:
         print("<remove_docker>>>>> Unexpected error occurred", str(e))
+
+
+def kvm_virtualization():
+    command = f"""
+    su - root -c '
+    # Variables
+    USER="{secret.USER}"
+    modprobe kvm
+    modprobe kvm_amd
+    usermod -aG kvm $USER
+    '
+    """
+    try:
+        with tqdm(total=100, desc="kvm_virtualization", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
+        print("<kvm_virtualization>>>>> Function executed successfully", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<kvm_virtualization>>>>> Error occurred", e.stderr)
+    except Exception as e:
+        print("<kvm_virtualization>>>>> Unexpected error occurred", str(e))
 
 
 def docker_repository():
