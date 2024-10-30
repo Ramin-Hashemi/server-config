@@ -15,7 +15,7 @@ def run():
     # clone_github_repository()
     create_admin_user()
     remove_docker()
-    kvm_virtualization()
+    # kvm_virtualization()
     # docker_repository()
     # docker_engine()
     gnome_extension()
@@ -34,7 +34,6 @@ def install_packages():
         add-apt-repository universe
         apt-get install -y python3-venv
         apt-get install -y build-essential
-        apt-get install -y qemu
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
