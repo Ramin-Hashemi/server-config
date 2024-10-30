@@ -14,6 +14,7 @@ def run():
     install_packages()
     # clone_github_repository()
     create_admin_user()
+    remove_docker()
     docker_repository()
     docker_engine()
     gnome_extension()
@@ -35,28 +36,6 @@ def install_packages():
 
         # Install required packages
         apt-get install -y python3-venv python3-tqdm &&
-
-        # Remove conflicting Docker packages
-        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-            if dpkg -l | grep -q $pkg; then
-                apt-get remove -y $pkg
-            fi
-        done &&
-
-        # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
-        for pkg in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras; do
-            if dpkg -l | grep -q $pkg; then
-                apt-get purge -y $pkg
-            fi
-        done &&
-        
-        # Delete all Docker images, containers, and volumes
-        if [ -d /var/lib/docker ]; then
-            rm -rf /var/lib/docker
-        fi
-        if [ -d /var/lib/containerd ]; then
-            rm -rf /var/lib/containerd
-        fi &&
 
         # Install GNOME Desktop
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
@@ -153,6 +132,47 @@ def create_admin_user():
         print("<create_admin_user>>>>> Error occurred", e.stderr)
     except Exception as e:
         print("<create_admin_user>>>>> Unexpected error occurred", str(e))
+
+
+def remove_docker():
+    command = [
+        "su", "-", "root", "-c",
+        '''
+        # Remove conflicting Docker packages
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+            if dpkg -l | grep -q $pkg; then
+                apt-get remove -y $pkg
+            fi
+        done &&
+
+        # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
+        for pkg in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras; do
+            if dpkg -l | grep -q $pkg; then
+                apt-get purge -y $pkg
+            fi
+        done &&
+        
+        # Delete all Docker images, containers, and volumes
+        if [ -d /var/lib/docker ]; then
+            rm -rf /var/lib/docker
+        fi
+        if [ -d /var/lib/containerd ]; then
+            rm -rf /var/lib/containerd
+        fi &&
+        '''
+    ]
+    try:
+        # Execute the command and show progress
+        with tqdm(total=100, desc="remove_docker", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            for _ in range(10):
+                time.sleep(0.1)  # Simulate progress
+                pbar.update(10)
+        print("<remove_docker>>>>> Function executed successfully", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("<remove_docker>>>>> Error occurred", e.stderr)
+    except Exception as e:
+        print("<remove_docker>>>>> Unexpected error occurred", str(e))
 
 
 def docker_repository():
