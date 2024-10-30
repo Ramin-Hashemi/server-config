@@ -60,7 +60,6 @@ def install_packages():
 
         # Install GNOME Desktop
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
-        '
         '''
     ]
     try:
