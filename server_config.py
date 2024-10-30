@@ -218,24 +218,24 @@ def gnome_extension():
         "su", "-", "root", "-c",
         '''
         # Update package lists
-        apt-get update -y &&
+        apt-get update -y
 
         # Install necessary dependencies
-        apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 &&
+        apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1
 
         # Clone the extension repository
         rm -rf /tmp/gnome-shell-extension-appindicator
-        git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
+        git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator
         
         # Build and install the extension
-        meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build &&
-        ninja -C /tmp/g-s-appindicators-build install &&
+        meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build
+        ninja -C /tmp/g-s-appindicators-build install
 
         # Enable the extension
-        gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com &&
+        gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 
         # Clean up
-        rm -rf /tmp/gnome-shell-extension-appindicator &&
+        rm -rf /tmp/gnome-shell-extension-appindicator
 
         # Restart GNOME Shell (only necessary under X11)
         if [ "$XDG_SESSION_TYPE" = "x11" ]; then
@@ -247,8 +247,8 @@ def gnome_extension():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="gnome_extension", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
-            for _ in range (10):
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
+            for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
         print("<gnome_extension>>>>> Function executed successfully", result.stdout)
