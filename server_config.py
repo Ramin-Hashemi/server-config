@@ -33,7 +33,7 @@ def install_packages():
     apt-get upgrade -y &&
 
     # Install required packages
-    apt-get install -y python3-venv python3-tqdm qemu &&
+    apt-get install -y python3-venv python3-tqdm &&
 
     # Remove conflicting Docker packages
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
@@ -237,6 +237,7 @@ def gnome_extension():
     except Exception as e:
         print("<gnome_extension>>>>> Unexpected error occurred", str(e))
 
+
 def initialize_pass():
     command = [
         "su", "-", "root", "-c",
@@ -277,7 +278,7 @@ def initialize_pass():
         if [ -f "$DOCKER_CONFIG_FILE" ]; then
             jq '.credsStore = "pass"' "$DOCKER_CONFIG_FILE" > "$DOCKER_CONFIG_FILE.tmp" && mv "$DOCKER_CONFIG_FILE.tmp" "$DOCKER_CONFIG_FILE"
         else
-            echo '{"credsStore": "pass"}' > "$DOCKER_CONFIG_FILE"
+            echo '{{"credsStore": "pass"}}' > "$DOCKER_CONFIG_FILE"
         fi
         '''
     ]
