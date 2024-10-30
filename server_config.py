@@ -226,14 +226,6 @@ def gnome_extension():
     rm -rf /tmp/gnome-shell-extension-appindicator &&
     git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
     
-    # Checkout the latest version (v59)
-    cd /tmp/gnome-shell-extension-appindicator &&
-    if [ "$(git symbolic-ref --short HEAD)" != "v59" ]; then
-        git switch -c v59
-    else
-        echo "Already on branch v59."
-    fi
-
     # Build and install the extension
     meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build &&
     ninja -C /tmp/g-s-appindicators-build install &&
