@@ -35,8 +35,6 @@ def install_packages():
         apt-get install -y python3-venv
         apt-get install build-essential
         apt-get install qemu
-        apt-get install qemu-kvm
-        apt-get install virt-manager
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
