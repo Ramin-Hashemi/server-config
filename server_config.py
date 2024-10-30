@@ -196,7 +196,7 @@ def docker_engine():
     # Command to install the Docker packages (latest)
     command = [
         "su", "-", "root", "-c",
-        "apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
+        "apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
     ]
     try:
         # Execute the command and show progress
