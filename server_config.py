@@ -33,8 +33,8 @@ def install_packages():
         apt-get upgrade -y
         add-apt-repository universe
         apt-get install -y python3-venv
-        apt-get install build-essential
-        apt-get install qemu
+        apt-get install -y build-essential
+        apt-get install -y qemu
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
