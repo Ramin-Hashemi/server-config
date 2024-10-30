@@ -29,14 +29,14 @@ def install_packages():
     command = [
         "su", "-", "root", "-c",
         '''
-        apt-get update -y &&
-        apt-get upgrade -y &&
-        add-apt-repository universe &&
-        apt-get install -y python3-venv &&
-        apt-get install build-essential &&
-        apt-get install qemu &&
-        apt-get install qemu-kvm &&
-        apt-get install virt-manager &&
+        apt-get update -y
+        apt-get upgrade -y
+        add-apt-repository universe
+        apt-get install -y python3-venv
+        apt-get install build-essential
+        apt-get install qemu
+        apt-get install qemu-kvm
+        apt-get install virt-manager
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
