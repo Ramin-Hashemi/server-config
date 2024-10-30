@@ -351,24 +351,25 @@ HOSTNAME=$(cat hostname.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 
 
 # ####################
 
-# # Gnome Extension
+# Gnome Extension
 
-# # Install necessary dependencies
-# if sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
-#     echo "Dependencies installed successfully."
-# else
-#     echo "Failed to install dependencies." >&2
-#     exit 1
-# fi
+# Install necessary dependencies
+if sudo apt-get -y install libappindicator1 && \
+   sudo apt-get -y install meson && \
+   sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
+    echo "Dependencies installed successfully."
+else
+    echo "Failed to install dependencies." >&2
+    exit 1
+fi
 
-# # Clone the extension repository
-# if rm -rf /tmp/gnome-shell-extension-appindicator && \
-#    git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator; then
-#     echo "Repository cloned successfully."
-# else
-#     echo "Failed to clone repository." >&2
-#     exit 1
-# fi
+# Clone the extension repository
+if git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git; then
+    echo "Repository cloned successfully."
+else
+    echo "Failed to clone repository." >&2
+    exit 1
+fi
 
 # Build and install the extension
 if meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build && \
