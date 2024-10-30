@@ -9,7 +9,7 @@ SSH_KEY_PATH = '~/.ssh/'
 PUBLIC_SSH_KEY = ''
 IP_ADDRESS = '185.213.165.171'
 
-### GitHub
+# GitHub
 GITHUB_USERNAME = 'Ramin-Hashemi'
 GITHUB_PAT = 'ghp_********'
 
