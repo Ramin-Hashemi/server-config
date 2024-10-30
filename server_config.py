@@ -229,7 +229,7 @@ def gnome_extension():
     # Checkout the latest version (v59)
     cd /tmp/gnome-shell-extension-appindicator &&
     if [ "$(git symbolic-ref --short HEAD)" != "v59" ]; then
-        git checkout v59
+        git switch -c v59
     else
         echo "Already on branch v59."
     fi
