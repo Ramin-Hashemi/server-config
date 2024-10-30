@@ -30,7 +30,6 @@ def install_packages():
         '''
         apt-get update -y &&
         apt-get upgrade -y &&
-        apt-get dpkg --configure -a &&
         apt-get install -y python3-venv &&
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
@@ -203,7 +202,7 @@ def docker_engine():
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="docker_engine", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
