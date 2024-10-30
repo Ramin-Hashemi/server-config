@@ -2,8 +2,12 @@
 # File secret.py #
 ##################
 
+
+USER = 'ime-server-admin'
+GROUP_NAME = 'ime-app-group'
 SSH_KEY_PATH = '~/.ssh/'
 PUBLIC_SSH_KEY = ''
+IP_ADDRESS = '185.213.165.171'
 
 ### GitHub
 GITHUB_USERNAME = 'Ramin-Hashemi'
