@@ -235,8 +235,8 @@ def gnome_extension():
     fi
 
     # Build and install the extension
-    meson build &&
-    ninja -C build install &&
+    meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build &&
+    ninja -C /tmp/g-s-appindicators-build install &&
 
     # Enable the extension
     gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com &&
