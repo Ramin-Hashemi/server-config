@@ -31,344 +31,344 @@ HOSTNAME=$(cat hostname.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 
 
 ####################
 
-# # Configure dpkg
-# if sudo dpkg --configure -a; then
-#     echo "dpkg configured successfully."
+# Configure dpkg
+if sudo dpkg --configure -a; then
+    echo "dpkg configured successfully."
+else
+    echo "Failed to configure dpkg." >&2
+    exit 1
+fi
+
+# Install python3-tqdm
+if sudo apt-get install -y python3-tqdm; then
+    echo "python3-tqdm installed successfully."
+else
+    echo "Failed to install python3-tqdm." >&2
+    exit 1
+fi
+
+# KVM virtualization support
+if sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils; then
+    sudo modprobe kvm
+    sudo modprobe kvm_amd
+    sudo usermod -aG kvm {secret.USER}
+    echo "KVM virtualization installed successfully."
+else
+    echo "Failed to install KVM virtualization." >&2
+    exit 1
+fi
+
+# Install Packages
+if sudo apt-get update -y; then
+    sudo apt-get upgrade -y
+    sudo add-apt-repository universe -y
+    sudo apt-get install curl -y
+    sudo apt-get install openssl -y
+    sudo apt-get install -y python3-venv
+    sudo apt-get install -y build-essential
+    sudo apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
+    echo "Packages installed successfully."
+else
+    echo "Failed to install packages." >&2
+    exit 1
+fi
+
+####################
+
+# SSL Certificate Certbot
+
+# # Check if certbot is installed
+# if command -v certbot &> /dev/null
+# then
+#     echo "Certbot is already installed."
 # else
-#     echo "Failed to configure dpkg." >&2
+#     echo "Certbot is not installed. Installing Certbot..."
+#     sudo snap install --classic certbot
+#     sudo ln -s /snap/bin/certbot /usr/bin/certbot
+# fi
+
+# # Generate a certificate for your domain
+# echo "Generating certificate for your domain..."
+# sudo certbot --nginx
+
+# # Check if the certificate generation was successful
+# if [ $? -eq 0 ]; then
+#     echo "Certificate generated successfully."
+# else
+#     echo "Failed to generate certificate."
 #     exit 1
 # fi
 
-# # Install python3-tqdm
-# if sudo apt-get install -y python3-tqdm; then
-#     echo "python3-tqdm installed successfully."
+# # Test certificate renewal
+# echo "Testing certificate renewal..."
+# sudo certbot renew --dry-run
+
+# # Check if the renewal test was successful
+# if [ $? -eq 0 ]; then
+#     echo "Certificate renewal test successful."
 # else
-#     echo "Failed to install python3-tqdm." >&2
+#     echo "Certificate renewal test failed."
 #     exit 1
 # fi
 
-# # KVM virtualization support
-# if sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils; then
-#     sudo modprobe kvm
-#     sudo modprobe kvm_amd
-#     sudo usermod -aG kvm {secret.USER}
-#     echo "KVM virtualization installed successfully."
-# else
-#     echo "Failed to install KVM virtualization." >&2
-#     exit 1
-# fi
+####################
 
-# # Install Packages
-# if sudo apt-get update -y; then
-#     sudo apt-get upgrade -y
-#     sudo add-apt-repository universe -y
-#     sudo apt-get install curl -y
-#     sudo apt-get install openssl -y
-#     sudo apt-get install -y python3-venv
-#     sudo apt-get install -y build-essential
-#     sudo apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
-#     echo "Packages installed successfully."
-# else
-#     echo "Failed to install packages." >&2
-#     exit 1
-# fi
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" &> /dev/null
+}
 
-# ####################
+# Install Nginx if not installed
+if command_exists nginx; then
+    echo "Nginx is already installed."
+else
+    echo "Nginx is not installed. Installing Nginx..."
+    sudo apt-get update
+    sudo apt-get install -y nginx
+fi
 
-# # SSL Certificate Certbot
+# Create directories for SSL certificates if they don't exist
+if [ ! -d /etc/ssl/private ]; then
+    sudo mkdir -p /etc/ssl/private
+fi
+if [ ! -d /etc/ssl/certs ]; then
+    sudo mkdir -p /etc/ssl/certs
+fi
 
-# # # Check if certbot is installed
-# # if command -v certbot &> /dev/null
-# # then
-# #     echo "Certbot is already installed."
-# # else
-# #     echo "Certbot is not installed. Installing Certbot..."
-# #     sudo snap install --classic certbot
-# #     sudo ln -s /snap/bin/certbot /usr/bin/certbot
-# # fi
+# Generate a self-signed SSL certificate if it doesn't exist
+if [ ! -f /etc/ssl/private/nginx-selfsigned.key ] || [ ! -f /etc/ssl/certs/nginx-selfsigned.crt ]; then
+    echo "Generating a self-signed SSL certificate..."
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/CN=$IP_ADDRESS"
+else
+    echo "Self-signed SSL certificate already exists."
+fi
 
-# # # Generate a certificate for your domain
-# # echo "Generating certificate for your domain..."
-# # sudo certbot --nginx
+# Create SSL configuration snippets if they don't exist
+if [ ! -f /etc/nginx/snippets/self-signed.conf ]; then
+    echo "Creating SSL configuration snippet..."
+    sudo bash -c 'cat > /etc/nginx/snippets/self-signed.conf <<EOF
+ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+EOF'
+fi
 
-# # # Check if the certificate generation was successful
-# # if [ $? -eq 0 ]; then
-# #     echo "Certificate generated successfully."
-# # else
-# #     echo "Failed to generate certificate."
-# #     exit 1
-# # fi
+if [ ! -f /etc/nginx/snippets/ssl-params.conf ]; then
+    echo "Creating SSL parameters configuration snippet..."
+    sudo bash -c 'cat > /etc/nginx/snippets/ssl-params.conf <<EOF
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
+ssl_dhparam /etc/nginx/dhparam.pem;
+EOF'
+fi
 
-# # # Test certificate renewal
-# # echo "Testing certificate renewal..."
-# # sudo certbot renew --dry-run
+# Generate a Diffie-Hellman group if it doesn't exist
+if [ ! -f /etc/nginx/dhparam.pem ]; then
+    echo "Generating Diffie-Hellman group..."
+    sudo openssl dhparam -out /etc/nginx/dhparam.pem 2048
+else
+    echo "Diffie-Hellman group already exists."
+fi
 
-# # # Check if the renewal test was successful
-# # if [ $? -eq 0 ]; then
-# #     echo "Certificate renewal test successful."
-# # else
-# #     echo "Certificate renewal test failed."
-# #     exit 1
-# # fi
+# Configure Nginx to use SSL
+echo "Configuring Nginx to use SSL..."
+sudo bash -c 'cat > /etc/nginx/sites-available/default <<EOF
+server {
+    listen 443 ssl;
+    server_name 185.213.165.171;
 
-# ####################
+    include snippets/self-signed.conf;
+    include snippets/ssl-params.conf;
 
-# # Function to check if a command exists
-# command_exists() {
-#     command -v "$1" &> /dev/null
-# }
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
 
-# # Install Nginx if not installed
-# if command_exists nginx; then
-#     echo "Nginx is already installed."
-# else
-#     echo "Nginx is not installed. Installing Nginx..."
-#     sudo apt-get update
-#     sudo apt-get install -y nginx
-# fi
+server {
+    listen 80;
+    server_name 185.213.165.171;
 
-# # Create directories for SSL certificates if they don't exist
-# if [ ! -d /etc/ssl/private ]; then
-#     sudo mkdir -p /etc/ssl/private
-# fi
-# if [ ! -d /etc/ssl/certs ]; then
-#     sudo mkdir -p /etc/ssl/certs
-# fi
+    return 301 https://\$server_name\$request_uri;
+}
+EOF'
 
-# # Generate a self-signed SSL certificate if it doesn't exist
-# if [ ! -f /etc/ssl/private/nginx-selfsigned.key ] || [ ! -f /etc/ssl/certs/nginx-selfsigned.crt ]; then
-#     echo "Generating a self-signed SSL certificate..."
-#     sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/CN=$IP_ADDRESS"
-# else
-#     echo "Self-signed SSL certificate already exists."
-# fi
+# Test Nginx configuration
+echo "Testing Nginx configuration..."
+sudo nginx -t
 
-# # Create SSL configuration snippets if they don't exist
-# if [ ! -f /etc/nginx/snippets/self-signed.conf ]; then
-#     echo "Creating SSL configuration snippet..."
-#     sudo bash -c 'cat > /etc/nginx/snippets/self-signed.conf <<EOF
-# ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
-# ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
-# EOF'
-# fi
+# Reload Nginx to apply changes
+echo "Reloading Nginx..."
+sudo systemctl reload nginx
 
-# if [ ! -f /etc/nginx/snippets/ssl-params.conf ]; then
-#     echo "Creating SSL parameters configuration snippet..."
-#     sudo bash -c 'cat > /etc/nginx/snippets/ssl-params.conf <<EOF
-# ssl_protocols TLSv1.2 TLSv1.3;
-# ssl_prefer_server_ciphers on;
-# ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
-# ssl_dhparam /etc/nginx/dhparam.pem;
-# EOF'
-# fi
+echo "Nginx is now configured with a self-signed SSL certificate."
 
-# # Generate a Diffie-Hellman group if it doesn't exist
-# if [ ! -f /etc/nginx/dhparam.pem ]; then
-#     echo "Generating Diffie-Hellman group..."
-#     sudo openssl dhparam -out /etc/nginx/dhparam.pem 2048
-# else
-#     echo "Diffie-Hellman group already exists."
-# fi
+####################
 
-# # Configure Nginx to use SSL
-# echo "Configuring Nginx to use SSL..."
-# sudo bash -c 'cat > /etc/nginx/sites-available/default <<EOF
-# server {
-#     listen 443 ssl;
-#     server_name 185.213.165.171;
+# Clone GitHub Repository
 
-#     include snippets/self-signed.conf;
-#     include snippets/ssl-params.conf;
+# Create directories if they do not exist
+if [ ! -d "/home/app-source" ]; then
+    mkdir -p /home/app-source
+fi
 
-#     location / {
-#         try_files \$uri \$uri/ =404;
-#     }
-# }
+if [ ! -d "/home/images" ]; then
+    mkdir -p /home/images
+fi
 
-# server {
-#     listen 80;
-#     server_name 185.213.165.171;
+# Change to the app-source directory
+cd /home/app-source
 
-#     return 301 https://\$server_name\$request_uri;
-# }
-# EOF'
+# Clone repositories
+for repo in $REPO_URL_1 \
+    $REPO_URL_2 \
+    $REPO_URL_3 \
+    $REPO_URL_4 \
+    $REPO_URL_5 \
+    $REPO_URL_6 \
+    $REPO_URL_7 \
+    $REPO_URL_8 \
+    $REPO_URL_9 \
+    $REPO_URL_10; do
+    if git clone https://$GITHUB_USERNAME:$GITHUB_PAT@$repo; then
+        echo "Successfully cloned $repo"
+    else
+        echo "Failed to clone $repo" >&2
+        exit 1
+    fi
+done
 
-# # Test Nginx configuration
-# echo "Testing Nginx configuration..."
-# sudo nginx -t
+####################
 
-# # Reload Nginx to apply changes
-# echo "Reloading Nginx..."
-# sudo systemctl reload nginx
+# Create Admin User
 
-# echo "Nginx is now configured with a self-signed SSL certificate."
+# Variables
+USER_HOME="/home"
+USER_SHELL="/bin/bash"
 
-# ####################
+# Check if group exists, if not, create it
+if ! getent group "$GROUP_NAME" > /dev/null 2>&1; then
+    if groupadd "$GROUP_NAME"; then
+        echo "Group $GROUP_NAME created."
+    else
+        echo "Failed to create group $GROUP_NAME" >&2
+        exit 1
+    fi
+else
+    echo "Group $GROUP_NAME already exists."
+fi
 
-# # Clone GitHub Repository
+# Check if user exists, if not, create it
+if ! id -u "$USER" > /dev/null 2>&1; then
+    if useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$USER"; then
+        echo "User $USER created."
+    else
+        echo "Failed to create user $USER" >&2
+        exit 1
+    fi
+else
+    echo "User $USER already exists."
+fi
 
-# # Create directories if they do not exist
-# if [ ! -d "/home/app-source" ]; then
-#     mkdir -p /home/app-source
-# fi
+####################
 
-# if [ ! -d "/home/images" ]; then
-#     mkdir -p /home/images
-# fi
+# Remove Docker
 
-# # Change to the app-source directory
-# cd /home/app-source
+# Remove conflicting Docker packages
+for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+    if dpkg -l | grep -q $pkg; then
+        if apt-get remove -y $pkg; then
+            echo "Successfully removed $pkg"
+        else
+            echo "Failed to remove $pkg" >&2
+            exit 1
+        fi
+    else
+        echo "$pkg is not installed"
+    fi
+done
 
-# # Clone repositories
-# for repo in $REPO_URL_1 \
-#     $REPO_URL_2 \
-#     $REPO_URL_3 \
-#     $REPO_URL_4 \
-#     $REPO_URL_5 \
-#     $REPO_URL_6 \
-#     $REPO_URL_7 \
-#     $REPO_URL_8 \
-#     $REPO_URL_9 \
-#     $REPO_URL_10; do
-#     if git clone https://$GITHUB_USERNAME:$GITHUB_PAT@$repo; then
-#         echo "Successfully cloned $repo"
-#     else
-#         echo "Failed to clone $repo" >&2
-#         exit 1
-#     fi
-# done
+# Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
+for pkg in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras; do
+    if dpkg -l | grep -q $pkg; then
+        if apt-get purge -y $pkg; then
+            echo "Successfully purged $pkg"
+        else
+            echo "Failed to purge $pkg" >&2
+            exit 1
+        fi
+    else
+        echo "$pkg is not installed"
+    fi
+done
 
-# ####################
+# Delete all Docker images, containers, and volumes
+if [ -d /var/lib/docker ]; then
+    echo "Deleting Docker data..."
+    rm -rf /var/lib/docker
+    echo "Docker data deleted."
+else
+    echo "Docker directory does not exist."
+fi
 
-# # Create Admin User
+if [ -d /var/lib/containerd ]; then
+    echo "Deleting containerd data..."
+    rm -rf /var/lib/containerd
+    echo "containerd data deleted."
+else
+    echo "containerd directory does not exist."
+fi
 
-# # Variables
-# USER_HOME="/home"
-# USER_SHELL="/bin/bash"
+####################
 
-# # Check if group exists, if not, create it
-# if ! getent group "$GROUP_NAME" > /dev/null 2>&1; then
-#     if groupadd "$GROUP_NAME"; then
-#         echo "Group $GROUP_NAME created."
-#     else
-#         echo "Failed to create group $GROUP_NAME" >&2
-#         exit 1
-#     fi
-# else
-#     echo "Group $GROUP_NAME already exists."
-# fi
+# Set up Docker's apt Repository
 
-# # Check if user exists, if not, create it
-# if ! id -u "$USER" > /dev/null 2>&1; then
-#     if useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$USER"; then
-#         echo "User $USER created."
-#     else
-#         echo "Failed to create user $USER" >&2
-#         exit 1
-#     fi
-# else
-#     echo "User $USER already exists."
-# fi
+if apt-get update && \
+   apt-get install -y ca-certificates curl && \
+   install -m 0755 -d /etc/apt/keyrings && \
+   curl -fsSLv --insecure --tlsv1.3 https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
+   chmod a+r /etc/apt/keyrings/docker.asc && \
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+   apt-get update; then
+    echo "Docker's apt repository set up successfully."
+else
+    echo "Failed to set up Docker's apt repository." >&2
+    exit 1
+fi
 
-# ####################
+####################
 
-# # Remove Docker
+# Docker Engine
 
-# # Remove conflicting Docker packages
-# for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-#     if dpkg -l | grep -q $pkg; then
-#         if apt-get remove -y $pkg; then
-#             echo "Successfully removed $pkg"
-#         else
-#             echo "Failed to remove $pkg" >&2
-#             exit 1
-#         fi
-#     else
-#         echo "$pkg is not installed"
-#     fi
-# done
+# Command to install the Docker packages (latest)
+if sudo apt-get update && \
+   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin; then
+    echo "Docker packages installed successfully."
+else
+    echo "Failed to install Docker packages." >&2
+    exit 1
+fi
 
-# # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
-# for pkg in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras; do
-#     if dpkg -l | grep -q $pkg; then
-#         if apt-get purge -y $pkg; then
-#             echo "Successfully purged $pkg"
-#         else
-#             echo "Failed to purge $pkg" >&2
-#             exit 1
-#         fi
-#     else
-#         echo "$pkg is not installed"
-#     fi
-# done
-
-# # Delete all Docker images, containers, and volumes
-# if [ -d /var/lib/docker ]; then
-#     echo "Deleting Docker data..."
-#     rm -rf /var/lib/docker
-#     echo "Docker data deleted."
-# else
-#     echo "Docker directory does not exist."
-# fi
-
-# if [ -d /var/lib/containerd ]; then
-#     echo "Deleting containerd data..."
-#     rm -rf /var/lib/containerd
-#     echo "containerd data deleted."
-# else
-#     echo "containerd directory does not exist."
-# fi
-
-# ####################
-
-# # Set up Docker's apt Repository
-
-# if apt-get update && \
-#    apt-get install -y ca-certificates curl && \
-#    install -m 0755 -d /etc/apt/keyrings && \
-#    curl -fsSLv --insecure --tlsv1.3 https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
-#    chmod a+r /etc/apt/keyrings/docker.asc && \
-#    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-#    apt-get update; then
-#     echo "Docker's apt repository set up successfully."
-# else
-#     echo "Failed to set up Docker's apt repository." >&2
-#     exit 1
-# fi
-
-# ####################
-
-# # Docker Engine
-
-# # Command to install the Docker packages (latest)
-# if sudo apt-get update && \
-#    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin; then
-#     echo "Docker packages installed successfully."
-# else
-#     echo "Failed to install Docker packages." >&2
-#     exit 1
-# fi
-
-# ####################
+####################
 
 # Gnome Extension
 
-# # Install necessary dependencies
-# if sudo apt-get -y install meson && \
-#    sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
-#     echo "Dependencies installed successfully."
-# else
-#     echo "Failed to install dependencies." >&2
-#     exit 1
-# fi
+# Install necessary dependencies
+if sudo apt-get -y install meson && \
+   sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
+    echo "Dependencies installed successfully."
+else
+    echo "Failed to install dependencies." >&2
+    exit 1
+fi
 
-# # Clone the extension repository
-# if git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git; then
-#     echo "Repository cloned successfully."
-# else
-#     echo "Failed to clone repository." >&2
-#     exit 1
-# fi
+# Clone the extension repository
+if git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git; then
+    echo "Repository cloned successfully."
+else
+    echo "Failed to clone repository." >&2
+    exit 1
+fi
 
 # Build and install the extension
 if meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build && \
