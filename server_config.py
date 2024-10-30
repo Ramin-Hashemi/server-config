@@ -12,7 +12,7 @@ import time
 
 def run():
     install_packages()
-    # clone_github_repository()
+    clone_github_repository()
     create_admin_user()
     docker_repository()
     docker_engine()
@@ -20,7 +20,7 @@ def run():
     initialize_pass()
     docker_desktop()
     docker_post_install()
-    # secure_server()
+    secure_server()
 
 
 def install_packages():
@@ -241,10 +241,10 @@ def gnome_extension():
 def initialize_pass():
     command = [
         "su", "-", "root", "-c",
-        f'''
+        '''
         # Variables
-        NAME_REAL="{secret.NAME_REAL}"
-        NAME_EMAIL="{secret.NAME_EMAIL}"
+        NAME_REAL="raminhashemi"
+        NAME_EMAIL="ramin.hashemi@usa.com"
 
         # Check if gpg and pass are installed
         if ! command -v gpg &> /dev/null || ! command -v pass &> /dev/null; then
@@ -278,7 +278,7 @@ def initialize_pass():
         if [ -f "$DOCKER_CONFIG_FILE" ]; then
             jq '.credsStore = "pass"' "$DOCKER_CONFIG_FILE" > "$DOCKER_CONFIG_FILE.tmp" && mv "$DOCKER_CONFIG_FILE.tmp" "$DOCKER_CONFIG_FILE"
         else
-            echo '{{"credsStore": "pass"}}' > "$DOCKER_CONFIG_FILE"
+            echo '{"credsStore": "pass"}' > "$DOCKER_CONFIG_FILE"
         fi
         '''
     ]
