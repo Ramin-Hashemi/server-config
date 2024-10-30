@@ -515,7 +515,7 @@
 # fi
 
 # Install Docker Desktop dependencies
-if sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager uidmap; then
+if sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager libsubid4 uidmap; then
     echo "Docker Desktop dependencies installed successfully."
 else
     echo "Failed to install Docker Desktop dependencies." >&2
