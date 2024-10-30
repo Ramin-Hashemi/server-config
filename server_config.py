@@ -11,12 +11,12 @@ import time
 
 
 def run():
-    install_packages()
+    # install_packages()
     # clone_github_repository()
-    create_admin_user()
-    docker_repository()
-    docker_engine()
-    # gnome_extension()
+    # create_admin_user()
+    # docker_repository()
+    # docker_engine()
+    gnome_extension()
     # initialize_pass()
     # docker_desktop()
     # docker_post_install()
