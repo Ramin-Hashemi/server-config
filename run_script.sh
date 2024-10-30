@@ -29,11 +29,16 @@ else
     exit 1
 fi
 
-# Run the Python script
-if python3 server_config.py "run"; then
-    echo "Python script executed successfully."
+# Install Packages
+if sudo apt-get update -y; then
+    sudo apt-get upgrade -y
+    sudo add-apt-repository universe -y
+    sudo apt-get install -y python3-venv
+    sudo apt-get install -y build-essential
+    sudo apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
+    echo "Packages installed successfully."
 else
-    echo "Failed to execute Python script." >&2
+    echo "Failed to install packages." >&2
     exit 1
 fi
 
