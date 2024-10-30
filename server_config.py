@@ -28,21 +28,13 @@ def install_packages():
     command = [
         "su", "-", "root", "-c",
         '''
-        # Update package lists
         apt-get update -y &&
-
-        # Upgrade all packages
         apt-get upgrade -y &&
-
-        # Install required packages
         apt-get install -y python3-venv python3-tqdm &&
-
-        # Install GNOME Desktop
         apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
         '''
     ]
     try:
-        # Execute the command and show progress
         with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
             result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
@@ -158,11 +150,10 @@ def remove_docker():
         fi
         if [ -d /var/lib/containerd ]; then
             rm -rf /var/lib/containerd
-        fi &&
+        fi
         '''
     ]
     try:
-        # Execute the command and show progress
         with tqdm(total=100, desc="remove_docker", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
             result = subprocess.run(command, check=True, capture_output=True, text=True)
             for _ in range(10):
