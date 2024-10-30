@@ -223,7 +223,6 @@ def gnome_extension():
     apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 &&
 
     # Clone the extension repository
-    rm -rf /tmp/gnome-shell-extension-appindicator &&
     git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
     
     # Build and install the extension
