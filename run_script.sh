@@ -353,23 +353,22 @@ HOSTNAME=$(cat hostname.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 
 
 # Gnome Extension
 
-# Install necessary dependencies
-if sudo apt-get -y install libappindicator1 && \
-   sudo apt-get -y install meson && \
-   sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
-    echo "Dependencies installed successfully."
-else
-    echo "Failed to install dependencies." >&2
-    exit 1
-fi
+# # Install necessary dependencies
+# if sudo apt-get -y install meson && \
+#    sudo apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1; then
+#     echo "Dependencies installed successfully."
+# else
+#     echo "Failed to install dependencies." >&2
+#     exit 1
+# fi
 
-# Clone the extension repository
-if git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git; then
-    echo "Repository cloned successfully."
-else
-    echo "Failed to clone repository." >&2
-    exit 1
-fi
+# # Clone the extension repository
+# if git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git; then
+#     echo "Repository cloned successfully."
+# else
+#     echo "Failed to clone repository." >&2
+#     exit 1
+# fi
 
 # Build and install the extension
 if meson gnome-shell-extension-appindicator /tmp/g-s-appindicators-build && \
@@ -406,11 +405,33 @@ fi
 
 # Initialize pass
 
-# Check if gpg and pass are installed
-if ! command -v gpg &> /dev/null || ! command -v pass &> /dev/null; then
-    echo "gpg and pass are required but not installed. Please install them first."
-    exit 1
+# Check if gpg is installed, install if not
+if ! command -v gpg &> /dev/null; then
+    echo "gpg is not installed. Installing gpg..."
+    if sudo apt-get install -y gnupg; then
+        echo "gpg installed successfully."
+    else
+        echo "Failed to install gpg." >&2
+        exit 1
+    fi
+else
+    echo "gpg is already installed."
 fi
+
+# Check if pass is installed, install if not
+if ! command -v pass &> /dev/null; then
+    echo "pass is not installed. Installing pass..."
+    if sudo apt-get install -y pass; then
+        echo "pass installed successfully."
+    else
+        echo "Failed to install pass." >&2
+        exit 1
+    fi
+else
+    echo "pass is already installed."
+fi
+
+echo "gpg and pass are installed."
 
 # Generate a new GPG key
 echo "Generating a new GPG key..."
