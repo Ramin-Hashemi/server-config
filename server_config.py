@@ -15,7 +15,7 @@ def run():
     # clone_github_repository()
     create_admin_user()
     remove_docker()
-    docker_repository()
+    # docker_repository()
     # docker_engine()
     gnome_extension()
     initialize_pass()
@@ -177,7 +177,6 @@ def docker_repository():
         "chmod a+r /etc/apt/keyrings/docker.asc && "
         "echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null && "
         "apt-get update && "
-        "apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
     ]
     try:
         # Execute the command and show progress
