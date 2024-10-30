@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Install dpkg
+if sudo dpkg --configure -a; then
+    echo "dpkg installed successfully."
+else
+    echo "Failed to install dpkg." >&2
+    exit 1
+fi
+
 # Install python3-tqdm
 if sudo apt-get install -y python3-tqdm; then
     echo "python3-tqdm installed successfully."
