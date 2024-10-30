@@ -31,6 +31,7 @@ def install_packages():
         '''
         apt-get update -y &&
         apt-get upgrade -y &&
+        add-apt-repository universe &&
         apt-get install -y python3-venv &&
         apt-get install build-essential &&
         apt-get install qemu &&
@@ -245,9 +246,6 @@ def gnome_extension():
     command = [
         "su", "-", "root", "-c",
         '''
-        # Update package lists
-        apt-get update -y
-
         # Install necessary dependencies
         apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1
 
