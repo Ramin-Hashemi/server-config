@@ -19,84 +19,79 @@ def run():
     gnome_extension()
     initialize_pass()
     docker_desktop()
-    # docker_post_install()
+    docker_post_install()
     # secure_server()
 
 
 def install_packages():
-    command = [
-        "su", "-", "root", "-c",
-        """
-        # Update package lists
-        "apt-get update -y "
+    command = """
+    su - root -c '
+    # Update package lists
+    apt-get update -y &&
 
-        # Upgrade all packages
-        "apt-get upgrade -y "
+    # Upgrade all packages
+    apt-get upgrade -y &&
 
-        # Projects required packages
-        "apt-get install -y python3-venv "
-        "apt-get install -y python3-tqdm "
-        "apt-get upgrade -y qemu "
+    # Install required packages
+    apt-get install -y python3-venv python3-tqdm qemu &&
 
-        # Run the following command to uninstall all conflicting packages
-        "for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done "
-        
-        # Uninstall the Docker Engine, CLI, containerd, and Docker Compose packages
-        "apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras "
-        
-        # To delete all images, containers, and volumes
-        "rm -rf /var/lib/docker "
-        "rm -rf /var/lib/containerd "
+    # Remove conflicting Docker packages
+    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+        apt-get remove -y $pkg
+    done &&
 
-        # Install GNOME Desktop
-        "apt-get install -y ubuntu-gnome-desktop "
-        "apt-get install -y install gnome-terminal "
-        "apt-get install -y gnome-browser-connector"
-        """
-    ]
+    # Uninstall Docker Engine, CLI, containerd, and Docker Compose packages
+    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras &&
+
+    # Delete all Docker images, containers, and volumes
+    rm -rf /var/lib/docker /var/lib/containerd &&
+
+    # Install GNOME Desktop
+    apt-get install -y ubuntu-gnome-desktop gnome-terminal gnome-browser-connector
+    '
+    """
     try:
         # Execute the command and show progress
-        with tqdm(total=100, desc="install_packages", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+        with tqdm(total=100, desc="system_setup", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
-        print("<install_packages>>>>> Function executed successfully", result.stdout)
+        print("<system_setup>>>>> Function executed successfully", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("<install_packages>>>>> Error occurred", e.stderr)
+        print("<system_setup>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<install_packages>>>>> Unexpected error occurred", str(e))
+        print("<system_setup>>>>> Unexpected error occurred", str(e))
 
 
 def clone_github_repository():
-    command = [
-        "su", "-", "root", "-c",
-        f"""
-        if [ ! -d "/home/app-source" ]; then
+    command = f"""
+    su - root -c '
+    if [ ! -d "/home/app-source" ]; then
         mkdir -p /home/app-source
-        fi
+    fi
 
-        if [ ! -d "/home/images" ]; then
+    if [ ! -d "/home/images" ]; then
         mkdir -p /home/images
-        fi
+    fi
 
-        cd /home/app-source &&
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_1} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_2} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_3} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_4} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_5} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_6} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_7} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_8} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_9} "
-        "git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_10}"
-        """
-    ]
+    cd /home/app-source &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_1} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_2} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_3} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_4} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_5} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_6} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_7} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_8} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_9} &&
+    git clone https://{secret.GITHUB_USERNAME}:{secret.GITHUB_PAT}@{secret.REPO_URL_10}
+    '
+    """
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="clone_github_repository", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
             for _ in range(10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
@@ -104,36 +99,35 @@ def clone_github_repository():
     except subprocess.CalledProcessError as e:
         print("<clone_github_repository>>>>> Error occurred", e.stderr)
     except Exception as e:
-        print("<create_admin_user>>>>> Unexpected error occurred", str(e))
+        print("<clone_github_repository>>>>> Unexpected error occurred", str(e))
 
 
 def create_admin_user():
-    command = [
-        "su", "-", "root", "-c",
-        f"""
-        # Variables
-        GROUP_NAME="{secret.GROUP_NAME}"
-        USER="{secret.USER}"
-        USER_HOME="/home"
-        USER_SHELL="/bin/bash"
+    command = f"""
+    su - root -c '
+    # Variables
+    GROUP_NAME="{secret.GROUP_NAME}"
+    USER="{secret.USER}"
+    USER_HOME="/home"
+    USER_SHELL="/bin/bash"
 
-        # Check if group exists, if not, create it
-        if ! getent group "$GROUP_NAME" > /dev/null 2>&1; then
-            groupadd "$GROUP_NAME"
-            echo "Group $GROUP_NAME created."
-        else
-            echo "Group $GROUP_NAME already exists."
-        fi
+    # Check if group exists, if not, create it
+    if ! getent group "$GROUP_NAME" > /dev/null 2>&1; then
+        groupadd "$GROUP_NAME"
+        echo "Group $GROUP_NAME created."
+    else
+        echo "Group $GROUP_NAME already exists."
+    fi
 
-        # Check if user exists, if not, create it
-        if ! id -u "$USER" > /dev/null 2>&1; then
-            useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$USER"
-            echo "User $USER created."
-        else
-            echo "User $USER already exists."
-        fi
-        """
-    ]
+    # Check if user exists, if not, create it
+    if ! id -u "$USER" > /dev/null 2>&1; then
+        useradd --system --gid "$GROUP_NAME" --shell "$USER_SHELL" --home "$USER_HOME" "$USER"
+        echo "User $USER created."
+    else
+        echo "User $USER already exists."
+    fi
+    '
+    """
     
     try:
         # Execute the command and show progress
@@ -197,44 +191,44 @@ def docker_engine():
 
 
 def gnome_extension():
-    command = [
-        "su", "-", "root", "-c",
-        """
-        # Update package lists
-        "apt-get update -y "
+    command = """
+    su - root -c '
+    # Update package lists
+    apt-get update -y &&
 
-        # Install necessary dependencies
-        "apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 "
+    # Install necessary dependencies
+    apt-get install -y gnome-shell-extension-appindicator gir1.2-appindicator3-0.1 &&
 
-        # Clone the extension repository
-        "git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator "
+    # Clone the extension repository
+    git clone https://github.com/ubuntu/gnome-shell-extension-appindicator.git /tmp/gnome-shell-extension-appindicator &&
 
-        # Checkout the latest version (v59) "
-        "cd /tmp/gnome-shell-extension-appindicator "
-        "git checkout v59 "
+    # Checkout the latest version (v59)
+    cd /tmp/gnome-shell-extension-appindicator &&
+    git checkout v59 &&
 
-        # Build and install the extension
-        "meson build "
-        "ninja -C build install "
+    # Build and install the extension
+    meson build &&
+    ninja -C build install &&
 
-        # Enable the extension
-        "gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com "
+    # Enable the extension
+    gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com &&
 
-        # Clean up
-        "rm -rf /tmp/gnome-shell-extension-appindicator "
+    # Clean up
+    rm -rf /tmp/gnome-shell-extension-appindicator &&
 
-        # Restart GNOME Shell (only necessary under X11)
-        if [ "$XDG_SESSION_TYPE" = "x11" ]; then
-            echo "Restarting GNOME Shell..."
-            gnome-shell --replace &
-        fi
-        """
-    ]
+    # Restart GNOME Shell (only necessary under X11)
+    if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+        echo "Restarting GNOME Shell..."
+        gnome-shell --replace &
+    fi
+    '
+    """
+    
     try:
         # Execute the command and show progress
         with tqdm(total=100, desc="gnome_extension", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
-            for _ in range(10):
+            result = subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
+            for _ in range (10):
                 time.sleep(0.1)  # Simulate progress
                 pbar.update(10)
         print("<gnome_extension>>>>> Function executed successfully", result.stdout)
@@ -243,11 +237,10 @@ def gnome_extension():
     except Exception as e:
         print("<gnome_extension>>>>> Unexpected error occurred", str(e))
 
-
 def initialize_pass():
     command = [
         "su", "-", "root", "-c",
-        f"""
+        f'''
         # Variables
         NAME_REAL="{secret.NAME_REAL}"
         NAME_EMAIL="{secret.NAME_EMAIL}"
@@ -286,7 +279,7 @@ def initialize_pass():
         else
             echo '{"credsStore": "pass"}' > "$DOCKER_CONFIG_FILE"
         fi
-        """
+        '''
     ]
     try:
         # Execute the command and show progress
@@ -306,7 +299,7 @@ def docker_desktop():
     # Install the Docker packages (latest)
     command = [
         "su", "-", "root", "-c",
-        f"""
+        f'''
         # Variables
         USER="{secret.USER}"
 
@@ -346,7 +339,7 @@ def docker_desktop():
         # Enable and start Docker Desktop service
         systemctl --user enable docker-desktop &&
         systemctl --user start docker-desktop
-        """
+        '''
     ]
     try:
         # Execute the command and show progress
@@ -365,7 +358,7 @@ def docker_desktop():
 def docker_post_install():
     command = [
         "su", "-", "root", "-c",
-        f"""
+        f'''
         # Variables
         GROUP_NAME_DOCKER="docker"
         USER="{secret.USER}"
@@ -433,7 +426,7 @@ def docker_post_install():
             echo "Failed to add DNS entry."
             exit 1
         fi
-        """
+        '''
     ]
     try:
         # Execute the command and show progress
@@ -453,7 +446,7 @@ def secure_server():
     # Set up your server so that you connect to it using an SSH key instead of a password
     command = [
         "su", "-", "root", "-c",
-        f"""
+        f'''
         if [ ! -d "/home/.ssh" ]; then
             mkdir -p /home/.ssh
         fi &&
@@ -462,7 +455,7 @@ def secure_server():
         echo "{secret.PUBLIC_SSH_KEY}" >> /home/.ssh/authorized_keys &&
         sed -i s|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes| /etc/ssh/sshd_config &&
         sed -i s|^#\\?PasswordAuthentication .*|PasswordAuthentication yes| /etc/ssh/sshd_config
-        """
+        '''
     ]
     try:
         # Execute the command and show progress
