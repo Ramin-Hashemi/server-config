@@ -574,7 +574,7 @@ else
 fi
 
 # Change ~/.docker/ directory ownership and permissions
-if chown "$USER":"$USER" /home/"$USER"/.docker -R && chmod g+rwx "$HOME/.docker" -R; then
+if chown "$USER":"$GROUP_NAME_DOCKER" /root/.docker -R && chmod g+rwx "/root/.docker" -R; then
     echo "Ownership and permissions for ~/.docker/ changed."
 else
     echo "Failed to change ownership and permissions for ~/.docker/."
@@ -589,10 +589,9 @@ else
     exit 1
 fi
 
-# Check if the source file exists
-if [ ! -f /usr/local/bin/com.docker.cli ]; then
-    echo "Source file /usr/local/bin/com.docker.cli does not exist."
-    exit 1
+# Remove existing symlink if it exists
+if [ -L /usr/bin/docker ]; then
+    sudo rm /usr/bin/docker
 fi
 
 # Create the symbolic link
@@ -667,6 +666,18 @@ else
     exit 1
 fi
 
+# Check if the authorized_keys file, if not, create it
+if [ ! -f "/home/.ssh/authorized_keys" ]; then
+    if touch /home/.ssh/authorized_keys; then
+        echo "authorized_keys file created."
+    else
+        echo "Failed to create authorized_keys file."
+        exit 1
+    fi
+else
+    echo "authorized_keys file already exists."
+fi
+
 # Set permissions for the authorized_keys file
 if chmod 600 /home/.ssh/authorized_keys; then
     echo "Permissions set for authorized_keys file."
@@ -684,7 +695,7 @@ else
 fi
 
 # Enable PubkeyAuthentication in sshd_config
-if sed -i s|^#\\?PubkeyAuthentication .*|PubkeyAuthentication yes| /etc/ssh/sshd_config; then
+if sudo sed -i 's|^#\?PubkeyAuthentication .*|PubkeyAuthentication yes|' /etc/ssh/sshd_config; then
     echo "PubkeyAuthentication enabled."
 else
     echo "Failed to enable PubkeyAuthentication."
@@ -692,7 +703,7 @@ else
 fi
 
 # Enable PasswordAuthentication in sshd_config
-if sed -i s|^#\\?PasswordAuthentication .*|PasswordAuthentication yes| /etc/ssh/sshd_config; then
+if sudo sed -i 's|^#\?PasswordAuthentication .*|PasswordAuthentication yes|' /etc/ssh/sshd_config; then
     echo "PasswordAuthentication enabled."
 else
     echo "Failed to enable PasswordAuthentication."
