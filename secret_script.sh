@@ -29,6 +29,3 @@ echo "ramin.hashemi@usa.com" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -i
 
 echo "docker" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > group_name_docker.txt
 echo "kubernetes.local" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > hostname.txt
-
-# Keep the shell open
-exec "$SHELL"

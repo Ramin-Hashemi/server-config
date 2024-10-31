@@ -501,18 +501,6 @@ trap 'echo "Script interrupted!"; exit 1' SIGINT SIGTERM
 # Load configuration
 source /home/server-config/config.sh
 
-# Function to check dependencies
-check_dependencies() {
-    command -v docker >/dev/null 2>&1 || { echo >&2 "Docker is required but it's not installed. Aborting."; exit 1; }
-    # Add more dependency checks as needed
-}
-
-# Function to prepare the server
-prepare_server() {
-    echo "Updating and upgrading the server..."
-    sudo apt-get update && sudo apt-get upgrade -y
-    # Add more server preparation steps
-}
 
 # Function to run containers
 run_containers() {
@@ -1253,6 +1241,3 @@ if ! (return 0 2> /dev/null); then
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
-
-# Keep the shell open
-exec "$SHELL"
