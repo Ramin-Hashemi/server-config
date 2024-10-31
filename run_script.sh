@@ -1,4 +1,52 @@
-#!/bin/bash
+#!/bin/bash -x
+
+# ────────────────────────
+#     ███╗   ███╗ ███████╗
+# ██╗ ████╗ ████║ ██╔════╝
+#     ██╔████╔██║ █████╗  
+# ██║ ██║╚██╔╝██║ ██╔══╝  
+# ██║ ██║ ╚═╝ ██║ ███████╗
+# ╚═╝ ╚═╝     ╚═╝ ╚══════╝
+# ────────────────────────
+# ───────────────────────────────────────────────────────────────
+# ██████╗  ██████╗   ██████╗       ██╗ ███████╗ ██████╗ ████████╗
+# ██╔══██╗ ██╔══██╗ ██╔═══██╗      ██║ ██╔════╝██╔════╝ ╚══██╔══╝
+# ██████╔╝ ██████╔╝ ██║   ██║      ██║ █████╗  ██║         ██║   
+# ██╔═══╝  ██╔══██╗ ██║   ██║ ██   ██║ ██╔══╝  ██║         ██║   
+# ██║      ██║  ██║ ╚██████╔╝ ╚█████╔╝ ███████╗╚██████╗    ██║   
+# ╚═╝      ╚═╝  ╚═╝  ╚═════╝   ╚════╝  ╚══════╝ ╚═════╝    ╚═╝   
+# ───────────────────────────────────────────────────────────────Thanks to CoPilot
+
+
+
+
+# The trap command allows you to specify actions to be taken \
+# when the script receives certain signals, such as SIGINT (Ctrl+C) or SIGTERM (termination signal).
+# This can be useful for cleaning up resources or performing graceful shutdowns.
+trap 'echo "Script interrupted!"; exit 1' SIGINT SIGTERM
+
+# Load configuration
+source /home/server-config/config.sh
+
+# Function to check dependencies
+check_dependencies() {
+    command -v docker >/dev/null 2>&1 || { echo >&2 "Docker is required but it's not installed. Aborting."; exit 1; }
+    # Add more dependency checks as needed
+}
+
+# Function to prepare the server
+prepare_server() {
+    echo "Updating and upgrading the server..."
+    sudo apt-get update && sudo apt-get upgrade -y
+    # Add more server preparation steps
+}
+
+# Function to run containers
+run_containers() {
+    echo "Starting containers..."
+    docker-compose up -d
+    # Add more container management steps
+}
 
 # Decrypt the secret
 USER=$(cat user.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
@@ -709,6 +757,15 @@ else
     echo "Failed to enable PasswordAuthentication."
     exit 1
 fi
+
+\\ *************************************************************************************************** #
+
+# Main script execution
+main() {
+    check_dependencies
+    prepare_server
+    run_containers
+}
 
 # Keep the shell open
 exec "$SHELL"
