@@ -3,12 +3,14 @@
 </div>
 
 # iME Server Config Project
+
 Get up and config the server to run the iME projects.
 
 # Quick Start
 ## 1. Import `server-config` Project (Local)
 - Open terminal on your local machine.
 - Run this command to clone the `server-config` poject from the GitHub repository:
+
 ```
 git clone https://github.com/Ramin-Hashemi/server-config.git
 ```
@@ -69,14 +71,17 @@ Run the following commands to schedule the script to run daily at 2 AM and log t
 ```
 0 2 * * * /home/server-config/server_monitoring_script.sh >> /home/ime-server-admin/server_monitoring.log 2>&1
 ```
-```
+
+```text
 0 3 * * * /home/server-config/backup_script.sh >> /home/ime-server-admin/backup.log 2>&1
 ```
+
 ### Enjoy!
 
-
 ## Bash Scripts Best Practices
+
 Following best practices can help you create a robust and maintainable script.
+
 1. Structure Your Script
 Modularize: Break down your script into functions. Each function should perform a single task.
 Validate User Input: Always validate user input to ensure that your scripts can handle unexpected or malicious input gracefully. Use conditional statements and error handling to catch and respond to invalid input.
@@ -94,6 +99,9 @@ Validate inputs to prevent injection attacks.
 6. Testing
 Test your script in a staging environment before deploying it to production.
 
-## Helps:
- Final server directory structure
+## Helps
 
+A Bash scripting template incorporating best practices & several useful functions.
+<https://github.com/ralish/bash-script-template>
+
+ Final server directory structure

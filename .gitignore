@@ -1,20 +1,38 @@
+# # Ignore macOS system files.
+._*
+.DS_Store
+.LSOverride
+# Icon must end with two carriage returns (\r)
+Icon
+
+# # Ignore Windows system files.
+[Dd]esktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+[Tt]humbs.db
+
+# Backups
+*.bak
+
 # Ignore all log files.
 *.log
+log/
+logs/
 
 # Ignore all Databases files.
 *.sqlite3
 
-# Ignore the temp directory.
+# Ignore the Temporary directory.
+*~
+*.tmp
+*.temp
+tmp/
 temp/
 
 # Ignore compiled Java class files, object files, and shared libraries.
 *.class
 *.o
 *.so
-
-# Ignore macOS and Windows system files.
-.DS_Store
-Thumbs.db
 
 # Ignore directories commonly used for dependencies in Node.js and PHP projects.
 node_modules/
@@ -70,7 +88,6 @@ checkpoints/
 *.pt
 
 # Ignore temporary files and swap files.
-*.tmp
 *.swp
 
 # Ignore configuration files and directories for various IDEs and text editors.
@@ -81,3 +98,12 @@ checkpoints/
 
 # Ignore a specific file.
 secret.txt
+
+# Vim
+.netrwhist
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]*.un~
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
