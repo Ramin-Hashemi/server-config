@@ -8,9 +8,10 @@ Get up and config the server to run the iME projects.
 
 # Quick Start
 
-## 1. Import `server-config` Project (Local)
+## 1. Import `server-config` Project (Remote Server)
 
-- Open terminal on your local machine.
+- Open terminal on remote server.
+- Change directory to `./home`
 - Run this command to clone the `server-config` poject from the GitHub repository:
 
 ```text
@@ -34,39 +35,23 @@ git clone https://github.com/Ramin-Hashemi/server-config.git
   cat ~/.ssh/id_ed25519.pub
   ```
 
-- Then paste your <PUBLIC_SSH_KEY> in `secret_script.sh` file in the local project repsitory.
-
-## 3. Import `server-config` Project (Remote Server)
-
-- Open terminal on remote server.
-- Change directory to `./home`
-- Run this command to clone the `server-config` poject from the GitHub repository:
-
-```text
-git clone https://github.com/Ramin-Hashemi/server-config.git
-```
-
-## 4. Configure the Remote Server
-
 - Change directory to `./home/server_config/`
-- Run this command to check for syntax errors:
-
-```text
-bash -n run_script.sh
-```
-
-### 4.1. Add Your <GITHUB_PAT>
-
 - Run this command to open the `secret_script.sh` file:
 
 ```text
 sudo nano secret_script.sh
 ```
 
+- Then paste your <PUBLIC_SSH_KEY> in `secret_script.sh` file.
+
+### 2.2. Add Your <GITHUB_PAT>
+
 - Copy GitHup Personal Access Token (classic) from your GitHub profile.
 - Paste your <GITHUB_PAT> in the `secret_script.sh` file.
 - Then save and exit.
-Change the script files permissions to make them executable.
+
+## 3. Change the script files permissions to make them executable.
+
 - Run this command:
 
 ```text
@@ -103,7 +88,7 @@ Run the following commands to schedule the script to run daily at 2 AM and log t
 ```
 
 ```text
-0 3 * * * /home/server-config/backup_script.sh >> /home/ime-server-admin/backup.log 2>&1
+0 3 * * * /home/server-config/server_backup_script.sh >> /home/ime-server-admin/backup.log 2>&1
 ```
 
 ### Enjoy
