@@ -50,8 +50,8 @@ env/
 .env/
 
 # Ignore environment variable files.
-.env
-.env.*
+# .env
+# .env.*
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints

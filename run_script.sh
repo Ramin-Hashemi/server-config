@@ -509,7 +509,10 @@ run_containers() {
     # Add more container management steps
 }
 
-# Decrypt the secrets
+
+## ╔══════════════════════════════════════════════╗
+## ║             Decrypt the secrets               ║
+## ╚══════════════════════════════════════════════╝
 
 USER=$(cat user.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 GROUP_NAME=$(cat group_name.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
@@ -549,9 +552,11 @@ NAME_EMAIL=$(cat name_email.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbk
 GROUP_NAME_DOCKER=$(cat group_name_docker.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 HOSTNAME=$(cat hostname.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 
-####################
 
-# Configure dpkg
+## ╔══════════════════════════════════════════════╗
+## ║                Configure dpkg                 ║
+## ╚══════════════════════════════════════════════╝
+
 if sudo dpkg --configure -a; then
     echo "dpkg configured successfully."
 else
@@ -559,7 +564,11 @@ else
     exit 1
 fi
 
-# Install python3-tqdm
+
+## ╔══════════════════════════════════════════════╗
+## ║            Install python3-tqdm               ║
+## ╚══════════════════════════════════════════════╝
+
 if sudo apt-get install -y python3-tqdm; then
     echo "python3-tqdm installed successfully."
 else
@@ -567,7 +576,11 @@ else
     exit 1
 fi
 
-# KVM virtualization support
+
+## ╔══════════════════════════════════════════════╗
+## ║         KVM virtualization support            ║
+## ╚══════════════════════════════════════════════╝
+
 if sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils; then
     sudo modprobe kvm
     sudo modprobe kvm_amd
@@ -578,7 +591,11 @@ else
     exit 1
 fi
 
-# Install Packages
+
+## ╔══════════════════════════════════════════════╗
+## ║               Install Packages                ║
+## ╚══════════════════════════════════════════════╝
+
 if sudo apt-get update -y; then
     sudo apt-get upgrade -y
     sudo add-apt-repository universe -y
@@ -593,9 +610,10 @@ else
     exit 1
 fi
 
-####################
 
-# SSL Certificate Certbot
+## ╔══════════════════════════════════════════════╗
+## ║           SSL Certificate Certbot             ║
+## ╚══════════════════════════════════════════════╝
 
 # # Check if certbot is installed
 # if command -v certbot &> /dev/null
@@ -631,7 +649,10 @@ fi
 #     exit 1
 # fi
 
-####################
+
+## ╔══════════════════════════════════════════════╗
+## ║                Install NGINX                  ║
+## ╚══════════════════════════════════════════════╝
 
 # Function to check if a command exists
 command_exists() {
@@ -723,9 +744,10 @@ sudo systemctl reload nginx
 
 echo "Nginx is now configured with a self-signed SSL certificate."
 
-####################
 
-# Clone GitHub Repository
+## ╔══════════════════════════════════════════════╗
+## ║           Clone GitHub Repository             ║
+## ╚══════════════════════════════════════════════╝
 
 # Create directories if they do not exist
 if [ ! -d "/home/app-source" ]; then
@@ -758,9 +780,10 @@ for repo in $REPO_URL_1 \
     fi
 done
 
-####################
 
-# Create Admin User
+## ╔══════════════════════════════════════════════╗
+## ║               Create Admin User               ║
+## ╚══════════════════════════════════════════════╝
 
 # Variables
 USER_HOME="/home"
@@ -790,9 +813,10 @@ else
     echo "User $USER already exists."
 fi
 
-####################
 
-# Remove Docker
+## ╔══════════════════════════════════════════════╗
+## ║                 Remove Docker                 ║
+## ╚══════════════════════════════════════════════╝
 
 # Remove conflicting Docker packages
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
@@ -839,9 +863,10 @@ else
     echo "containerd directory does not exist."
 fi
 
-####################
 
-# Set up Docker's apt Repository
+## ╔══════════════════════════════════════════════╗
+## ║        Set up Docker's apt Repository         ║
+## ╚══════════════════════════════════════════════╝
 
 if apt-get update && \
    apt-get install -y ca-certificates curl && \
@@ -856,9 +881,10 @@ else
     exit 1
 fi
 
-####################
 
-# Docker Engine
+## ╔══════════════════════════════════════════════╗
+## ║                Docker Engine                  ║
+## ╚══════════════════════════════════════════════╝
 
 # Command to install the Docker packages (latest)
 if sudo apt-get update && \
@@ -869,9 +895,10 @@ else
     exit 1
 fi
 
-####################
 
-# Gnome Extension
+## ╔══════════════════════════════════════════════╗
+## ║               Gnome Extension                 ║
+## ╚══════════════════════════════════════════════╝
 
 # Install necessary dependencies
 if sudo apt-get -y install meson && \
@@ -921,9 +948,10 @@ if [ "$XDG_SESSION_TYPE" = "x11" ]; then
     gnome-shell --replace &
 fi
 
-####################
 
-# Initialize pass
+## ╔══════════════════════════════════════════════╗
+## ║               Initialize pass                 ║
+## ╚══════════════════════════════════════════════╝
 
 # Check if gpg is installed, install if not
 if ! command -v gpg &> /dev/null; then
@@ -1005,9 +1033,10 @@ else
     fi
 fi
 
-####################
 
-# Docker Desktop
+## ╔══════════════════════════════════════════════╗
+## ║                Docker Desktop                 ║
+## ╚══════════════════════════════════════════════╝
 
 # Update package list and install docker prerequisites
 if sudo apt-get update -y && \
@@ -1061,9 +1090,10 @@ else
     exit 1
 fi
 
-####################
 
-# Docker Post Install
+## ╔══════════════════════════════════════════════╗
+## ║            Docker Post Install                ║
+## ╚══════════════════════════════════════════════╝
 
 # Check if group exists, if not, create it
 if ! getent group "$GROUP_NAME_DOCKER" > /dev/null 2>&1; then
@@ -1160,9 +1190,10 @@ else
     exit 1
 fi
 
-####################
 
-# Secure Server
+## ╔══════════════════════════════════════════════╗
+## ║                Secure Server                  ║
+## ╚══════════════════════════════════════════════╝
 
 # Set up your server so that you connect to it using an SSH key instead of a password
 
@@ -1230,7 +1261,10 @@ else
     exit 1
 fi
 
-####################
+
+## ╔══════════════════════════════════════════════╗
+## ║             Main control flow                 ║
+## ╚══════════════════════════════════════════════╝
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
