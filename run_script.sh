@@ -517,6 +517,16 @@ SSH_KEY_PATH=$(cat ssh_key_path.txt | openssl enc -aes-256-cbc -md sha512 -a -d 
 PUBLIC_SSH_KEY=$(cat public_ssh_key.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 IP_ADDRESS=$(cat ip_address.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 
+# Database
+# mysql
+MYSQL_DATABASE=$(cat mysql_database_name.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+MYSQL_USERNAME=$(cat mysql_database_username.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+MYSQL_PASSWORD=$(cat mysql_database_password.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+# postgres
+POSTGRES_DATABASE=$(cat postgres_database_name.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+POSTGRES_USERNAME=$(cat postgres_database_username.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+POSTGRES_PASSWORD=$(cat postgres_database_password.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
+
 # GitHub
 GITHUB_USERNAME=$(cat github_username.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 GITHUB_PAT=$(cat github_pat.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
@@ -1219,6 +1229,68 @@ else
     echo "Failed to enable PasswordAuthentication."
     exit 1
 fi
+
+####################
+
+# Monitoring Server
+
+# Enable strict mode for better error handling
+set -euo pipefail
+
+# Server details
+server_url="http://ime-agent.com"
+email_recipient="ramin.hashemi@usa.com"
+
+# Function to send email alerts
+send_alert() {
+  local message=$1
+  echo "$message" | mail -s "Server Down Alert" "$email_recipient"
+}
+
+# Check server status
+response=$(curl -s -o /dev/null -w "%{http_code}" "$server_url")
+
+if [ "$response" -ne 200 ]; then
+  send_alert "Server is down! HTTP status code: $response"
+else
+  echo "Server is up and running."
+fi
+
+####################
+
+# Backup Server
+
+# Enable strict mode for better error handling
+set -euo pipefail
+
+# Set the backup directory
+backup_dir="/path/to/backup"
+
+# Create the backup directory if it doesn't exist
+mkdir -p "$backup_dir"
+
+# List of files and directories to back up
+backup_items=("/home/user/documents" "/etc" "/var/log")
+
+# Timestamp for the backup file
+timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+backup_file="$backup_dir/backup_$timestamp.tar.gz"
+
+# Function to log messages
+log_message() {
+  local message=$1
+  echo "$(date +"%Y-%m-%d %H:%M:%S") - $message"
+}
+
+# Perform the backup
+log_message "Starting backup..."
+if tar -czf "$backup_file" "${backup_items[@]}"; then
+  log_message "Backup complete: $backup_file"
+else
+  log_message "Backup failed!"
+  exit 1
+fi
+
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script

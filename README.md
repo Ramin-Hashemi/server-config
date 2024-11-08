@@ -131,7 +131,41 @@ Test your script in a staging environment before deploying it to production.
 
 ## Helps
 
-A Bash scripting template incorporating best practices & several useful functions.
-<https://github.com/ralish/bash-script-template>
+- A Bash scripting template incorporating best practices & several useful functions.
+  <https://github.com/ralish/bash-script-template>
 
- Final server directory structure
+- Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL.
+  <https://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/>
+
+# Final server directory structure
+
+/home/nginx-server/
+├── bin                          <= Directory created by virtualenv
+│   ├── activate                 <= Environment activation script
+│   ├── django-admin.py
+│   ├── gunicorn
+│   ├── gunicorn_django
+│   ├── gunicorn_start           <= Script to start application with Gunicorn
+│   └── python
+├── ime-app-django               <= Django project directory, add this to PYTHONPATH
+│   ├── manage.py
+│   ├── project_application_1
+│   ├── project_application_2
+│   └── ime-app-settings                    <= Project settings directory
+│       ├── __init__.py
+│       ├── settings.py          <= ime-app.settings - settings module Gunicorn will use
+│       ├── urls.py
+│       └── wsgi.py              <= hello.wsgi - WSGI module Gunicorn will use
+├── include
+│   └── python3.12 -> /usr/include/python3.12
+├── lib
+│   └── python2.7
+├── lib64 -> /web-apps/ime-app/lib
+├── logs                         <= Application logs directory
+│   ├── gunicorn_supervisor.log
+│   ├── nginx-access.log
+│   └── nginx-error.log
+├── media                        <= User uploaded files folder
+├── run
+│   └── gunicorn.sock 
+└── static                       <= Collect and serve static files from here

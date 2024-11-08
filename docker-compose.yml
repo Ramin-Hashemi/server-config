@@ -18,8 +18,10 @@ services:
     networks:
       - backend_network  # Connect to the backend network
     environment:
-      TRAEFIK_DASHBOARD_PORT: 8080  # Environment variables
-      PHPMYADMIN_PORT: 9090
+      TRAEFIK_DASHBOARD_BACKEND_PORT: 8080  # Environment variables
+      TRAEFIK_DASHBOARD_FRONTEND_PORT: 3031
+      PHPMYADMIN_BACKEND_PORT: 9090
+      PHPMYADMIN_FRONTEND_PORT: 3030
       MYSQL_PORT: 9091
       POSTGRES_PORT: 9092
       BACKEND_API_PORT: 8001
@@ -186,17 +188,19 @@ services:
     networks:
       - frontend_network  # Connect to the frontend network
     environment:
-      TRAEFIK_DASHBOARD_PORT: 8080  # Environment variables
-      PHPMYADMIN_PORT: 9090
-      BACKEND_API_PORT: 8001
-      HOME_DOMAIN_PORT: 8002
-      DASHBOARD_PORT: 8003
-      BLOG_PORT: 8004
-      SOLUTIONS_PORT: 8005
-      IME_AGENT_PORT: 8008
-      WIKI_PORT: 8009
-      SAMPLE_PORT: 8010
-      IME_NFT_PORT: 8011
+      TRAEFIK_DASHBOARD_BACKEND_PORT: 8080  # Environment variables
+      TRAEFIK_DASHBOARD_FRONTEND_PORT: 3031
+      PHPMYADMIN_BACKEND_PORT: 9090
+      PHPMYADMIN_FRONTEND_PORT: 3030
+      BACKEND_API_PORT: 7001
+      HOME_DOMAIN_PORT: 7002
+      DASHBOARD_PORT: 7003
+      BLOG_PORT: 7004
+      SOLUTIONS_PORT: 7005
+      IME_AGENT_PORT: 7008
+      WIKI_PORT: 7009
+      SAMPLE_PORT: 7010
+      IME_NFT_PORT: 7011
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -266,7 +270,8 @@ services:
     environment:
         PMA_HOST: mysql  # Link to the MySQL service
         MYSQL_ROOT_PASSWORD: root_password  # MySQL root password
-        PHPMYADMIN_PORT: 9090  # Environment variables
+        PHPMYADMIN_BACKEND_PORT: 9090  # Environment variables
+        PHPMYADMIN_FRONTEND_PORT: 3030
     volumes:
       - ./phpmyadmin/sessions:/sessions  # Mount a directory for session storage
     networks:
@@ -354,7 +359,7 @@ services:
       MYSQL_DATABASE: mydatabase  # Create a default database
       MYSQL_USER: myuser  # Create a default user
       MYSQL_PASSWORD: mypassword  # Set the password for the default user
-      MYSQL_PORT: 9091  # Environment variables
+      MYSQL_BACKEND_PORT: 9091  # Environment variables
     volumes:
       - mysql_data:/var/lib/mysql  # Persist MySQL data
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialization scripts
@@ -442,7 +447,7 @@ services:
       POSTGRES_USER: postgres_user  # Set the PostgreSQL user
       POSTGRES_PASSWORD: postgres_password  # Set the PostgreSQL password
       POSTGRES_DB: postgres_db  # Create a default database
-      POSTGRES_PORT: 9092  # Environment variables
+      POSTGRES_BACKEND_PORT: 9092  # Environment variables
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialization scripts
@@ -533,7 +538,8 @@ services:
     container_name: backend-api  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - BACKEND_API_PORT=8001  # Environment variables
+      BACKEND_API_BACKEND_PORT: 8001  # Environment variables
+      BACKEND_API_FRONTEND_PORT: 7001
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -623,7 +629,8 @@ services:
     container_name: home-domain  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - HOME_DOMAIN_PORT=8002  # Environment variables
+      HOME_DOMAIN_BACKEND_PORT: 8002  # Environment variables
+      HOME_DOMAIN_FRONTEND_PORT: 7002
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -713,7 +720,8 @@ services:
     container_name: dashboard  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - DASHBOARD_PORT=8003  # Environment variables
+      DASHBOARD_BACKEND_PORT: 8003  # Environment variables
+      DASHBOARD_FRONTEND_PORT: 7003
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -803,7 +811,8 @@ services:
     container_name: blog  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - BLOG_PORT=8004  # Environment variables
+      BLOG_BACKEND_PORT: 8004  # Environment variables
+      BLOG_FRONTEND_PORT: 7004
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -893,7 +902,8 @@ services:
     container_name: solutions  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - SOLUTIONS_PORT=8005  # Environment variables
+      SOLUTIONS_BACKEND_PORT: 8005  # Environment variables
+      SOLUTIONS_FRONTEND_PORT: 7005
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -993,8 +1003,9 @@ services:
     container_name: ime-agent  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - MODEL_PATH=/home/app-source/ime-agent/models/ime_model  # Environment variables
-      - IME_AGENT_PORT=8008
+      MODEL_PATH: "/home/app-source/ime-agent/models/ime_model"  # Environment variables
+      IME_AGENT_BACKEND_PORT: 8008
+      IME_AGENT_FRONTEND_PORT: 7008
     volumes:
       - ime_model_data:/home/app-source/ime-agent/models  # Mount host directories or files
     networks:
@@ -1084,7 +1095,8 @@ services:
     container_name: wiki  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - WIKI_PORT=8009  # Environment variables
+      WIKI_BACKEND_PORT: 8009  # Environment variables
+      WIKI_FRONTEND_PORT: 7009
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -1179,7 +1191,8 @@ services:
     container_name: ime-nft  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
-      - IME_NFT_PORT=8011  # Environment variables
+      IME_NFT_BACKEND_PORT: 8011  # Environment variables
+      IME_NFT_FRONTEND_PORT: 8011
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:

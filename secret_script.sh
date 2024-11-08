@@ -8,6 +8,16 @@ echo "/.ssh" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt
 echo "********" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > public_ssh_key.txt
 echo "185.213.165.171" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > ip_address.txt
 
+# Database
+# mysql
+echo "ime_app_mysql_db" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > mysql_database_name.txt
+echo "ime-app-db-admin" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > mysql_database_username.txt
+echo "123456789" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > mysql_database_password.txt
+# postgres
+echo "ime_app_postgre_db" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > postgres_database_name.txt
+echo "ime-app-db-admin" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > postgres_database_username.txt
+echo "123456789" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > postgres_database_password.txt
+
 # GitHub
 echo "Ramin-Hashemi" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > github_username.txt
 echo "ghp_********" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > github_pat.txt
