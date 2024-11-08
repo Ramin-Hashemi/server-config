@@ -20,7 +20,7 @@ services:
       - ./mysql/ime_app_init.sql:/docker-entrypoint-initdb.d/ime_app_init.sql  # Initialization scripts
       - ./mysql/ime_app_mysql.cnf:/etc/mysql/ime_app_mysql.cnf  # Custom MySQL configuration
     networks:
-      - backend_network  # Connect to the main network
+      - backend_network  # Connect to the backend network
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
     logging:
       driver: "json-file"  # Logging driver
@@ -279,10 +279,7 @@ services:
     build:
       context: /home/app-source/backend-api  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: backend-api  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       BACKEND_API_BACKEND_PORT: ${BACKEND_API_BACKEND_PORT}
       BACKEND_API_FRONTEND_PORT: ${BACKEND_API_BACKEND_PORT}
@@ -371,10 +368,7 @@ services:
     build:
       context: /home/app-source/home-domain  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: home-domain  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       HOME_DOMAIN_BACKEND_PORT: ${HOME_DOMAIN_BACKEND_PORT}
       HOME_DOMAIN_FRONTEND_PORT: ${HOME_DOMAIN_FRONTEND_PORT}
@@ -462,10 +456,7 @@ services:
     build:
       context: /home/app-source/dashboard  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: dashboard  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       DASHBOARD_BACKEND_PORT: ${DASHBOARD_BACKEND_PORT}
       DASHBOARD_FRONTEND_PORT: ${DASHBOARD_FRONTEND_PORT}
@@ -555,10 +546,7 @@ services:
     build:
       context: /home/app-source/blog  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: blog  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       BLOG_BACKEND_PORT: ${BLOG_BACKEND_PORT}
       BLOG_FRONTEND_PORT: ${BLOG_FRONTEND_PORT}
@@ -648,10 +636,7 @@ services:
     build:
       context: /home/app-source/solutions  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: solutions  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       SOLUTIONS_BACKEND_PORT: ${SOLUTIONS_BACKEND_PORT}
       SOLUTIONS_FRONTEND_PORT: ${SOLUTIONS_FRONTEND_PORT}
@@ -753,10 +738,7 @@ services:
     build:
       context: /home/app-source/ime-agent  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: ime-agent  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       MODEL_PATH: "/home/app-source/ime-agent/models/ime_model"  # Environment variables
       IME_AGENT_BACKEND_PORT: ${IME_AGENT_BACKEND_PORT}
@@ -847,10 +829,7 @@ services:
     build:
       context: /home/app-source/wiki  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: wiki  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       WIKI_BACKEND_PORT: ${WIKI_BACKEND_PORT}
       WIKI_FRONTEND_PORT: ${WIKI_FRONTEND_PORT}
@@ -946,10 +925,7 @@ services:
     build:
       context: /home/app-source/ime-nft  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
     container_name: ime-nft  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
     environment:
       IME_NFT_BACKEND_PORT: ${IME_NFT_BACKEND_PORT}
       IME_NFT_FRONTEND_PORT: ${IME_NFT_FRONTEND_PORT}
@@ -1154,7 +1130,6 @@ services:
       args:
         - BUILD_ENV=production  # Build arguments
     container_name: fastapi-gunicorn-uvicorn  # Name the container
-    command: gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app  # Start Gunicorn with Uvicorn workers
     environment:
       BACKEND_API_AI_PORT: ${BACKEND_API_AI_PORT}
       IME_AGENT_AI_PORT: ${IME_AGENT_AI_PORT}
