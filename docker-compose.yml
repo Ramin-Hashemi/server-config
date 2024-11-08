@@ -14,7 +14,9 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}  # Create a default database
       MYSQL_USERNAME: ${MYSQL_USERNAME}  # Create a default user
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Set the password for the default user
-      MYSQL_BACKEND_PORT: ${MYSQL_BACKEND_PORT}  # Environment variables
+      MYSQL_BACKEND_PORT: ${MYSQL_BACKEND_PORT}
+      PHPMYADMIN_BACKEND_PORT: ${PHPMYADMIN_BACKEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
     volumes:
       - mysql_data:/var/lib/mysql  # Persist MySQL data
       - ./mysql/ime_app_init.sql:/docker-entrypoint-initdb.d/ime_app_init.sql  # Initialization scripts
@@ -33,6 +35,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.mysql.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.mysql.priority: "10"  # Set the priority of the router
@@ -40,7 +43,7 @@ services:
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
       traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
       traefik.http.services.mysql.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
-      traefik.http.services.mysql.loadbalancer.server.port: "9091"  # Define the port for the load balancer
+      traefik.http.services.mysql.loadbalancer.server.port: ${MYSQL_BACKEND_PORT}  # Define the port for the load balancer
       traefik.http.services.mysql.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
       traefik.http.routers.mysql.tls: "true"  # Enable TLS for the router
       traefik.http.routers.mysql.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
@@ -99,10 +102,13 @@ services:
     image: phpmyadmin/phpmyadmin:latest  # Use the latest phpMyAdmin image
     container_name: phpmyadmin  # Name the container
     environment:
-        PMA_HOST: mysql  # Link to the MySQL service
-        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # MySQL root password
-        PHPMYADMIN_BACKEND_PORT: ${PHPMYADMIN_BACKEND_PORT}  # Environment variables
-        PHPMYADMIN_FRONTEND_PORT: ${PHPMYADMIN_FRONTEND_PORT}
+      PMA_HOST: mysql  # Link to the MySQL service
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PHPMYADMIN_BACKEND_PORT: ${PHPMYADMIN_BACKEND_PORT}
+      PHPMYADMIN_FRONTEND_PORT: ${PHPMYADMIN_FRONTEND_PORT}
+      MYSQL_BACKEND_PORT: ${MYSQL_BACKEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - ./phpmyadmin/sessions:/sessions  # Mount a directory for session storage
     networks:
@@ -122,8 +128,9 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
-      traefik.http.routers.phpmyadmin.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.phpmyadmin.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
       traefik.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
@@ -134,6 +141,19 @@ services:
       traefik.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
       traefik.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${PHPMYADMIN_BACKEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -191,8 +211,8 @@ services:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE}  # Create a default database
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}  # Set the PostgreSQL user
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Set the PostgreSQL password
-      POSTGRES_BACKEND_PORT: ${POSTGRES_BACKEND_PORT}  # Environment variables
-      POSTGRES_AI_PORT: ${POSTGRES_AI_PORT}
+      POSTGRES_BACKEND_PORT: ${POSTGRES_BACKEND_PORT}
+      IME_AGENT_BACKEND_PORT: ${IME_AGENT_BACKEND_PORT}
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialization scripts
@@ -212,6 +232,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.postgres.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.postgres.priority: "10"  # Set the priority of the router
@@ -283,6 +304,10 @@ services:
     environment:
       BACKEND_API_BACKEND_PORT: ${BACKEND_API_BACKEND_PORT}
       BACKEND_API_FRONTEND_PORT: ${BACKEND_API_BACKEND_PORT}
+      BACKEND_API_AI_PORT: ${BACKEND_API_AI_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
+      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -301,6 +326,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.backend-api.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.backend-api.priority: "10"  # Set the priority of the router
@@ -313,6 +339,19 @@ services:
       traefik.http.routers.backend-api.tls: "true"  # Enable TLS for the router
       traefik.http.routers.backend-api.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${BACKEND_API_BACKEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -372,6 +411,8 @@ services:
     environment:
       HOME_DOMAIN_BACKEND_PORT: ${HOME_DOMAIN_BACKEND_PORT}
       HOME_DOMAIN_FRONTEND_PORT: ${HOME_DOMAIN_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -389,6 +430,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.home-domain.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.home-domain.priority: "10"  # Set the priority of the router
@@ -401,6 +443,19 @@ services:
       traefik.http.routers.home-domain.tls: "true"  # Enable TLS for the router
       traefik.http.routers.home-domain.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${HOME_DOMAIN_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -460,6 +515,8 @@ services:
     environment:
       DASHBOARD_BACKEND_PORT: ${DASHBOARD_BACKEND_PORT}
       DASHBOARD_FRONTEND_PORT: ${DASHBOARD_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -479,6 +536,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.dashboard.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.dashboard.priority: "10"  # Set the priority of the router
@@ -491,6 +549,19 @@ services:
       traefik.http.routers.dashboard.tls: "true"  # Enable TLS for the router
       traefik.http.routers.dashboard.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${DASHBOARD_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -550,6 +621,8 @@ services:
     environment:
       BLOG_BACKEND_PORT: ${BLOG_BACKEND_PORT}
       BLOG_FRONTEND_PORT: ${BLOG_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -569,6 +642,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.blog.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.blog.priority: "10"  # Set the priority of the router
@@ -581,6 +655,19 @@ services:
       traefik.http.routers.blog.tls: "true"  # Enable TLS for the router
       traefik.http.routers.blog.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${BLOG_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -640,6 +727,8 @@ services:
     environment:
       SOLUTIONS_BACKEND_PORT: ${SOLUTIONS_BACKEND_PORT}
       SOLUTIONS_FRONTEND_PORT: ${SOLUTIONS_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -659,6 +748,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.solutions.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.solutions.priority: "10"  # Set the priority of the router
@@ -671,6 +761,19 @@ services:
       traefik.http.routers.solutions.tls: "true"  # Enable TLS for the router
       traefik.http.routers.solutions.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${SOLUTIONS_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -742,8 +845,10 @@ services:
     environment:
       MODEL_PATH: "/home/app-source/ime-agent/models/ime_model"  # Environment variables
       IME_AGENT_BACKEND_PORT: ${IME_AGENT_BACKEND_PORT}
-      IME_AGENT_FRONTEND_PORT: ${IME_AGENT_FRONTEND_PORT}
       IME_AGENT_AI_PORT: ${IME_AGENT_AI_PORT}
+      POSTGRES_BACKEND_PORT: ${POSTGRES_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_AI_PORT: ${NGINX_REVERSE_PROXY_AI_PORT}
+      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
     volumes:
       - ime_model_data:/home/app-source/ime-agent/models  # Mount host directories or files
     networks:
@@ -762,6 +867,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.ime-agent.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.ime-agent.priority: "10"  # Set the priority of the router
@@ -774,6 +880,19 @@ services:
       traefik.http.routers.ime-agent.tls: "true"  # Enable TLS for the router
       traefik.http.routers.ime-agent.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${IME_AGENT_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -833,6 +952,8 @@ services:
     environment:
       WIKI_BACKEND_PORT: ${WIKI_BACKEND_PORT}
       WIKI_FRONTEND_PORT: ${WIKI_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -852,6 +973,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.wiki.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.wiki.priority: "10"  # Set the priority of the router
@@ -864,6 +986,19 @@ services:
       traefik.http.routers.wiki.tls: "true"  # Enable TLS for the router
       traefik.http.routers.wiki.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${WIKI_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -929,6 +1064,8 @@ services:
     environment:
       IME_NFT_BACKEND_PORT: ${IME_NFT_BACKEND_PORT}
       IME_NFT_FRONTEND_PORT: ${IME_NFT_FRONTEND_PORT}
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
@@ -948,6 +1085,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
+      # Traefik Labels (Internal Network)
       traefik.enable: "true"  # Enable Traefik for this service
       traefik.http.routers.ime-nft.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
       traefik.http.routers.ime-nft.priority: "10"  # Set the priority of the router
@@ -960,6 +1098,19 @@ services:
       traefik.http.routers.ime-nft.tls: "true"  # Enable TLS for the router
       traefik.http.routers.ime-nft.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
       traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+      # Nginx Labels (Externally Exposed Network)
+      nginx.enable: "true"  # Enable Nginx for this service
+      nginx.http.routers.phpmyadmin.entrypoints: "websecure"  # Define the entry points (e.g., websecure)
+      nginx.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      nginx.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      nginx.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      nginx.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      nginx.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      nginx.http.services.phpmyadmin.loadbalancer.server.port: ${IME_NFT_FRONTEND_PORT}  # Define the port for the load balancer
+      nginx.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      nginx.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      nginx.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      nginx.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -1024,19 +1175,17 @@ services:
     networks:
       - backend_network  # Connect to the backend network
     environment:
+      TRAEFIK_BACKEND_PORT: ${TRAEFIK_BACKEND_PORT}
+      TRAEFIK_DASHBOARD_FRONTEND_PORT: ${TRAEFIK_DASHBOARD_FRONTEND_PORT}
       MYSQL_BACKEND_PORT: ${MYSQL_BACKEND_PORT}
       PHPMYADMIN_BACKEND_PORT: ${PHPMYADMIN_BACKEND_PORT}
-      POSTGRES_BACKEND_PORT: ${POSTGRES_BACKEND_PORT}
       BACKEND_API_BACKEND_PORT: ${BACKEND_API_BACKEND_PORT}
       HOME_DOMAIN_BACKEND_PORT: ${HOME_DOMAIN_BACKEND_PORT}
       DASHBOARD_BACKEND_PORT: ${DASHBOARD_BACKEND_PORT}
       BLOG_BACKEND_PORT: ${BLOG_BACKEND_PORT}
       SOLUTIONS_BACKEND_PORT: ${SOLUTIONS_BACKEND_PORT}
-      IME_AGENT_BACKEND_PORT: ${IME_AGENT_BACKEND_PORT}
       WIKI_BACKEND_PORT: ${WIKI_BACKEND_PORT}
       IME_NFT_BACKEND_PORT: ${IME_NFT_BACKEND_PORT}
-      TRAEFIK_DASHBOARD_BACKEND_PORT: ${TRAEFIK_DASHBOARD_BACKEND_PORT}
-      TRAEFIK_DASHBOARD_FRONTEND_PORT: ${TRAEFIK_DASHBOARD_FRONTEND_PORT}
     depends_on:
       mysql:  # Ensure this service starts after some_other_service
         condition: service_healthy
@@ -1131,9 +1280,10 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: fastapi-gunicorn-uvicorn  # Name the container
     environment:
+      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
+      NGINX_REVERSE_PROXY_AI_PORT: ${NGINX_REVERSE_PROXY_AI_PORT}
       BACKEND_API_AI_PORT: ${BACKEND_API_AI_PORT}
       IME_AGENT_AI_PORT: ${IME_AGENT_AI_PORT}
-      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
       MODULE_NAME: app.main
       VARIABLE_NAME: app
       WORKERS_PER_CORE: 1
@@ -1226,18 +1376,19 @@ services:
       - frontend_network  # Connect to the frontend network
       - ai_network  # Connect to the ai network
     environment:
+      NGINX_REVERSE_PROXY_AI_PORT: ${NGINX_REVERSE_PROXY_AI_PORT}
+      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
+      IME_AGENT_AI_PORT: ${IME_AGENT_AI_PORT}
+      NGINX_REVERSE_PROXY_FRONTEND_PORT: ${NGINX_REVERSE_PROXY_FRONTEND_PORT}
       PHPMYADMIN_FRONTEND_PORT: ${PHPMYADMIN_FRONTEND_PORT}
       BACKEND_API_FRONTEND_PORT: ${BACKEND_API_FRONTEND_PORT}
       HOME_DOMAIN_FRONTEND_PORT: ${HOME_DOMAIN_FRONTEND_PORT}
       DASHBOARD_FRONTEND_PORT: ${DASHBOARD_FRONTEND_PORT}
       BLOG_FRONTEND_PORT: ${BLOG_FRONTEND_PORT}
       SOLUTIONS_FRONTEND_PORT: ${SOLUTIONS_FRONTEND_PORT}
-      IME_AGENT_FRONTEND_PORT: ${IME_AGENT_FRONTEND_PORT}
-      IME_AGENT_AI_PORT: ${IME_AGENT_AI_PORT}
       WIKI_FRONTEND_PORT: ${WIKI_FRONTEND_PORT}
       IME_NFT_FRONTEND_PORT: ${IME_NFT_FRONTEND_PORT}
       TRAEFIK_DASHBOARD_FRONTEND_PORT: ${TRAEFIK_DASHBOARD_FRONTEND_PORT}
-      FASTAPI_GUNICORN_UVICORN_AI_PORT: ${FASTAPI_GUNICORN_UVICORN_AI_PORT}
     depends_on:
       backend-api:
         condition: service_healthy
