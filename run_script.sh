@@ -17,10 +17,10 @@
 # ╚═╝      ╚═╝  ╚═╝  ╚═════╝   ╚════╝  ╚══════╝ ╚═════╝    ╚═╝
 # ───────────────────────────────────────────────────────────────Thanks to CoPilot
 
-# A best practices Bash script template with many useful functions.
-# This file configure ther server from scratch to be fully prepared for iME projects.
-# After the requirements and configurations set, this file willrun all iME projects automatically.
-# This script is meant to be entirely self-contained then this should be what we want!
+# A best practices Bash script with many useful functions.
+# This file configure the server from scratch to be fully prepared for iME projects.
+# After the requirements and configurations set, this file will run all iME projects automatically.
+# This script is meant to be entirely self-contained!
 
 # Enable xtrace if the DEBUG environment variable is set
 if [[ ${DEBUG-} =~ ^1|yes|true$ ]]; then
@@ -509,7 +509,8 @@ run_containers() {
     # Add more container management steps
 }
 
-# Decrypt the secret
+# Decrypt the secrets
+
 USER=$(cat user.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 GROUP_NAME=$(cat group_name.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)
 SSH_KEY_PATH=$(cat ssh_key_path.txt | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:encryption_key)

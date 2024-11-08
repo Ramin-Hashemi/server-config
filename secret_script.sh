@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Encrypt the Secret
+# Encrypt the Secrets
 
 echo "ime-server-admin" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > user.txt
 echo "ime-app-group" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:encryption_key > group_name.txt

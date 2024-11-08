@@ -2,21 +2,35 @@ version: '3.8'  # Specify the Docker Compose version
 
 services:
 ## ╔═══════════════════════╗
-## ║ Main Apache web server ║
+## ║     Traefik server     ║
 ## ╚═══════════════════════╝
-  apache:
-    image: httpd:latest  # Use the latest Apache HTTP server image
-    container_name: apache_server  # Name the container
-    ports:
-      - "80:80"  # Map port 80 on the host to port 80 in the container (HTTP)
-      - "443:443"  # Map port 443 on the host to port 443 in the container (HTTPS)
+  traefik:
+    image: traefik:latest  # Use the latest Traefik image
+    container_name: traefik_server  # Name the container
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     volumes:
-      - ./apache/www:/usr/local/apache2/htdocs/  # Mount the web content directory
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for Traefik to communicate with Docker
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml  # Mount Traefik configuration file
     networks:
-      - main_network  # Connect to the main network
+      - backend_network  # Connect to the backend network
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      TRAEFIK_DASHBOARD_PORT: 8080  # Environment variables
+      PHPMYADMIN_PORT: 9090
+      MYSQL_PORT: 9091
+      POSTGRES_PORT: 9092
+      BACKEND_API_PORT: 8001
+      HOME_DOMAIN_PORT: 8002
+      DASHBOARD_PORT: 8003
+      BLOG_PORT: 8004
+      SOLUTIONS_PORT: 8005
+      IME_AGENT_PORT: 8008
+      WIKI_PORT: 8009
+      SAMPLE_PORT: 8010
+      IME_NFT_PORT: 8011
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -31,7 +45,7 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "Apache HTTP Server"  # Custom metadata labels
+      com.example.description: "Traefik Reverse Proxy"  # Custom metadata labels
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -73,9 +87,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔══════════════════════════════════════════════╗
 ## ║ Main FastAPI server with Gunicorn and Uvicorn ║
@@ -153,9 +167,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║ Nginx as reverse proxy ║
@@ -171,10 +185,18 @@ services:
       - ./nginx/certs:/etc/nginx/certs  # SSL certificates
     networks:
       - frontend_network  # Connect to the frontend network
-      - backend_network  # Connect to the backend network
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      TRAEFIK_DASHBOARD_PORT: 8080  # Environment variables
+      PHPMYADMIN_PORT: 9090
+      BACKEND_API_PORT: 8001
+      HOME_DOMAIN_PORT: 8002
+      DASHBOARD_PORT: 8003
+      BLOG_PORT: 8004
+      SOLUTIONS_PORT: 8005
+      IME_AGENT_PORT: 8008
+      WIKI_PORT: 8009
+      SAMPLE_PORT: 8010
+      IME_NFT_PORT: 8011
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -231,9 +253,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔════════════════════════════════╗
 ## ║ PHPMyAdmin for MySQL management ║
@@ -241,15 +263,15 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest  # Use the latest phpMyAdmin image
     container_name: phpmyadmin  # Name the container
-    ports:
-      - "3000:3000"  # Map port 3000 on the host to port 3000 in the container
     environment:
-      PMA_HOST: mysql  # Link to the MySQL service
-      MYSQL_ROOT_PASSWORD: root_password  # MySQL root password
+        PMA_HOST: mysql  # Link to the MySQL service
+        MYSQL_ROOT_PASSWORD: root_password  # MySQL root password
+        PHPMYADMIN_PORT: 9090  # Environment variables
     volumes:
       - ./phpmyadmin/sessions:/sessions  # Mount a directory for session storage
     networks:
-      - main_network  # Connect to the main network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - mysql  # Ensure this service starts after the MySQL service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -259,12 +281,23 @@ services:
         max-size: "10m"  # Maximum log file size
         max-file: "3"  # Maximum number of log files
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]  # Command to check service health
+      test: ["CMD", "curl", "-f", "http://localhost:9090"]  # Command to check service health
       interval: 1m  # Time between checks
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "phpMyAdmin Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.phpmyadmin.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.phpmyadmin.priority: "10"  # Set the priority of the router
+      traefik.http.routers.phpmyadmin.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.phpmyadmin.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.phpmyadmin.loadbalancer.server.port: "9090"  # Define the port for the load balancer
+      traefik.http.services.phpmyadmin.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.phpmyadmin.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.phpmyadmin.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -306,9 +339,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║     MySQL database     ║
@@ -321,14 +354,13 @@ services:
       MYSQL_DATABASE: mydatabase  # Create a default database
       MYSQL_USER: myuser  # Create a default user
       MYSQL_PASSWORD: mypassword  # Set the password for the default user
-    ports:
-      - "3306:3306"  # Map port 3306 on the host to port 3306 in the container
+      MYSQL_PORT: 9091  # Environment variables
     volumes:
       - mysql_data:/var/lib/mysql  # Persist MySQL data
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialization scripts
       - ./mysql/my.cnf:/etc/mysql/my.cnf  # Custom MySQL configuration
     networks:
-      - main_network  # Connect to the main network
+      - backend_network  # Connect to the main network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -343,7 +375,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "MySQL Database Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.mysql.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.mysql.priority: "10"  # Set the priority of the router
+      traefik.http.routers.mysql.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.mysql.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.mysql.loadbalancer.server.port: "9091"  # Define the port for the load balancer
+      traefik.http.services.mysql.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.mysql.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.mysql.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -385,9 +428,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║  PostgreSQL database   ║
@@ -399,14 +442,13 @@ services:
       POSTGRES_USER: postgres_user  # Set the PostgreSQL user
       POSTGRES_PASSWORD: postgres_password  # Set the PostgreSQL password
       POSTGRES_DB: postgres_db  # Create a default database
-    ports:
-      - "5432:5432"  # Map port 5432 on the host to port 5432 in the container
+      POSTGRES_PORT: 9092  # Environment variables
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialization scripts
       - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf  # Custom PostgreSQL configuration
     networks:
-      - main_network  # Connect to the main network
+      - backend_network  # Connect to the main network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -421,7 +463,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "PostgreSQL Database Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.postgres.entrypoints: "web"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.postgres.priority: "10"  # Set the priority of the router
+      traefik.http.routers.postgres.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.postgres.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.postgres.loadbalancer.server.port: "9092"  # Define the port for the load balancer
+      traefik.http.services.postgres.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.postgres.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.postgres.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -463,9 +516,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║       Project 1        ║
@@ -479,15 +532,13 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: backend-api  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8001:8001"  # Map port 8001 on the host to port 8001 in the container
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      - BACKEND_API_PORT=8001  # Environment variables
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -502,7 +553,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "Backend API Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.backend-api.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.backend-api.priority: "10"  # Set the priority of the router
+      traefik.http.routers.backend-api.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.backend-api.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.backend-api.loadbalancer.server.port: "8001"  # Define the port for the load balancer
+      traefik.http.services.backend-api.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.backend-api.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.backend-api.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -544,9 +606,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║       Project 2        ║
@@ -560,15 +622,13 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: home-domain  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8002:8002"  # Map port 8002 on the host to port 8002 in the container
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      - HOME_DOMAIN_PORT=8002  # Environment variables
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -583,7 +643,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "Home Domain Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.home-domain.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.home-domain.priority: "10"  # Set the priority of the router
+      traefik.http.routers.home-domain.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.home-domain.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.home-domain.loadbalancer.server.port: "8002"  # Define the port for the load balancer
+      traefik.http.services.home-domain.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.home-domain.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.home-domain.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -625,355 +696,29 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║       Project 3        ║
 ## ║  dashboard Container   ║
 ## ╚═══════════════════════╝
   dashboard:
-      build:
-        context: /home/app-source/dashboard  # Build context
-        dockerfile: Dockerfile  # Specify an alternate Dockerfile
-        args:
-          - BUILD_ENV=production  # Build arguments
-      container_name: dashboard  # Name the container
-      command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-      ports:
-        - "8003:8003"  # Map port 8003 on the host to port 8003 in the container
-      environment:
-        - ENV_VAR1=value1  # Environment variables
-        - ENV_VAR2=value2
-      volumes:
-        - /host/path:/container/path  # Mount host directories or files
-      networks:
-        - project_network  # Connect to the project network
-      depends_on:
-        - some_other_service  # Ensure this service starts after some_other_service
-      restart: always  # Restart policy (no, on-failure, always, unless-stopped)
-      logging:
-        driver: "json-file"  # Logging driver
-        options:
-          max-size: "10m"  # Maximum log file size
-          max-file: "3"  # Maximum number of log files
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8003"]  # Command to check service health
-        interval: 1m  # Time between checks
-        timeout: 10s  # Time before considering the check failed
-        retries: 3  # Number of retries before marking the service as unhealthy
-      labels:
-        com.example.description: "Dashboard Service"  # Custom metadata labels
-      deploy:
-        replicas: 2  # Number of container instances
-        resources:
-          limits:
-            cpus: '0.5'  # CPU limit
-            memory: 512M  # Memory limit
-          reservations:
-            cpus: '0.25'  # CPU reservation
-            memory: 256M  # Memory reservation
-        restart_policy:
-          condition: on-failure  # Restart policy condition
-          delay: 5s  # Delay before restarting
-          max_attempts: 3  # Maximum number of restart attempts
-          window: 120s  # Time window for restart attempts
-        placement:
-          constraints:
-            - node.role == manager  # Placement constraints
-        update_config:
-          parallelism: 2  # Number of containers to update at a time
-          delay: 10s  # Delay between updates
-          order: start-first  # Update order
-        rollback_config:
-          parallelism: 2  # Number of containers to rollback at a time
-          delay: 10s  # Delay between rollbacks
-      extra_hosts:
-        - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
-      dns:
-        - 8.8.8.8  # Custom DNS servers
-        - 8.8.4.4
-      dns_search:
-        - example.com  # Custom DNS search domains
-      ulimits:
-        nproc: 65535  # Set ulimits for the container
-        nofile:
-          soft: 20000
-          hard: 40000
-      cap_add:
-        - NET_ADMIN  # Add Linux capabilities
-      cap_drop:
-        - MKNOD  # Drop Linux capabilities
-      secrets:
-        - my_secret  # Use Docker secrets
-      configs:
-        - my_config  # Use Docker configs
-
-## ╔═══════════════════════╗
-## ║       Project 4        ║
-## ║     blog Container     ║
-## ╚═══════════════════════╝
-  blog:
-      build:
-        context: /home/app-source/blog  # Build context
-        dockerfile: Dockerfile  # Specify an alternate Dockerfile
-        args:
-          - BUILD_ENV=production  # Build arguments
-      container_name: blog  # Name the container
-      command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-      ports:
-        - "8004:8004"  # Map port 8004 on the host to port 8004 in the container
-      environment:
-        - ENV_VAR1=value1  # Environment variables
-        - ENV_VAR2=value2
-      volumes:
-        - /host/path:/container/path  # Mount host directories or files
-      networks:
-        - project_network  # Connect to the project network
-      depends_on:
-        - some_other_service  # Ensure this service starts after some_other_service
-      restart: always  # Restart policy (no, on-failure, always, unless-stopped)
-      logging:
-        driver: "json-file"  # Logging driver
-        options:
-          max-size: "10m"  # Maximum log file size
-          max-file: "3"  # Maximum number of log files
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8004"]  # Command to check service health
-        interval: 1m  # Time between checks
-        timeout: 10s  # Time before considering the check failed
-        retries: 3  # Number of retries before marking the service as unhealthy
-      labels:
-        com.example.description: "Blog Service"  # Custom metadata labels
-      deploy:
-        replicas: 2  # Number of container instances
-        resources:
-          limits:
-            cpus: '0.5'  # CPU limit
-            memory: 512M  # Memory limit
-          reservations:
-            cpus: '0.25'  # CPU reservation
-            memory: 256M  # Memory reservation
-        restart_policy:
-          condition: on-failure  # Restart policy condition
-          delay: 5s  # Delay before restarting
-          max_attempts: 3  # Maximum number of restart attempts
-          window: 120s  # Time window for restart attempts
-        placement:
-          constraints:
-            - node.role == manager  # Placement constraints
-        update_config:
-          parallelism: 2  # Number of containers to update at a time
-          delay: 10s  # Delay between updates
-          order: start-first  # Update order
-        rollback_config:
-          parallelism: 2  # Number of containers to rollback at a time
-          delay: 10s  # Delay between rollbacks
-      extra_hosts:
-        - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
-      dns:
-        - 8.8.8.8  # Custom DNS servers
-        - 8.8.4.4
-      dns_search:
-        - example.com  # Custom DNS search domains
-      ulimits:
-        nproc: 65535  # Set ulimits for the container
-        nofile:
-          soft: 20000
-          hard: 40000
-      cap_add:
-        - NET_ADMIN  # Add Linux capabilities
-      cap_drop:
-        - MKNOD  # Drop Linux capabilities
-      secrets:
-        - my_secret  # Use Docker secrets
-      configs:
-        - my_config  # Use Docker configs
-
-## ╔═══════════════════════╗
-## ║       Project 5        ║
-## ║   solutions Container  ║
-## ╚═══════════════════════╝
-  solutions:
-      build:
-        context: /home/app-source/solutions  # Build context
-        dockerfile: Dockerfile  # Specify an alternate Dockerfile
-        args:
-          - BUILD_ENV=production  # Build arguments
-      container_name: solutions  # Name the container
-      command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-      ports:
-        - "8005:8005"  # Map port 8005 on the host to port 8005 in the container
-      environment:
-        - ENV_VAR1=value1  # Environment variables
-        - ENV_VAR2=value2
-      volumes:
-        - /host/path:/container/path  # Mount host directories or files
-      networks:
-        - project_network  # Connect to the project network
-      depends_on:
-        - some_other_service  # Ensure this service starts after some_other_service
-      restart: always  # Restart policy (no, on-failure, always, unless-stopped)
-      logging:
-        driver: "json-file"  # Logging driver
-        options:
-          max-size: "10m"  # Maximum log file size
-          max-file: "3"  # Maximum number of log files
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8005"]  # Command to check service health
-        interval: 1m  # Time between checks
-        timeout: 10s  # Time before considering the check failed
-        retries: 3  # Number of retries before marking the service as unhealthy
-      labels:
-        com.example.description: "Solutions Service"  # Custom metadata labels
-      deploy:
-        replicas: 2  # Number of container instances
-        resources:
-          limits:
-            cpus: '0.5'  # CPU limit
-            memory: 512M  # Memory limit
-          reservations:
-            cpus: '0.25'  # CPU reservation
-            memory: 256M  # Memory reservation
-        restart_policy:
-          condition: on-failure  # Restart policy condition
-          delay: 5s  # Delay before restarting
-          max_attempts: 3  # Maximum number of restart attempts
-          window: 120s  # Time window for restart attempts
-        placement:
-          constraints:
-            - node.role == manager  # Placement constraints
-        update_config:
-          parallelism: 2  # Number of containers to update at a time
-          delay: 10s  # Delay between updates
-          order: start-first  # Update order
-        rollback_config:
-          parallelism: 2  # Number of containers to rollback at a time
-          delay: 10s  # Delay between rollbacks
-      extra_hosts:
-        - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
-      dns:
-        - 8.8.8.8  # Custom DNS servers
-        - 8.8.4.4
-      dns_search:
-        - example.com  # Custom DNS search domains
-      ulimits:
-        nproc: 65535  # Set ulimits for the container
-        nofile:
-          soft: 20000
-          hard: 40000
-      cap_add:
-        - NET_ADMIN  # Add Linux capabilities
-      cap_drop:
-        - MKNOD  # Drop Linux capabilities
-      secrets:
-        - my_secret  # Use Docker secrets
-      configs:
-        - my_config  # Use Docker configs
-
-## ╔═══════════════════════╗
-## ║       Project 6        ║
-## ║     ??? Container      ║
-## ╚═══════════════════════╝
-  project6:
-      build:
-        context: /home/app-source/project6  # Build context
-        dockerfile: Dockerfile  # Specify an alternate Dockerfile
-        args:
-          - BUILD_ENV=production  # Build arguments
-      container_name: project6  # Name the container
-      command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-      ports:
-        - "8006:8006"  # Map port 8006 on the host to port 8006 in the container
-      environment:
-        - ENV_VAR1=value1  # Environment variables
-        - ENV_VAR2=value2
-      volumes:
-        - /host/path:/container/path  # Mount host directories or files
-      networks:
-        - project_network  # Connect to the project network
-      depends_on:
-        - some_other_service  # Ensure this service starts after some_other_service
-      restart: always  # Restart policy (no, on-failure, always, unless-stopped)
-      logging:
-        driver: "json-file"  # Logging driver
-        options:
-          max-size: "10m"  # Maximum log file size
-          max-file: "3"  # Maximum number of log files
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8006"]  # Command to check service health
-        interval: 1m  # Time between checks
-        timeout: 10s  # Time before considering the check failed
-        retries: 3  # Number of retries before marking the service as unhealthy
-      labels:
-        com.example.description: "Project6 Service"  # Custom metadata labels
-      deploy:
-        replicas: 2  # Number of container instances
-        resources:
-          limits:
-            cpus: '0.5'  # CPU limit
-            memory: 512M  # Memory limit
-          reservations:
-            cpus: '0.25'  # CPU reservation
-            memory: 256M  # Memory reservation
-        restart_policy:
-          condition: on-failure  # Restart policy condition
-          delay: 5s  # Delay before restarting
-          max_attempts: 3  # Maximum number of restart attempts
-          window: 120s  # Time window for restart attempts
-        placement:
-          constraints:
-            - node.role == manager  # Placement constraints
-        update_config:
-          parallelism: 2  # Number of containers to update at a time
-          delay: 10s  # Delay between updates
-          order: start-first  # Update order
-        rollback_config:
-          parallelism: 2  # Number of containers to rollback at a time
-          delay: 10s  # Delay between rollbacks
-      extra_hosts:
-        - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
-      dns:
-        - 8.8.8.8  # Custom DNS servers
-        - 8.8.4.4
-      dns_search:
-        - example.com  # Custom DNS search domains
-      ulimits:
-        nproc: 65535  # Set ulimits for the container
-        nofile:
-          soft: 20000
-          hard: 40000
-      cap_add:
-        - NET_ADMIN  # Add Linux capabilities
-      cap_drop:
-        - MKNOD  # Drop Linux capabilities
-      secrets:
-        - my_secret  # Use Docker secrets
-      configs:
-        - my_config  # Use Docker configs
-
-## ╔═══════════════════════╗
-## ║       Project 7        ║
-## ║     wiki Container     ║
-## ╚═══════════════════════╝
-  project7:
     build:
-      context: /home/app-source/project7  # Build context
+      context: /home/app-source/dashboard  # Build context
       dockerfile: Dockerfile  # Specify an alternate Dockerfile
       args:
         - BUILD_ENV=production  # Build arguments
-    container_name: project7  # Name the container
+    container_name: dashboard  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8007:8007"  # Map port 8007 on the host to port 8007 in the container
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      - DASHBOARD_PORT=8003  # Environment variables
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+    - backend_network  # Connect to the backend network
+    - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -983,12 +728,23 @@ services:
         max-size: "10m"  # Maximum log file size
         max-file: "3"  # Maximum number of log files
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8007"]  # Command to check service health
+      test: ["CMD", "curl", "-f", "http://localhost:8003"]  # Command to check service health
       interval: 1m  # Time between checks
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "Project 7 Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.dashboard.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.dashboard.priority: "10"  # Set the priority of the router
+      traefik.http.routers.dashboard.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.dashboard.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.dashboard.loadbalancer.server.port: "8003"  # Define the port for the load balancer
+      traefik.http.services.dashboard.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.dashboard.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.dashboard.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -1030,9 +786,199 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
+
+## ╔═══════════════════════╗
+## ║       Project 4        ║
+## ║     blog Container     ║
+## ╚═══════════════════════╝
+  blog:
+    build:
+      context: /home/app-source/blog  # Build context
+      dockerfile: Dockerfile  # Specify an alternate Dockerfile
+      args:
+        - BUILD_ENV=production  # Build arguments
+    container_name: blog  # Name the container
+    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
+    environment:
+      - BLOG_PORT=8004  # Environment variables
+    volumes:
+      - /host/path:/container/path  # Mount host directories or files
+    networks:
+    - backend_network  # Connect to the backend network
+    - frontend_network  # Connect to the frontend network
+    depends_on:
+      - some_other_service  # Ensure this service starts after some_other_service
+    restart: always  # Restart policy (no, on-failure, always, unless-stopped)
+    logging:
+      driver: "json-file"  # Logging driver
+      options:
+        max-size: "10m"  # Maximum log file size
+        max-file: "3"  # Maximum number of log files
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004"]  # Command to check service health
+      interval: 1m  # Time between checks
+      timeout: 10s  # Time before considering the check failed
+      retries: 3  # Number of retries before marking the service as unhealthy
+    labels:
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.blog.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.blog.priority: "10"  # Set the priority of the router
+      traefik.http.routers.blog.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.blog.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.blog.loadbalancer.server.port: "8004"  # Define the port for the load balancer
+      traefik.http.services.blog.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.blog.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.blog.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+    deploy:
+      replicas: 2  # Number of container instances
+      resources:
+        limits:
+          cpus: '0.5'  # CPU limit
+          memory: 512M  # Memory limit
+        reservations:
+          cpus: '0.25'  # CPU reservation
+          memory: 256M  # Memory reservation
+      restart_policy:
+        condition: on-failure  # Restart policy condition
+        delay: 5s  # Delay before restarting
+        max_attempts: 3  # Maximum number of restart attempts
+        window: 120s  # Time window for restart attempts
+      placement:
+        constraints:
+          - node.role == manager  # Placement constraints
+      update_config:
+        parallelism: 2  # Number of containers to update at a time
+        delay: 10s  # Delay between updates
+        order: start-first  # Update order
+      rollback_config:
+        parallelism: 2  # Number of containers to rollback at a time
+        delay: 10s  # Delay between rollbacks
+    extra_hosts:
+      - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
+    dns:
+      - 8.8.8.8  # Custom DNS servers
+      - 8.8.4.4
+    dns_search:
+      - example.com  # Custom DNS search domains
+    ulimits:
+      nproc: 65535  # Set ulimits for the container
+      nofile:
+        soft: 20000
+        hard: 40000
+    cap_add:
+      - NET_ADMIN  # Add Linux capabilities
+    cap_drop:
+      - MKNOD  # Drop Linux capabilities
+    secrets:
+      - secret  # Use Docker secrets
+    configs:
+      - config  # Use Docker configs
+
+## ╔═══════════════════════╗
+## ║       Project 5        ║
+## ║   solutions Container  ║
+## ╚═══════════════════════╝
+  solutions:
+    build:
+      context: /home/app-source/solutions  # Build context
+      dockerfile: Dockerfile  # Specify an alternate Dockerfile
+      args:
+        - BUILD_ENV=production  # Build arguments
+    container_name: solutions  # Name the container
+    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
+    environment:
+      - SOLUTIONS_PORT=8005  # Environment variables
+    volumes:
+      - /host/path:/container/path  # Mount host directories or files
+    networks:
+    - backend_network  # Connect to the backend network
+    - frontend_network  # Connect to the frontend network
+    depends_on:
+      - some_other_service  # Ensure this service starts after some_other_service
+    restart: always  # Restart policy (no, on-failure, always, unless-stopped)
+    logging:
+      driver: "json-file"  # Logging driver
+      options:
+        max-size: "10m"  # Maximum log file size
+        max-file: "3"  # Maximum number of log files
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005"]  # Command to check service health
+      interval: 1m  # Time between checks
+      timeout: 10s  # Time before considering the check failed
+      retries: 3  # Number of retries before marking the service as unhealthy
+    labels:
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.solutions.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.solutions.priority: "10"  # Set the priority of the router
+      traefik.http.routers.solutions.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.solutions.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.solutions.loadbalancer.server.port: "8005"  # Define the port for the load balancer
+      traefik.http.services.solutions.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.solutions.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.solutions.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
+    deploy:
+      replicas: 2  # Number of container instances
+      resources:
+        limits:
+          cpus: '0.5'  # CPU limit
+          memory: 512M  # Memory limit
+        reservations:
+          cpus: '0.25'  # CPU reservation
+          memory: 256M  # Memory reservation
+      restart_policy:
+        condition: on-failure  # Restart policy condition
+        delay: 5s  # Delay before restarting
+        max_attempts: 3  # Maximum number of restart attempts
+        window: 120s  # Time window for restart attempts
+      placement:
+        constraints:
+          - node.role == manager  # Placement constraints
+      update_config:
+        parallelism: 2  # Number of containers to update at a time
+        delay: 10s  # Delay between updates
+        order: start-first  # Update order
+      rollback_config:
+        parallelism: 2  # Number of containers to rollback at a time
+        delay: 10s  # Delay between rollbacks
+    extra_hosts:
+      - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
+    dns:
+      - 8.8.8.8  # Custom DNS servers
+      - 8.8.4.4
+    dns_search:
+      - example.com  # Custom DNS search domains
+    ulimits:
+      nproc: 65535  # Set ulimits for the container
+      nofile:
+        soft: 20000
+        hard: 40000
+    cap_add:
+      - NET_ADMIN  # Add Linux capabilities
+    cap_drop:
+      - MKNOD  # Drop Linux capabilities
+    secrets:
+      - secret  # Use Docker secrets
+    configs:
+      - config  # Use Docker configs
+
+## ╔═══════════════════════╗
+## ║       Project 6        ║
+## ║     ??? Container      ║
+## ╚═══════════════════════╝
+
+## ╔═══════════════════════╗
+## ║       Project 7        ║
+## ║     ??? Container      ║
+## ╚═══════════════════════╝
 
 ## ╔═══════════════════════╗
 ## ║       Project 8        ║
@@ -1046,16 +992,14 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: ime-agent  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8010:8010"  # Map port 8010 on the host to port 8010 in the container
     environment:
       - MODEL_PATH=/home/app-source/ime-agent/models/ime_model  # Environment variables
-      - ENV_VAR1=value1
-      - ENV_VAR2=value2
+      - IME_AGENT_PORT=8008
     volumes:
       - ime_model_data:/home/app-source/ime-agent/models  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -1065,12 +1009,23 @@ services:
         max-size: "10m"  # Maximum log file size
         max-file: "3"  # Maximum number of log files
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8010"]  # Command to check service health
+      test: ["CMD", "curl", "-f", "http://localhost:8008"]  # Command to check service health
       interval: 1m  # Time between checks
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "IME Agent Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.ime-agent.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.ime-agent.priority: "10"  # Set the priority of the router
+      traefik.http.routers.ime-agent.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.ime-agent.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.ime-agent.loadbalancer.server.port: "8008"  # Define the port for the load balancer
+      traefik.http.services.ime-agent.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.ime-agent.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.ime-agent.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -1112,9 +1067,9 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║       Project 9        ║
@@ -1128,15 +1083,13 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: wiki  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8009:8009"  # Map port 8009 on the host to port 8009 in the container
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      - WIKI_PORT=8009  # Environment variables
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -1151,7 +1104,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "Wiki Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.wiki.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.wiki.priority: "10"  # Set the priority of the router
+      traefik.http.routers.wiki.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.services.wiki.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.wiki.loadbalancer.server.port: "8009"  # Define the port for the load balancer
+      traefik.http.services.wiki.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.wiki.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.wiki.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -1193,90 +1157,14 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
+      - config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║       Project 10       ║
-## ║     ??? Container      ║
+## ║    sample Container    ║
 ## ╚═══════════════════════╝
-  project10:
-    build:
-      context: /home/app-source/project10  # Build context
-      dockerfile: Dockerfile  # Specify an alternate Dockerfile
-      args:
-        - BUILD_ENV=production  # Build arguments
-    container_name: project10  # Name the container
-    command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8010:8010"  # Map port 8010 on the host to port 8010 in the container
-    environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
-    volumes:
-      - /host/path:/container/path  # Mount host directories or files
-    networks:
-      - project_network  # Connect to the project network
-    depends_on:
-      - some_other_service  # Ensure this service starts after some_other_service
-    restart: always  # Restart policy (no, on-failure, always, unless-stopped)
-    logging:
-      driver: "json-file"  # Logging driver
-      options:
-        max-size: "10m"  # Maximum log file size
-        max-file: "3"  # Maximum number of log files
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8010"]  # Command to check service health
-      interval: 1m  # Time between checks
-      timeout: 10s  # Time before considering the check failed
-      retries: 3  # Number of retries before marking the service as unhealthy
-    labels:
-      com.example.description: "Project 10 Service"  # Custom metadata labels
-    deploy:
-      replicas: 2  # Number of container instances
-      resources:
-        limits:
-          cpus: '0.5'  # CPU limit
-          memory: 512M  # Memory limit
-        reservations:
-          cpus: '0.25'  # CPU reservation
-          memory: 256M  # Memory reservation
-      restart_policy:
-        condition: on-failure  # Restart policy condition
-        delay: 5s  # Delay before restarting
-        max_attempts: 3  # Maximum number of restart attempts
-        window: 120s  # Time window for restart attempts
-      placement:
-        constraints:
-          - node.role == manager  # Placement constraints
-      update_config:
-        parallelism: 2  # Number of containers to update at a time
-        delay: 10s  # Delay between updates
-        order: start-first  # Update order
-      rollback_config:
-        parallelism: 2  # Number of containers to rollback at a time
-        delay: 10s  # Delay between rollbacks
-    extra_hosts:
-      - "somehost:162.242.195.82"  # Add entries to container's /etc/hosts file
-    dns:
-      - 8.8.8.8  # Custom DNS servers
-      - 8.8.4.4
-    dns_search:
-      - example.com  # Custom DNS search domains
-    ulimits:
-      nproc: 65535  # Set ulimits for the container
-      nofile:
-        soft: 20000
-        hard: 40000
-    cap_add:
-      - NET_ADMIN  # Add Linux capabilities
-    cap_drop:
-      - MKNOD  # Drop Linux capabilities
-    secrets:
-      - my_secret  # Use Docker secrets
-    configs:
-      - my_config  # Use Docker configs
 
 ## ╔═══════════════════════╗
 ## ║      Project 11        ║
@@ -1290,15 +1178,13 @@ services:
         - BUILD_ENV=production  # Build arguments
     container_name: ime-nft  # Name the container
     command: ["your_start_command", "arg1", "arg2"]  # Command to start the service
-    ports:
-      - "8011:8011"  # Map port 8011 on the host to port 8011 in the container
     environment:
-      - ENV_VAR1=value1  # Environment variables
-      - ENV_VAR2=value2
+      - IME_NFT_PORT=8011  # Environment variables
     volumes:
       - /host/path:/container/path  # Mount host directories or files
     networks:
-      - project_network  # Connect to the project network
+      - backend_network  # Connect to the backend network
+      - frontend_network  # Connect to the frontend network
     depends_on:
       - some_other_service  # Ensure this service starts after some_other_service
     restart: always  # Restart policy (no, on-failure, always, unless-stopped)
@@ -1313,7 +1199,18 @@ services:
       timeout: 10s  # Time before considering the check failed
       retries: 3  # Number of retries before marking the service as unhealthy
     labels:
-      com.example.description: "IME NFT Service"  # Custom metadata labels
+      traefik.enable: "true"  # Enable Traefik for this service
+      traefik.http.routers.ime-nft.entrypoints: "web && websecure"  # Define the entry points (e.g., web, websecure)
+      traefik.http.routers.ime-nft.priority: "10"  # Set the priority of the router
+      traefik.http.routers.ime-nft.rule: "Host(`yourdomain.com`) && Path(`/path`)"  # Routing Rules: Host and Path-based routing
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"  # Middleware for redirection to HTTPS
+      traefik.http.middlewares.auth.basicauth.users: "user:password"  # Middleware for basic authentication
+      traefik.http.servicesime-nft.loadbalancer.method: "wrr"  # Load Balancing method (Weighted Round Robin)
+      traefik.http.services.ime-nft.loadbalancer.server.port: "8011"  # Define the port for the load balancer
+      traefik.http.services.ime-nft.loadbalancer.healthcheck.path: "/health"  # Set the health check path for the load balancer
+      traefik.http.routers.ime-nft.tls: "true"  # Enable TLS for the router
+      traefik.http.routers.ime-nft.tls.certresolver: "myresolver"  # Specify the TLS certificate resolver
+      traefik.http.middlewares.custom-headers.headers.customrequestheaders.X-Forwarded-For: "client"  # Add custom headers
     deploy:
       replicas: 2  # Number of container instances
       resources:
@@ -1355,26 +1252,25 @@ services:
     cap_drop:
       - MKNOD  # Drop Linux capabilities
     secrets:
-      - my_secret  # Use Docker secrets
+      - secret  # Use Docker secrets
     configs:
-      - my_config  # Use Docker configs
-
-
-
+      - config  # Use Docker configs
 
 # Define networks
 networks:
-  main_network:
+  backend_network:
     driver: bridge  # Network driver
-  project_network:
+    internal: true
+  frontend_network:
     driver: bridge  # Network driver
+    external: true
 
 secrets:
-  my_secret:
+  secret:
     file: ./secret.txt  # File containing the secret
 
 configs:
-  my_config:
+  config:
     file: ./config.json  # File containing the configuration
 
 # Define volumes
