@@ -502,14 +502,6 @@ trap 'echo "Script interrupted!"; exit 1' SIGINT SIGTERM
 source /home/server-config/config.sh
 
 
-# Function to run containers
-run_containers() {
-    echo "Starting containers..."
-    docker-compose up -d
-    # Add more container management steps
-}
-
-
 ## ╔══════════════════════════════════════════════╗
 ## ║             Decrypt the secrets               ║
 ## ╚══════════════════════════════════════════════╝
