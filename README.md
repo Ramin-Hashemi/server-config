@@ -124,7 +124,9 @@ Test your script in a staging environment before deploying it to production.
 
 ## UML Diagram
 
-!UML uml-diagram
+<div align="center"h1>
+ <img alt="iME" height="300px" src="assets/uml-diagram.drawio.svg"</h1>
+</div>
 
 # Final server directory structure
 
