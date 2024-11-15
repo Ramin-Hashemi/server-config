@@ -1,5 +1,5 @@
 <div align="center"h1>
- <img alt="iME" height="300px" src="assets/ime_logo.png"</h1>
+ <img alt="iME" height="300px" src="img/ime_logo.png"</h1>
 </div>
 
 # iME Server Config Project
@@ -125,7 +125,7 @@ Test your script in a staging environment before deploying it to production.
 ## UML Diagram
 
 <div align="center"h1>
- <img alt="iME" height="300px" src="assets/uml-diagram.drawio.svg"</h1>
+ <img alt="iME" height="300px" src="./uml-diagram.drawio.svg"</h1>
 </div>
 
 # Final server directory structure
