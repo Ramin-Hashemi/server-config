@@ -130,10 +130,6 @@ Test your script in a staging environment before deploying it to production.
  <img alt="iME UML Diagram" src="img/ime-uml-diagram.svg"</h1>
 </div>
 
-<div align="center"h1>
- <img alt="iME UML Diagram" src="img/fish.svg"</h1>
-</div>
-
 # Final server directory structure
 
 /home/nginx-server/
