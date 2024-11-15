@@ -1,11 +1,11 @@
-@startuml
-class User {
-  +String name
-  +String email
-  +login()
-}
-class Admin {
-  +manageUsers()
-}
-User <|-- Admin
-@enduml
+gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit
