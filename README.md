@@ -124,7 +124,7 @@ Test your script in a staging environment before deploying it to production.
 
 ## UML Diagram
 
-!UML Diagram
+!UML uml-diagram
 
 # Final server directory structure
 
