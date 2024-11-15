@@ -122,6 +122,10 @@ Test your script in a staging environment before deploying it to production.
 - Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL.
   <https://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/>
 
+## UML Diagram
+
+!UML Diagram
+
 # Final server directory structure
 
 /home/nginx-server/
