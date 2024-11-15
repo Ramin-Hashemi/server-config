@@ -124,8 +124,10 @@ Test your script in a staging environment before deploying it to production.
 
 ## UML Diagram
 
+- Edit uml-diagram.drawio file and then export it as a `.svg` file into this path: <img/ime-uml-diagram.svg>
+
 <div align="center"h1>
- <img alt="iME" height="300px" src="img/ime-uml-diagram.svg"</h1>
+ <img alt="iME UML Diagram" height="300px" width="500px" src="img/ime-uml-diagram.svg"</h1>
 </div>
 
 # Final server directory structure
